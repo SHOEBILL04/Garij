@@ -7,6 +7,8 @@ public interface IServiceJobService
 {
     Task<IEnumerable<ServiceJobDto>> GetAllServiceJobsAsync();
 
+    Task<IEnumerable<ServiceJobDto>> GetServiceJobsByStatusAsync(JobStatus status);
+
     Task<ServiceJobDto?> GetServiceJobByIdAsync(int id);
 
     Task<ServiceJobDto?> GetServiceJobByBookingReferenceAsync(string bookingReference);

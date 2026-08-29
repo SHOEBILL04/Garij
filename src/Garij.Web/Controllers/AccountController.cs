@@ -1,4 +1,5 @@
 using Garij.Domain.Entities;
+using Garij.Domain.Enums;
 using Garij.Infrastructure.Persistence;
 using Garij.Web.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -87,7 +88,12 @@ public class AccountController : Controller
         var result = await _userManager.CreateAsync(user, model.Password);
         if (result.Succeeded)
         {
-            await _userManager.AddToRoleAsync(user, model.Role.ToString());
+            // Public self-registration is never trusted with role selection - every
+            // self-registered account starts as FrontDesk. Promoting to Admin or
+            // Mechanic is an administrative action, not something the registrant chooses.
+            const UserRole selfRegisteredRole = UserRole.FrontDesk;
+
+            await _userManager.AddToRoleAsync(user, selfRegisteredRole.ToString());
 
             _context.StaffUsers.Add(new User
             {
@@ -95,7 +101,7 @@ public class AccountController : Controller
                 FullName = model.FullName,
                 Email = model.Email,
                 PhoneNumber = model.PhoneNumber,
-                Role = model.Role,
+                Role = selfRegisteredRole,
                 CreatedAt = DateTime.UtcNow
             });
             await _context.SaveChangesAsync();

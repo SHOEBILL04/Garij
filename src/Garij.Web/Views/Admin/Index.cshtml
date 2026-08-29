@@ -1,5 +1,101 @@
 @{
-    ViewData["Title"] = "Admin";
+    ViewData["Title"] = "Admin Dashboard";
 }
 
-<h1>Admin</h1>
+<div class="p-4 mb-4 rounded-4 text-white bg-dark bg-gradient">
+    <h1 class="fw-bold mb-1"><i class="bi bi-shield-lock me-2"></i>Admin Dashboard</h1>
+    <p class="mb-0 fs-6 text-white-50">
+        Full system oversight: manage staff accounts and roles, and reach every
+        operational module without restriction.
+    </p>
+</div>
+
+<h2 class="h5 text-muted mb-3">Staff Administration</h2>
+<div class="row row-cols-1 row-cols-md-3 g-3 mb-4">
+    <div class="col">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-people me-2"></i>Manage Users</h5>
+                <p class="card-text text-muted">View and manage staff accounts.</p>
+                <a asp-controller="Admin" asp-action="ManageUsers" class="btn btn-outline-dark btn-sm">Open</a>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-person-badge me-2"></i>Manage Roles</h5>
+                <p class="card-text text-muted">Assign Admin, Front Desk, or Mechanic roles to staff.</p>
+                <a asp-controller="Admin" asp-action="ManageRoles" class="btn btn-outline-dark btn-sm">Open</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h2 class="h5 text-muted mb-3">Operations</h2>
+<div class="row row-cols-1 row-cols-md-4 g-3">
+    <div class="col">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-person-lines-fill me-2"></i>Customers</h5>
+                <a asp-controller="Customer" asp-action="Index" class="btn btn-outline-secondary btn-sm">Open</a>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-car-front me-2"></i>Vehicles</h5>
+                <a asp-controller="Vehicle" asp-action="Index" class="btn btn-outline-secondary btn-sm">Open</a>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-wrench-adjustable me-2"></i>Service Jobs</h5>
+                <a asp-controller="ServiceJob" asp-action="Index" class="btn btn-outline-secondary btn-sm">Open</a>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-tools me-2"></i>Mechanics</h5>
+                <a asp-controller="Mechanic" asp-action="Index" class="btn btn-outline-secondary btn-sm">Open</a>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-box-seam me-2"></i>Parts</h5>
+                <a asp-controller="Parts" asp-action="Index" class="btn btn-outline-secondary btn-sm">Open</a>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-receipt me-2"></i>Billing</h5>
+                <a asp-controller="Billing" asp-action="Index" class="btn btn-outline-secondary btn-sm">Open</a>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-bell me-2"></i>Notifications</h5>
+                <a asp-controller="Notification" asp-action="Index" class="btn btn-outline-secondary btn-sm">Open</a>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-graph-up me-2"></i>Reports</h5>
+                <a asp-controller="Report" asp-action="Index" class="btn btn-outline-secondary btn-sm">Open</a>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using Garij.Domain.Enums;
 
 namespace Garij.Web.Models;
 
@@ -27,7 +26,4 @@ public class RegisterViewModel
     [Display(Name = "Confirm Password")]
     [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
     public string ConfirmPassword { get; set; } = string.Empty;
-
-    [Required(ErrorMessage = "Role is required.")]
-    public UserRole Role { get; set; } = UserRole.FrontDesk;
 }

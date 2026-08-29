@@ -1,5 +1,59 @@
+@model CustomerDto
 @{
     ViewData["Title"] = "Customer Details";
+    var vehicles = ViewBag.Vehicles as IEnumerable<VehicleDto> ?? Enumerable.Empty<VehicleDto>();
 }
 
-<h1>Customer Details</h1>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">@Model.FullName</h1>
+    <div>
+        <a asp-controller="Vehicle" asp-action="Create" asp-route-customerId="@Model.Id" class="btn btn-primary">Add Vehicle</a>
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Edit</a>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] is string message)
+{
+    <div class="alert alert-success">@message</div>
+}
+
+<dl class="row">
+    <dt class="col-sm-3">Email</dt>
+    <dd class="col-sm-9">@Model.Email</dd>
+    <dt class="col-sm-3">Phone</dt>
+    <dd class="col-sm-9">@Model.PhoneNumber</dd>
+    <dt class="col-sm-3">Address</dt>
+    <dd class="col-sm-9">@Model.Address</dd>
+</dl>
+
+<h2 class="h5 mt-4">Vehicles</h2>
+<div class="table-responsive">
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th>Plate</th>
+                <th>Vehicle</th>
+                <th>Color</th>
+                <th class="text-end">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var vehicle in vehicles)
+        {
+            <tr>
+                <td>@vehicle.LicensePlateNumber</td>
+                <td>@vehicle.Year @vehicle.Make @vehicle.Model</td>
+                <td>@vehicle.Color</td>
+                <td class="text-end">
+                    <a asp-controller="Vehicle" asp-action="Details" asp-route-id="@vehicle.Id" class="btn btn-sm btn-outline-primary">Details</a>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+
+@if (!vehicles.Any())
+{
+    <div class="alert alert-info">This customer does not have any vehicles yet.</div>
+}

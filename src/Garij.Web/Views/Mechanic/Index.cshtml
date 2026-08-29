@@ -1,5 +1,59 @@
+@model IEnumerable<Garij.Domain.Entities.User>
+
 @{
-    ViewData["Title"] = "Mechanic Assignments";
+    ViewData["Title"] = "Mechanic Roster";
 }
 
-<h1>Mechanic Assignments</h1>
+<div class="container-fluid px-4 py-3">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0 text-gray-800">Mechanic Staff Roster</h1>
+            <p class="text-muted small mb-0">Overview of available mechanics and lead technicians for job assignments.</p>
+        </div>
+        <a asp-controller="ServiceJob" asp-action="Index" class="btn btn-outline-primary shadow-sm">
+            <i class="bi bi-list-task me-1"></i> View All Service Jobs
+        </a>
+    </div>
+
+    <div class="row g-4">
+        @if (!Model.Any())
+        {
+            <div class="col-12 text-center py-5 text-muted">
+                <i class="bi bi-people fs-1 d-block mb-2"></i>
+                No mechanics found in staff directory.
+            </div>
+        }
+        else
+        {
+            @foreach (var mechanic in Model)
+            {
+                <div class="col-md-6 col-lg-4">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-body p-4">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
+                                    <i class="bi bi-tools fs-5"></i>
+                                </div>
+                                <div>
+                                    <h5 class="card-title mb-0">@mechanic.FullName</h5>
+                                    <span class="badge bg-info text-dark">@mechanic.Role</span>
+                                </div>
+                            </div>
+                            <div class="small text-muted mb-2">
+                                <i class="bi bi-envelope me-2"></i>@mechanic.Email
+                            </div>
+                            <div class="small text-muted mb-3">
+                                <i class="bi bi-telephone me-2"></i>@(string.IsNullOrEmpty(mechanic.PhoneNumber) ? "N/A" : mechanic.PhoneNumber)
+                            </div>
+                            <div class="d-grid mt-3">
+                                <a asp-controller="ServiceJob" asp-action="Index" class="btn btn-outline-secondary btn-sm">
+                                    Assign to Job
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>

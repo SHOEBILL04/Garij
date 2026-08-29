@@ -1,5 +1,66 @@
+@model Garij.Application.DTOs.ServiceJobDto
+@using Garij.Domain.Enums
+
 @{
     ViewData["Title"] = "Create Service Job";
 }
 
-<h1>Create Service Job</h1>
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white py-3">
+                    <h2 class="h5 card-title mb-0"><i class="bi bi-file-earmark-plus me-2"></i>Create New Service Job</h2>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Create" method="post">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="VehicleId" class="form-label fw-bold">Select Vehicle & Customer</label>
+                            <select asp-for="VehicleId" asp-items="ViewBag.Vehicles" class="form-select" id="vehicleSelect">
+                                <option value="">-- Choose Vehicle --</option>
+                            </select>
+                            <span asp-validation-for="VehicleId" class="text-danger small"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="JobType" class="form-label fw-bold">Job Type</label>
+                                <select asp-for="JobType" asp-items="Html.GetEnumSelectList<JobType>()" class="form-select"></select>
+                                <span asp-validation-for="JobType" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Status" class="form-label fw-bold">Initial Status</label>
+                                <select asp-for="Status" asp-items="Html.GetEnumSelectList<JobStatus>()" class="form-select"></select>
+                                <span asp-validation-for="Status" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="BookingReference" class="form-label fw-bold">Booking Reference (Optional)</label>
+                            <input asp-for="BookingReference" class="form-control" placeholder="Leave empty for auto-generated (e.g. GRJ-2026-0001)" />
+                            <div class="form-text">System will generate a unique reference if left blank.</div>
+                            <span asp-validation-for="BookingReference" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="DiagnosticNotes" class="form-label fw-bold">Diagnostic / Customer Notes</label>
+                            <textarea asp-for="DiagnosticNotes" class="form-control" rows="4" placeholder="Describe customer requests or initial diagnostic observations..."></textarea>
+                            <span asp-validation-for="DiagnosticNotes" class="text-danger small"></span>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary px-4"><i class="bi bi-check-circle me-1"></i> Create Job</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -1,5 +1,47 @@
+@model IEnumerable<CustomerDto>
 @{
     ViewData["Title"] = "Customers";
 }
 
-<h1>Customers</h1>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Customers</h1>
+    <a asp-action="Create" class="btn btn-primary">Register Customer</a>
+</div>
+
+@if (TempData["SuccessMessage"] is string message)
+{
+    <div class="alert alert-success">@message</div>
+}
+
+<div class="table-responsive">
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th class="text-end">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var customer in Model)
+        {
+            <tr>
+                <td>@customer.FullName</td>
+                <td>@customer.Email</td>
+                <td>@customer.PhoneNumber</td>
+                <td class="text-end">
+                    <a asp-action="Details" asp-route-id="@customer.Id" class="btn btn-sm btn-outline-primary">Details</a>
+                    <a asp-action="Edit" asp-route-id="@customer.Id" class="btn btn-sm btn-outline-secondary">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@customer.Id" class="btn btn-sm btn-outline-danger">Delete</a>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">No customers have been registered yet.</div>
+}

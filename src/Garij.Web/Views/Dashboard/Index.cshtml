@@ -1,5 +1,70 @@
 @{
-    ViewData["Title"] = "Dashboard";
+    ViewData["Title"] = "Front Desk Dashboard";
 }
 
-<h1>Dashboard</h1>
+<div class="p-4 mb-4 rounded-4 text-white" style="background-color:#0d6efd;">
+    <h1 class="fw-bold mb-1"><i class="bi bi-clipboard-check me-2"></i>Front Desk Dashboard</h1>
+    <p class="mb-0 fs-6">
+        This is the day-to-day workspace for reception staff: register customers and
+        vehicles, open and track service jobs, hand off invoices, and confirm
+        notifications before they go out.
+    </p>
+</div>
+
+<div class="row row-cols-1 row-cols-md-3 g-3">
+    <div class="col">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-person-lines-fill me-2"></i>Customers &amp; Vehicles</h5>
+                <p class="card-text text-muted">Register a customer, add a vehicle, or search by plate number.</p>
+                <a asp-controller="Customer" asp-action="Index" class="btn btn-outline-primary btn-sm">Open Customers</a>
+                <a asp-controller="Vehicle" asp-action="Index" class="btn btn-outline-primary btn-sm">Open Vehicles</a>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-wrench-adjustable me-2"></i>Service Jobs</h5>
+                <p class="card-text text-muted">Open a new job, check status, or review the job list.</p>
+                <a asp-controller="ServiceJob" asp-action="Index" class="btn btn-outline-primary btn-sm">Open Service Jobs</a>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-receipt me-2"></i>Billing</h5>
+                <p class="card-text text-muted">Generate an invoice for a completed job and record payment.</p>
+                <a asp-controller="Billing" asp-action="Index" class="btn btn-outline-primary btn-sm">Open Billing</a>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-box-seam me-2"></i>Parts</h5>
+                <p class="card-text text-muted">Check stock levels before promising a completion date.</p>
+                <a asp-controller="Parts" asp-action="Index" class="btn btn-outline-primary btn-sm">Open Parts</a>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-bell me-2"></i>Notifications</h5>
+                <p class="card-text text-muted">Approve or reject notifications before they are sent to customers.</p>
+                <a asp-controller="Notification" asp-action="Index" class="btn btn-outline-primary btn-sm">Open Notifications</a>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-graph-up me-2"></i>Reports</h5>
+                <p class="card-text text-muted">Revenue, mechanic workload, and low-stock reports.</p>
+                <a asp-controller="Report" asp-action="Index" class="btn btn-outline-primary btn-sm">Open Reports</a>
+            </div>
+        </div>
+    </div>
+</div>

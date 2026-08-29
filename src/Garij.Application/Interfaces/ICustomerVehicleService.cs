@@ -20,6 +20,8 @@ public interface ICustomerVehicleService
 
     Task<VehicleDto?> GetVehicleByLicensePlateAsync(string licensePlateNumber);
 
+    Task<IEnumerable<ServiceHistoryDto>> GetServiceHistoryByVehicleAsync(int vehicleId);
+
     Task<VehicleDto> AddVehicleAsync(VehicleDto vehicle);
 
     Task<VehicleDto> UpdateVehicleAsync(VehicleDto vehicle);

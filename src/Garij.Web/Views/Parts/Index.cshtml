@@ -1,5 +1,49 @@
+@using Garij.Application.DTOs
+@model IEnumerable<PartDto>
+
 @{
     ViewData["Title"] = "Parts Inventory";
 }
 
 <h1>Parts Inventory</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Add Part</a>
+</p>
+
+<table class="table table-striped align-middle">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Part Number</th>
+            <th>Unit Price</th>
+            <th>Quantity In Stock</th>
+            <th>Reorder Level</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var part in Model)
+        {
+            var isLowStock = part.QuantityInStock <= part.ReorderLevel;
+            <tr class="@(isLowStock ? "table-warning" : "")">
+                <td>@part.Name</td>
+                <td>@part.PartNumber</td>
+                <td>@part.UnitPrice.ToString("C")</td>
+                <td>
+                    @part.QuantityInStock
+                    @if (isLowStock)
+                    {
+                        <span class="badge bg-warning text-dark ms-1">Low stock</span>
+                    }
+                </td>
+                <td>@part.ReorderLevel</td>
+                <td class="text-end">
+                    <a asp-action="Details" asp-route-id="@part.Id" class="btn btn-sm btn-outline-secondary">Details</a>
+                    <a asp-action="Edit" asp-route-id="@part.Id" class="btn btn-sm btn-outline-secondary">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@part.Id" class="btn btn-sm btn-outline-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,5 +1,54 @@
+@model VehicleDto
 @{
     ViewData["Title"] = "Edit Vehicle";
 }
 
-<h1>Edit Vehicle</h1>
+<h1 class="h3 mb-3">Edit Vehicle</h1>
+
+<form asp-action="Edit" method="post" class="row g-3">
+    <input asp-for="Id" type="hidden" />
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="col-md-6">
+        <label asp-for="CustomerId" class="form-label"></label>
+        <select asp-for="CustomerId" asp-items="ViewBag.Customers" class="form-select"></select>
+        <span asp-validation-for="CustomerId" class="text-danger"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="LicensePlateNumber" class="form-label"></label>
+        <input asp-for="LicensePlateNumber" class="form-control" />
+        <span asp-validation-for="LicensePlateNumber" class="text-danger"></span>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="Make" class="form-label"></label>
+        <input asp-for="Make" class="form-control" />
+        <span asp-validation-for="Make" class="text-danger"></span>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="Model" class="form-label"></label>
+        <input asp-for="Model" class="form-control" />
+        <span asp-validation-for="Model" class="text-danger"></span>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="Year" class="form-label"></label>
+        <input asp-for="Year" class="form-control" />
+        <span asp-validation-for="Year" class="text-danger"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="Vin" class="form-label"></label>
+        <input asp-for="Vin" class="form-control" />
+        <span asp-validation-for="Vin" class="text-danger"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="Color" class="form-label"></label>
+        <input asp-for="Color" class="form-control" />
+        <span asp-validation-for="Color" class="text-danger"></span>
+    </div>
+    <div class="col-12">
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Cancel</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

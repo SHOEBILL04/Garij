@@ -10,6 +10,8 @@ public class MechanicAssignmentDto
 
     public int UserId { get; set; }
 
+    public string MechanicName { get; set; } = string.Empty;
+
     public RoleInJob RoleInJob { get; set; }
 
     public DateTime AssignedAt { get; set; }

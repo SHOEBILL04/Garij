@@ -1,5 +1,16 @@
 @{
-    ViewData["Title"] = "Check Service Status";
+    ViewData["Title"] = "Service History Lookup";
 }
 
-<h1>Check Service Status</h1>
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <h1 class="h3 mb-3">Search Service History</h1>
+        <form asp-action="Result" method="get" class="card card-body">
+            <label for="plateNumber" class="form-label">License plate number</label>
+            <div class="input-group">
+                <input id="plateNumber" name="plateNumber" class="form-control" required placeholder="BR-002" />
+                <button type="submit" class="btn btn-primary">Search</button>
+            </div>
+        </form>
+    </div>
+</div>

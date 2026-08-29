@@ -1,5 +1,34 @@
+@using Garij.Application.DTOs
+@model PartDto
+
 @{
     ViewData["Title"] = "Part Details";
 }
 
 <h1>Part Details</h1>
+
+<dl class="row">
+    <dt class="col-sm-3">@Html.DisplayNameFor(m => m.Name)</dt>
+    <dd class="col-sm-9">@Model.Name</dd>
+
+    <dt class="col-sm-3">@Html.DisplayNameFor(m => m.PartNumber)</dt>
+    <dd class="col-sm-9">@Model.PartNumber</dd>
+
+    <dt class="col-sm-3">@Html.DisplayNameFor(m => m.UnitPrice)</dt>
+    <dd class="col-sm-9">@Model.UnitPrice.ToString("C")</dd>
+
+    <dt class="col-sm-3">@Html.DisplayNameFor(m => m.QuantityInStock)</dt>
+    <dd class="col-sm-9">
+        @Model.QuantityInStock
+        @if (Model.QuantityInStock <= Model.ReorderLevel)
+        {
+            <span class="badge bg-warning text-dark ms-1">Low stock</span>
+        }
+    </dd>
+
+    <dt class="col-sm-3">@Html.DisplayNameFor(m => m.ReorderLevel)</dt>
+    <dd class="col-sm-9">@Model.ReorderLevel</dd>
+</dl>
+
+<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>
+<a asp-action="Index" class="btn btn-secondary">Back to List</a>

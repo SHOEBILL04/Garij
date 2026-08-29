@@ -2,7 +2,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Garij.Domain\Garij.Domain.csproj" />
-    <ProjectReference Include="..\Garij.Application\Garij.Application.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -213,3 +213,6 @@ appsettings.*.local.json
 *.db-shm
 *.db-wal
 
+# Local bin directory
+.bin/
+

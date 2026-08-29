@@ -1,5 +1,17 @@
+@model VehicleDto
 @{
     ViewData["Title"] = "Delete Vehicle";
 }
 
-<h1>Delete Vehicle</h1>
+<h1 class="h3 mb-3">Delete Vehicle</h1>
+
+<div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+<div class="alert alert-warning">
+    Delete @Model.LicensePlateNumber (@Model.Year @Model.Make @Model.Model)? Vehicles with service history cannot be deleted.
+</div>
+
+<form asp-action="Delete" method="post">
+    <input asp-for="Id" type="hidden" />
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Cancel</a>
+</form>

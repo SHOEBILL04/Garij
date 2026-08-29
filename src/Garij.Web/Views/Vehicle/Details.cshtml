@@ -1,5 +1,63 @@
+@model VehicleDto
 @{
     ViewData["Title"] = "Vehicle Details";
+    var serviceHistory = ViewBag.ServiceHistory as IEnumerable<ServiceHistoryDto> ?? Enumerable.Empty<ServiceHistoryDto>();
 }
 
-<h1>Vehicle Details</h1>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">@Model.LicensePlateNumber</h1>
+    <div>
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Edit</a>
+        <a asp-controller="ServiceJob" asp-action="Create" asp-route-vehicleId="@Model.Id" class="btn btn-primary">Create Job</a>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] is string message)
+{
+    <div class="alert alert-success">@message</div>
+}
+
+<dl class="row">
+    <dt class="col-sm-3">Customer</dt>
+    <dd class="col-sm-9">
+        <a asp-controller="Customer" asp-action="Details" asp-route-id="@Model.CustomerId">@Model.CustomerName</a>
+    </dd>
+    <dt class="col-sm-3">Vehicle</dt>
+    <dd class="col-sm-9">@Model.Year @Model.Make @Model.Model</dd>
+    <dt class="col-sm-3">Color</dt>
+    <dd class="col-sm-9">@Model.Color</dd>
+    <dt class="col-sm-3">VIN</dt>
+    <dd class="col-sm-9">@Model.Vin</dd>
+</dl>
+
+<h2 class="h5 mt-4">Service History</h2>
+<div class="table-responsive">
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th>Booking</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th>Completed</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var job in serviceHistory)
+        {
+            <tr>
+                <td>@job.BookingReference</td>
+                <td>@job.JobType</td>
+                <td><span class="badge bg-secondary">@job.Status</span></td>
+                <td>@job.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</td>
+                <td>@(job.CompletedAt?.ToLocalTime().ToString("dd MMM yyyy") ?? "Pending")</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+
+@if (!serviceHistory.Any())
+{
+    <div class="alert alert-info">No service history has been recorded for this vehicle.</div>
+}
