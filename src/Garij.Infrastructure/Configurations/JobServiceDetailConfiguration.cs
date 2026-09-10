@@ -11,5 +11,11 @@ public class JobServiceDetailConfiguration : IEntityTypeConfiguration<JobService
         builder.HasKey(jsd => jsd.Id);
 
         builder.Property(jsd => jsd.PriceAtBooking).HasColumnType("decimal(18,2)");
+
+        builder.ToTable(t =>
+        {
+            t.HasCheckConstraint("CK_JobServiceDetail_Quantity", "\"Quantity\" > 0");
+            t.HasCheckConstraint("CK_JobServiceDetail_PriceAtBooking", "\"PriceAtBooking\" >= 0");
+        });
     }
 }

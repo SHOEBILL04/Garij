@@ -1,0 +1,234 @@
+@model IEnumerable<Garij.Application.DTOs.PartsConsumptionReportDto>
+@{
+    ViewData["Title"] = "Part Consumption Report";
+
+    var partsList = Model.ToList();
+    var totalQuantity = partsList.Sum(p => p.TotalQuantityUsed);
+    var totalCost = partsList.Sum(p => p.TotalCost);
+    var lowStockCount = partsList.Count(p => p.IsLowStock);
+
+    var topParts = partsList.Take(8).ToList();
+    var labelsJson = System.Text.Json.JsonSerializer.Serialize(topParts.Select(p => p.PartName));
+    var costsJson = System.Text.Json.JsonSerializer.Serialize(topParts.Select(p => p.TotalCost));
+}
+
+<style>
+    @@media print {
+        header, nav, footer, .no-print, .app-btn, .navbar, .brand-title, .theme-toggle {
+            display: none !important;
+        }
+        body {
+            background: #ffffff !important;
+            color: #000000 !important;
+            font-size: 12pt;
+        }
+        .app-card {
+            border: 1px solid #ccc !important;
+            background: #ffffff !important;
+            color: #000000 !important;
+            box-shadow: none !important;
+            break-inside: avoid;
+        }
+        .text-white, .text-light, .text-info, .text-secondary {
+            color: #000000 !important;
+        }
+        table {
+            width: 100% !important;
+            border-collapse: collapse !important;
+        }
+        table, th, td {
+            border: 1px solid #333 !important;
+            color: #000000 !important;
+            padding: 6px !important;
+        }
+        .print-header {
+            display: block !important;
+            margin-bottom: 20px;
+        }
+    }
+    .print-header {
+        display: none;
+    }
+</style>
+
+<div class="print-header">
+    <h2>Garij Workshop — Part Consumption Report</h2>
+    <p>Generated: @DateTime.UtcNow.ToString("g") UTC</p>
+</div>
+
+<div class="app-page-header no-print">
+    <div>
+        <h1 class="app-page-title">Part Consumption Report</h1>
+        <p class="app-page-subtitle">Inventory usage volume, spend aggregation, and replenishment alerts.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="Index" class="app-btn app-btn-outline">Back to Reports</a>
+    </div>
+</div>
+
+@await Html.PartialAsync("_DateRangeFilterPartial")
+
+<!-- Domain Note: Approximation disclosure as mandated -->
+<div class="alert alert-info py-2 px-3 mb-4 d-flex align-items-center gap-2 small border border-info border-opacity-25 bg-dark" role="alert">
+    <i class="bi bi-info-circle-fill text-info fs-5 flex-shrink-0"></i>
+    <div>
+        <strong>Date Basis Notice:</strong> Part consumption is filtered by the associated <strong>Service Job Completion Date</strong> (falling back to Job Creation Date if incomplete). Individual part usage timestamps are not recorded by the schema.
+    </div>
+</div>
+
+<!-- Summary KPI Cards -->
+<div class="row row-cols-1 row-cols-sm-3 g-3 mb-4">
+    <div class="col">
+        <div class="app-card h-100 p-3">
+            <span class="text-secondary small text-uppercase">Total Quantity Used</span>
+            <h3 class="text-white fw-bold font-monospace mt-1 mb-0">@totalQuantity.ToString("N0")</h3>
+            <span class="small text-muted">Total units installed across jobs</span>
+        </div>
+    </div>
+    <div class="col">
+        <div class="app-card h-100 p-3 border-info border-opacity-25">
+            <span class="text-info small text-uppercase fw-semibold">Total Parts Spend</span>
+            <h3 class="text-info fw-bold font-monospace mt-1 mb-0">$@totalCost.ToString("N2")</h3>
+            <span class="small text-muted">Sum of (Qty &times; Locked Price at Usage)</span>
+        </div>
+    </div>
+    <div class="col">
+        <div class="app-card h-100 p-3 @(lowStockCount > 0 ? "border-warning border-opacity-50" : "")">
+            <span class="text-warning small text-uppercase fw-semibold">Low Stock Threshold</span>
+            <h3 class="text-warning fw-bold font-monospace mt-1 mb-0">@lowStockCount</h3>
+            <span class="small text-muted">Consumed parts at or below reorder level</span>
+        </div>
+    </div>
+</div>
+
+<!-- Chart Section -->
+@if (topParts.Count > 0)
+{
+    <div class="app-card mb-4 no-print">
+        <h5 class="text-white fw-bold mb-3"><i class="bi bi-graph-up me-2 text-info"></i>Top Consumed Parts by Spend</h5>
+        <div style="max-height: 280px; position: relative;">
+            <canvas id="partsCostChart"></canvas>
+        </div>
+    </div>
+}
+
+<!-- Ranked Table -->
+<div class="app-card">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="text-white fw-bold mb-0">Consumed Parts (Ranked by Total Cost)</h5>
+        <span class="badge bg-secondary bg-opacity-25 text-light">@partsList.Count Part(s)</span>
+    </div>
+
+    @if (partsList.Count == 0)
+    {
+        <div class="app-empty-state py-5">
+            <i class="bi bi-box-seam fs-1 text-secondary mb-2"></i>
+            <div class="fw-semibold">No parts consumed in selected date range.</div>
+            <div class="small text-secondary mt-1">Adjust dates above or ensure completed jobs have logged parts.</div>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-dark table-hover align-middle mb-0">
+                <thead>
+                    <tr class="text-secondary small text-uppercase border-secondary">
+                        <th>#</th>
+                        <th>Part Details</th>
+                        <th>Part Number</th>
+                        <th class="text-center">Units Used</th>
+                        <th class="text-end text-info">Total Cost</th>
+                        <th class="text-center">In Stock</th>
+                        <th class="text-center">Reorder Level</th>
+                        <th class="text-center">Stock Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < partsList.Count; i++)
+                    {
+                        var p = partsList[i];
+                        <tr>
+                            <td class="text-secondary font-monospace">@(i + 1)</td>
+                            <td>
+                                <div class="fw-semibold text-white">@p.PartName</div>
+                            </td>
+                            <td class="font-monospace text-secondary small">@p.PartNumber</td>
+                            <td class="text-center font-monospace fw-bold">@p.TotalQuantityUsed</td>
+                            <td class="text-end font-monospace text-info fw-semibold">$@p.TotalCost.ToString("N2")</td>
+                            <td class="text-center font-monospace">@p.CurrentStock</td>
+                            <td class="text-center font-monospace text-secondary">@p.ReorderLevel</td>
+                            <td class="text-center">
+                                @if (p.IsLowStock)
+                                {
+                                    <span class="badge bg-danger bg-opacity-25 text-danger border border-danger border-opacity-50">
+                                        <i class="bi bi-exclamation-triangle-fill me-1"></i>Reorder
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-50">
+                                        Adequate
+                                    </span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr class="fw-bold text-white border-top border-secondary">
+                        <td colspan="3">TOTAL</td>
+                        <td class="text-center font-monospace">@totalQuantity</td>
+                        <td class="text-end font-monospace text-info">$@totalCost.ToString("N2")</td>
+                        <td colspan="3"></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const ctx = document.getElementById('partsCostChart');
+            if (!ctx) return;
+
+            const labels = @Html.Raw(labelsJson);
+            const costs = @Html.Raw(costsJson);
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Total Cost ($)',
+                        data: costs,
+                        backgroundColor: 'rgba(6, 182, 212, 0.65)',
+                        borderColor: 'rgb(6, 182, 212)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(255, 255, 255, 0.08)' },
+                            ticks: { color: '#94a3b8' }
+                        },
+                        y: {
+                            grid: { display: false },
+                            ticks: { color: '#f8fafc' }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        });
+    </script>
+}

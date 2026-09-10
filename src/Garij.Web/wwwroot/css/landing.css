@@ -1,0 +1,2742 @@
+/* ==========================================================================
+   GARIJ - High-Performance Automotive Landing Page Styles
+   Typography: Montserrat (Regular 400, Italic 400i, SemiBold 600, Bold 700/800)
+   Design: Top-Tier Automotive Luxury, Glowing Rounded Buttons, Smooth Animations
+   ========================================================================== */
+
+/* 1. Google Fonts Import (Montserrat Full Weight Spectrum) */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+/* 2. Local Font-Face Fallback Support */
+@font-face {
+    font-family: 'Montserrat';
+    src: local('Montserrat Regular'), url('../fonts/Montserrat-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Montserrat';
+    src: local('Montserrat Italic'), url('../fonts/Montserrat-Italic.ttf') format('truetype');
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Montserrat';
+    src: local('Montserrat SemiBold'), url('../fonts/Montserrat-SemiBold.ttf') format('truetype');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Montserrat';
+    src: local('Montserrat Bold'), url('../fonts/Montserrat-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* 2b. Ethnocentric Automotive Font */
+@font-face {
+    font-family: 'Ethnocentric';
+    src: url('../fonts/Ethnocentric-Regular.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* 3. Global CSS Variables */
+:root {
+    --font-primary: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-heading: 'Ethnocentric', 'Montserrat', sans-serif;
+    --bg-dark-hero: #07090c;
+    --bg-dark-section: #0f1218;
+    --bg-dark-card: #151a23;
+    --bg-dark-card-hover: #1b222e;
+    --bg-navbar: rgba(11, 14, 19, 0.92);
+    --neon-blue: #00a8ff;
+    --neon-cyan: #00d2ff;
+    --neon-blue-glow: rgba(0, 168, 255, 0.45);
+    --neon-cyan-glow: rgba(0, 210, 255, 0.55);
+    --neon-blue-subtle: rgba(0, 168, 255, 0.1);
+    --accent-blue-btn: #0072f5;
+    --accent-blue-hover: #0088ff;
+    --text-pure: #ffffff;
+    --text-light: #f8fafc;
+    --text-muted: #94a3b8;
+    --text-dark-muted: #64748b;
+    --border-dark: rgba(255, 255, 255, 0.08);
+    --border-glow: #00a8ff;
+}
+
+/* Base Reset & Designer-Grade Font Smoothing */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+section[id], div[id^="purchase-"] {
+    scroll-margin-top: 95px;
+}
+
+body.landing-page-body {
+    font-family: var(--font-primary);
+    background-color: var(--bg-dark-hero);
+    color: var(--text-light);
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    letter-spacing: -0.01em;
+}
+
+/* Typography Utility Classes */
+.font-montserrat {
+    font-family: var(--font-primary) !important;
+}
+
+.font-ethnocentric {
+    font-family: 'Ethnocentric', var(--font-primary) !important;
+    letter-spacing: 1.5px;
+}
+
+.font-light {
+    font-weight: 300 !important;
+}
+
+.font-regular {
+    font-weight: 400 !important;
+}
+
+.font-italic {
+    font-style: italic !important;
+}
+
+.font-semibold {
+    font-weight: 600 !important;
+}
+
+.font-bold {
+    font-weight: 700 !important;
+}
+
+.font-extrabold {
+    font-weight: 800 !important;
+}
+
+.letter-spacing-1 {
+    letter-spacing: 1px !important;
+}
+
+.letter-spacing-2 {
+    letter-spacing: 2px !important;
+}
+
+.letter-spacing-3 {
+    letter-spacing: 3px !important;
+}
+
+/* ==========================================================================
+   4. Page Preloader / Loading Animation
+   ========================================================================== */
+#page-preloader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #07090c;
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.6s ease;
+}
+
+    #page-preloader.loaded {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+    }
+
+.preloader-lottie-container {
+    width: 100vw;
+    max-width: 1200px;
+    height: 380px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.preloader-lottie-player {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+    .preloader-lottie-player svg {
+        width: 100% !important;
+        height: 100% !important;
+        max-height: 380px;
+        display: block;
+        margin: 0 auto;
+    }
+
+.preloader-tachometer {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tachometer-dial {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 3px solid rgba(0, 168, 255, 0.15);
+    border-top: 3px solid var(--neon-cyan);
+    border-right: 3px solid var(--neon-blue);
+    box-shadow: 0 0 25px var(--neon-blue-glow);
+    animation: tachometer-spin 1.4s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+}
+
+.tachometer-inner-circle {
+    position: absolute;
+    width: 75%;
+    height: 75%;
+    border-radius: 50%;
+    border: 2px dashed rgba(255, 255, 255, 0.2);
+    animation: tachometer-counter-spin 3s linear infinite;
+}
+
+.tachometer-needle {
+    position: absolute;
+    width: 4px;
+    height: 52px;
+    background: linear-gradient(to top, #00d2ff, #ffffff);
+    border-radius: 4px;
+    box-shadow: 0 0 12px #00d2ff;
+    transform-origin: bottom center;
+    bottom: 50%;
+    animation: rev-needle 1.2s ease-in-out infinite alternate;
+}
+
+.tachometer-center {
+    width: 20px;
+    height: 20px;
+    background: #ffffff;
+    border-radius: 50%;
+    box-shadow: 0 0 15px #00d2ff;
+    z-index: 2;
+}
+
+.preloader-brand {
+    margin-top: 1.25rem;
+    font-family: 'Ethnocentric', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 400;
+    letter-spacing: 5px;
+    color: #ffffff;
+    text-transform: uppercase;
+    text-shadow: 0 0 15px rgba(0, 210, 255, 0.6);
+}
+
+.preloader-text {
+    margin-top: 0.5rem;
+    font-family: var(--font-primary);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 3px;
+    color: var(--neon-cyan);
+    text-transform: uppercase;
+    animation: pulse-glow 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes tachometer-spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes tachometer-counter-spin {
+    0% {
+        transform: rotate(360deg);
+    }
+
+    100% {
+        transform: rotate(0deg);
+    }
+}
+
+@keyframes rev-needle {
+    0% {
+        transform: rotate(-50deg);
+    }
+
+    50% {
+        transform: rotate(60deg);
+    }
+
+    70% {
+        transform: rotate(20deg);
+    }
+
+    100% {
+        transform: rotate(90deg);
+    }
+}
+
+@keyframes pulse-glow {
+    0% {
+        opacity: 0.4;
+    }
+
+    100% {
+        opacity: 1;
+        text-shadow: 0 0 10px var(--neon-cyan);
+    }
+}
+
+/* ==========================================================================
+   5. Hero Section (Automotive Robotic Workshop Template Slider)
+   ========================================================================== */
+.hero-template-section {
+    position: relative;
+    height: 100vh;
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    align-items: flex-start;
+    background: #0d1219 url('../images/hero-factory-bg.jpg') no-repeat center center;
+    background-size: cover;
+    overflow: hidden;
+    padding: 0;
+}
+
+.hero-template-overlay {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 25% 50%, rgba(12, 17, 26, 0.7) 0%, rgba(10, 14, 22, 0.5) 45%, rgba(8, 12, 18, 0.8) 100%), linear-gradient(to bottom, rgba(10, 14, 22, 0.6) 0%, rgba(10, 14, 22, 0.05) 35%, rgba(10, 14, 22, 0.72) 100%);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.hero-content-wrapper {
+    position: relative;
+    z-index: 5;
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2.5rem;
+    padding-top: 22vh;
+}
+
+.hero-slides-container {
+    position: relative;
+    width: 100%;
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+}
+
+.hero-slide-item {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    max-width: 780px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px);
+    transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.5s;
+    pointer-events: none;
+}
+
+    .hero-slide-item.active {
+        position: relative;
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+        pointer-events: auto;
+    }
+
+.hero-slide-kicker {
+    font-family: var(--font-primary);
+    font-size: clamp(0.78rem, 1.2vw, 0.88rem);
+    font-weight: 700;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--neon-cyan);
+    margin-bottom: 0.75rem;
+    display: inline-block;
+    text-shadow: 0 0 12px var(--neon-cyan-glow);
+}
+
+.hero-slide-title {
+    font-family: 'Ethnocentric', var(--font-primary);
+    font-size: clamp(1.8rem, 3.8vw, 3.2rem);
+    font-weight: 400;
+    letter-spacing: 1.5px;
+    line-height: 1.18;
+    color: #ffffff;
+    margin-bottom: 1.25rem;
+    text-transform: uppercase;
+    text-shadow: 0 4px 24px rgba(0, 0, 0, 0.95);
+}
+
+.hero-slide-subtext {
+    font-family: var(--font-primary);
+    font-size: clamp(0.95rem, 1.25vw, 1.15rem);
+    font-weight: 400;
+    line-height: 1.65;
+    color: #94a3b8;
+    max-width: 580px;
+    margin-bottom: 2rem;
+}
+
+.hero-slide-actions {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+}
+
+.btn-hero-book-repair {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.9rem 2.75rem;
+    font-family: var(--font-primary);
+    font-size: 0.88rem;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: #ffffff;
+    background: rgba(15, 23, 42, 0.75);
+    border: 2px solid var(--neon-cyan);
+    border-radius: 9999px;
+    text-decoration: none;
+    box-shadow: 0 0 20px var(--neon-cyan-glow), inset 0 0 12px rgba(0, 210, 255, 0.2);
+    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+    .btn-hero-book-repair::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+        transition: left 0.6s ease;
+    }
+
+    .btn-hero-book-repair:hover {
+        background: var(--neon-cyan);
+        color: #07090c;
+        box-shadow: 0 0 35px rgba(0, 210, 255, 0.9), 0 0 60px rgba(0, 168, 255, 0.45);
+        transform: translateY(-3px);
+    }
+
+        .btn-hero-book-repair:hover::before {
+            left: 100%;
+        }
+
+/* Bottom-Right Slider Navigation Controls */
+.hero-slider-nav {
+    position: absolute;
+    right: 3.5rem;
+    bottom: 6rem;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+}
+
+.hero-slide-indicators {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-right: 0.75rem;
+}
+
+.slide-indicator {
+    width: 28px;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.25);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+    .slide-indicator.active {
+        width: 48px;
+        background: var(--neon-cyan);
+        box-shadow: 0 0 12px var(--neon-cyan-glow);
+    }
+
+.btn-hero-slider {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(15, 23, 42, 0.8);
+    border: 1.5px solid rgba(0, 210, 255, 0.4);
+    color: #ffffff;
+    font-size: 1.25rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(8px);
+}
+
+    .btn-hero-slider:hover {
+        border-color: var(--neon-cyan);
+        background: rgba(0, 210, 255, 0.25);
+        color: var(--neon-cyan);
+        box-shadow: 0 0 20px var(--neon-cyan-glow);
+        transform: scale(1.08);
+    }
+
+@media (max-width: 1200px) {
+    .hero-content-wrapper {
+        padding-top: 20vh;
+    }
+}
+
+@media (max-width: 991px) {
+    .hero-template-section {
+        height: auto;
+        min-height: auto;
+    }
+
+    .hero-content-wrapper {
+        padding: 6rem 1.5rem 4rem;
+    }
+
+    .hero-slides-container {
+        min-height: 260px;
+    }
+
+    .hero-slide-title {
+        font-size: clamp(1.5rem, 5vw, 2.2rem);
+    }
+
+    .hero-slide-subtext {
+        font-size: 0.92rem;
+        max-width: 100%;
+    }
+
+    .hero-slider-nav {
+        right: 1.5rem;
+        bottom: 1.5rem;
+    }
+
+    .hero-slide-item {
+        max-width: 100%;
+    }
+
+    .btn-hero-book-repair {
+        padding: 0.8rem 2rem;
+        font-size: 0.82rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-content-wrapper {
+        padding: 5rem 1.25rem 3rem;
+    }
+
+    .hero-slides-container {
+        min-height: 220px;
+    }
+
+    .hero-slider-nav {
+        position: relative;
+        right: auto;
+        bottom: auto;
+        justify-content: center;
+        margin-top: 1.5rem;
+        gap: 0.5rem;
+    }
+
+    .btn-hero-slider {
+        width: 38px;
+        height: 38px;
+        font-size: 1rem;
+    }
+
+    .hero-slide-indicators {
+        display: none !important;
+    }
+
+    .hero-slide-actions {
+        gap: 0.75rem;
+    }
+}
+
+/* The public navbar keeps its account actions available on tablet widths, where
+   Bootstrap has already collapsed the links. Compact the action group before it
+   can push the final button beyond the viewport. */
+@media (max-width: 1199.98px) {
+    .main-navbar-sticky .container-fluid {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+
+    .landing-nav-actions {
+        flex-shrink: 0;
+        gap: 0.35rem !important;
+    }
+
+        .landing-nav-actions .theme-toggle-text,
+        .landing-nav-actions .btn-nav-glow-login span,
+        .landing-nav-actions .btn-nav-glow-register span,
+        .landing-nav-actions .landing-nav-buy span {
+            display: none !important;
+        }
+
+        .landing-nav-actions .btn-nav-glow-login,
+        .landing-nav-actions .btn-nav-glow-register,
+        .landing-nav-actions .landing-nav-buy {
+            width: 2.5rem;
+            height: 2.5rem;
+            margin: 0;
+            padding: 0 !important;
+            justify-content: center;
+        }
+
+            .landing-nav-actions .btn-nav-glow-login i,
+            .landing-nav-actions .btn-nav-glow-register i {
+                margin: 0 !important;
+            }
+}
+
+@media (max-width: 575.98px) {
+    .landing-nav-actions .landing-nav-buy {
+        display: none !important;
+    }
+
+    .main-navbar-sticky .brand-car-emblem {
+        width: 48px;
+    }
+
+    .main-navbar-sticky .brand-title-text {
+        font-size: 0.9rem !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-content-wrapper {
+        padding: 4.5rem 1rem 2.5rem;
+    }
+
+    .hero-slides-container {
+        min-height: 200px;
+    }
+
+    .hero-slide-title {
+        font-size: clamp(1.25rem, 6vw, 1.8rem);
+    }
+
+    .hero-slide-kicker {
+        font-size: 0.7rem;
+        letter-spacing: 3px;
+    }
+
+    .hero-slide-subtext {
+        font-size: 0.85rem;
+        line-height: 1.55;
+    }
+
+    .btn-hero-book-repair {
+        padding: 0.75rem 1.75rem;
+        font-size: 0.78rem;
+        letter-spacing: 1.5px;
+    }
+}
+
+/* ==========================================================================
+   6. Main Navigation Bar (With Rounded Glowing Hover & Pill Buttons)
+   ========================================================================== */
+.main-navbar-sticky {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: var(--bg-navbar);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(0, 168, 255, 0.2);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+    transition: all 0.3s ease;
+}
+
+/* Keep the original single-row navbar while reducing its action controls
+   enough for the full account button to remain visible. */
+.landing-nav-actions {
+    gap: 0.4rem !important;
+}
+
+    .landing-nav-actions .btn-nav-glow-login,
+    .landing-nav-actions .btn-nav-glow-register,
+    .landing-nav-actions .landing-nav-buy {
+        gap: 0.35rem;
+        margin: 0 0.1rem;
+        padding: 0.45rem 0.85rem !important;
+        font-size: 0.76rem !important;
+    }
+
+    .landing-nav-actions .theme-toggle-btn {
+        gap: 0.35rem;
+        padding: 0.4rem 0.7rem;
+        font-size: 0.76rem;
+    }
+
+.main-navbar-sticky .navbar-brand {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: 2.5px;
+    color: #ffffff !important;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+/* Brand Logo in Navbar & Drawer */
+.brand-emblem-wrap {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1;
+}
+
+.brand-car-emblem {
+    width: 68px;
+    height: 16px;
+    margin-bottom: 2px;
+    filter: drop-shadow(0 0 6px rgba(0, 210, 255, 0.6));
+}
+
+.brand-title-text {
+    font-family: 'Ethnocentric', sans-serif;
+    font-size: 1.35rem;
+    letter-spacing: 2px;
+    color: #ffffff;
+    text-shadow: 0 0 12px rgba(0, 210, 255, 0.5);
+}
+
+.brand-glow-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: var(--neon-cyan);
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--neon-cyan);
+}
+
+/* Nav Item Links with Animated Expanding Underlines & Rounded Hover Highlight */
+.main-navbar-sticky .nav-link {
+    font-family: var(--font-primary);
+    font-size: 0.84rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #cbd5e1 !important;
+    padding: 0.55rem 1.1rem !important;
+    margin: 0 0.2rem;
+    position: relative;
+    border-radius: 9999px; /* Rounded pill hover shape */
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+    .main-navbar-sticky .nav-link::after {
+        content: '';
+        position: absolute;
+        bottom: 4px;
+        left: 20%;
+        width: 60%;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+        box-shadow: 0 0 8px var(--neon-cyan);
+        transform: scaleX(0);
+        transform-origin: center;
+        transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .main-navbar-sticky .nav-link:hover,
+    .main-navbar-sticky .nav-link.active {
+        color: #ffffff !important;
+        text-shadow: 0 0 12px rgba(0, 210, 255, 0.7);
+        background: rgba(0, 168, 255, 0.12);
+    }
+
+        .main-navbar-sticky .nav-link:hover::after,
+        .main-navbar-sticky .nav-link.active::after {
+            transform: scaleX(1);
+        }
+
+/* Status Lookup Pill Button in Navbar */
+.btn-nav-status-pill,
+.btn-nav-glow-lookup {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1.25rem !important;
+    font-family: var(--font-primary);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #cbd5e1 !important;
+    background: rgba(15, 23, 42, 0.75);
+    border: 1px solid rgba(56, 189, 248, 0.35);
+    border-radius: 9999px;
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 0 12px rgba(0, 210, 255, 0.15);
+    white-space: nowrap;
+}
+
+    .btn-nav-status-pill:hover,
+    .btn-nav-glow-lookup:hover {
+        background: rgba(0, 210, 255, 0.18);
+        border-color: var(--neon-cyan);
+        color: #ffffff !important;
+        box-shadow: 0 0 20px rgba(0, 210, 255, 0.5);
+        transform: translateY(-2px);
+    }
+
+    .btn-nav-status-pill i,
+    .btn-nav-glow-lookup i {
+        color: var(--neon-cyan) !important;
+        font-size: 0.95rem;
+    }
+
+/* Sleek Transparent Menu Button matching original mockup */
+.btn-template-menu {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.48rem 1.1rem;
+    font-family: var(--font-primary);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    white-space: nowrap;
+}
+
+    .btn-template-menu:hover {
+        background: rgba(0, 210, 255, 0.15);
+        border-color: var(--neon-cyan);
+        color: var(--neon-cyan);
+        box-shadow: 0 0 18px rgba(0, 210, 255, 0.35);
+    }
+
+.menu-bars-icon {
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    width: 16px;
+}
+
+.bar-line {
+    display: block;
+    width: 100%;
+    height: 2px;
+    background-color: currentColor;
+    border-radius: 2px;
+    transition: all 0.25s ease;
+}
+
+/* Luxury Glassmorphic Offcanvas Navigation Drawer */
+.garij-offcanvas {
+    background: rgba(8, 12, 18, 0.98) !important;
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border-left: 1px solid rgba(0, 210, 255, 0.25) !important;
+    color: var(--text-light) !important;
+    width: 390px !important;
+    max-width: 92vw !important;
+    box-shadow: -15px 0 50px rgba(0, 0, 0, 0.9) !important;
+}
+
+    .garij-offcanvas .offcanvas-header {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+        padding: 1.5rem 1.75rem 1.25rem !important;
+        width: 100% !important;
+    }
+
+.btn-close-offcanvas {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    color: #ffffff;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    margin-left: auto;
+    font-size: 0.95rem;
+    padding: 0;
+    flex-shrink: 0;
+}
+
+    .btn-close-offcanvas:hover {
+        background: rgba(0, 210, 255, 0.2);
+        border-color: var(--neon-cyan);
+        color: var(--neon-cyan);
+        box-shadow: 0 0 16px var(--neon-cyan-glow);
+        transform: rotate(90deg);
+    }
+
+.garij-offcanvas .offcanvas-body {
+    padding: 1.5rem 1.75rem 1.75rem !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+}
+
+/* Offcanvas Navigation Links - Clean, Modern, Strictly No Bullets */
+.offcanvas-nav-list {
+    list-style: none !important;
+    list-style-type: none !important;
+    padding: 0 !important;
+    margin: 0 0 1.75rem 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.4rem !important;
+}
+
+    .offcanvas-nav-list li {
+        list-style: none !important;
+        list-style-type: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+.offcanvas-nav-link {
+    display: flex !important;
+    align-items: center !important;
+    gap: 1.1rem !important;
+    padding: 0.85rem 1.15rem !important;
+    border-radius: 12px !important;
+    color: rgba(255, 255, 255, 0.78) !important;
+    text-decoration: none !important;
+    font-family: var(--font-primary) !important;
+    font-weight: 700 !important;
+    font-size: 0.92rem !important;
+    letter-spacing: 1.2px !important;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    border: 1px solid transparent !important;
+    background: transparent !important;
+}
+
+    .offcanvas-nav-link .link-num {
+        font-family: 'Ethnocentric', var(--font-primary) !important;
+        font-size: 0.72rem !important;
+        color: var(--neon-cyan) !important;
+        opacity: 0.85;
+        letter-spacing: 1px !important;
+        min-width: 26px !important;
+    }
+
+    .offcanvas-nav-link:hover,
+    .offcanvas-nav-link.active {
+        color: #ffffff !important;
+        background: rgba(0, 210, 255, 0.1) !important;
+        border-color: rgba(0, 210, 255, 0.3) !important;
+        transform: translateX(6px) !important;
+        box-shadow: 0 0 20px rgba(0, 210, 255, 0.15) !important;
+    }
+
+        .offcanvas-nav-link.active .link-num {
+            opacity: 1 !important;
+            text-shadow: 0 0 10px var(--neon-cyan);
+        }
+
+/* Offcanvas Appointment Button */
+.garij-offcanvas .btn-nav-appointment {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    padding: 0.95rem 1.5rem !important;
+    border-radius: 12px !important;
+    font-family: var(--font-primary) !important;
+    font-size: 0.88rem !important;
+    font-weight: 800 !important;
+    letter-spacing: 1.5px !important;
+    text-transform: uppercase !important;
+    color: #ffffff !important;
+    background: linear-gradient(135deg, #0072f5, #00a8ff) !important;
+    border: none !important;
+    text-decoration: none !important;
+    box-shadow: 0 0 20px rgba(0, 114, 245, 0.6) !important;
+    transition: all 0.3s ease !important;
+    margin: 0 0 1rem 0 !important;
+}
+
+    .garij-offcanvas .btn-nav-appointment:hover {
+        background: linear-gradient(135deg, #0088ff, #00d2ff) !important;
+        box-shadow: 0 0 30px rgba(0, 136, 255, 0.85) !important;
+        transform: translateY(-2px) !important;
+        color: #ffffff !important;
+    }
+
+/* Offcanvas Footer Contact Info */
+.garij-offcanvas .offcanvas-contact-box {
+    margin-top: 1.5rem !important;
+    padding-top: 1.25rem !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+    .garij-offcanvas .offcanvas-contact-box a {
+        color: var(--neon-cyan) !important;
+        font-size: 0.95rem !important;
+        font-weight: 700 !important;
+        text-decoration: none !important;
+    }
+
+        .garij-offcanvas .offcanvas-contact-box a:hover {
+            color: #ffffff !important;
+            text-shadow: 0 0 10px var(--neon-cyan);
+        }
+
+    .garij-offcanvas .offcanvas-contact-box div {
+        color: rgba(255, 255, 255, 0.75) !important;
+        font-size: 0.82rem !important;
+        line-height: 1.5 !important;
+    }
+
+    .garij-offcanvas .offcanvas-contact-box i {
+        color: var(--neon-cyan) !important;
+    }
+
+.btn-nav-glow-register {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.55rem 1.25rem !important;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #e2e8f0 !important;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1.5px solid rgba(255, 255, 255, 0.25);
+    border-radius: 9999px; /* Rounded pill */
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    margin: 0 0.25rem;
+}
+
+    .btn-nav-glow-register:hover {
+        background: rgba(255, 255, 255, 0.18);
+        border-color: #ffffff;
+        color: #ffffff !important;
+        box-shadow: 0 0 15px rgba(255, 255, 255, 0.45);
+        transform: translateY(-2px);
+    }
+
+.btn-nav-glow-login {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.55rem 1.25rem !important;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #00d2ff !important;
+    background: rgba(0, 210, 255, 0.12);
+    border: 1.5px solid rgba(0, 210, 255, 0.45);
+    border-radius: 9999px; /* Rounded pill */
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    margin: 0 0.25rem;
+    box-shadow: 0 0 12px rgba(0, 210, 255, 0.25);
+}
+
+    .btn-nav-glow-login:hover {
+        background: var(--neon-cyan);
+        border-color: var(--neon-cyan);
+        color: #06080b !important;
+        box-shadow: 0 0 22px var(--neon-cyan);
+        transform: translateY(-2px);
+    }
+
+/* Rounded "Make Appointment" CTA Button */
+.btn-nav-appointment {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.65rem 1.6rem;
+    font-family: var(--font-primary);
+    font-size: 0.82rem;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #ffffff;
+    background: var(--accent-blue-btn);
+    border: none;
+    border-radius: 9999px; /* Rounded pill */
+    text-decoration: none;
+    box-shadow: 0 0 15px rgba(0, 114, 245, 0.55);
+    transition: all 0.3s ease;
+    margin-left: 0.4rem;
+}
+
+    .btn-nav-appointment:hover {
+        background: var(--accent-blue-hover);
+        color: #ffffff;
+        box-shadow: 0 0 25px rgba(0, 136, 255, 0.85);
+        transform: translateY(-2px);
+    }
+
+/* Grouped nav dropdowns (Workshop / Jobs / Clients). Bootstrap's own JS already
+   handles click/tap-to-open plus full keyboard access (Enter/Space/arrows/Escape,
+   aria-expanded) - this only adds a hover reveal for pointer devices and matches
+   the dropdown panel to the dark navbar theme. */
+.main-navbar-sticky .dropdown-menu {
+    background: rgba(15, 23, 42, 0.98);
+    border: 1px solid rgba(0, 168, 255, 0.25);
+    border-radius: 14px;
+    padding: 0.5rem;
+    margin-top: 0.5rem;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 168, 255, 0.1);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}
+
+.main-navbar-sticky .dropdown-item {
+    color: #cbd5e1;
+    font-family: var(--font-primary);
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    border-radius: 9999px;
+    padding: 0.55rem 1rem;
+    transition: all 0.25s ease;
+}
+
+    .main-navbar-sticky .dropdown-item:hover,
+    .main-navbar-sticky .dropdown-item:focus {
+        background: rgba(0, 168, 255, 0.15);
+        color: #ffffff;
+    }
+
+@media (hover: hover) {
+    .main-navbar-sticky .dropdown:hover > .dropdown-menu {
+        display: block;
+    }
+}
+
+/* ==========================================================================
+   7. "YOU NEED RENOVATION?" Section (Matching Demo Layout)
+   ========================================================================== */
+.renovation-section {
+    position: relative;
+    background-color: var(--bg-dark-section);
+    padding: 4.5rem 0 5.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    overflow: hidden;
+}
+
+/* Neon Blue Geometric Corner Brackets */
+.renovation-left-box {
+    position: relative;
+    padding: 2.5rem 2rem;
+    border-left: 3px solid var(--neon-blue);
+    border-top: 3px solid var(--neon-blue);
+    box-shadow: -10px -10px 30px -10px rgba(0, 168, 255, 0.25);
+    margin-bottom: 2rem;
+}
+
+    .renovation-left-box::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 40px;
+        height: 3px;
+        background: var(--neon-blue);
+    }
+
+    .renovation-left-box::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 3px;
+        height: 40px;
+        background: var(--neon-blue);
+    }
+
+.renovation-title {
+    font-family: 'Ethnocentric', var(--font-primary);
+    font-size: clamp(1.6rem, 3.2vw, 2.5rem);
+    font-weight: 400;
+    letter-spacing: 2px;
+    color: var(--neon-cyan);
+    text-transform: uppercase;
+    line-height: 1.25;
+    margin-bottom: 1.25rem;
+}
+
+.renovation-desc {
+    font-size: 0.95rem;
+    line-height: 1.75;
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+    max-width: 500px;
+}
+
+/* Clean Tuned Car Illustration (No Glow) */
+.renovation-car-wrap {
+    position: relative;
+    text-align: center;
+    margin-top: 1rem;
+}
+
+.renovation-car-img {
+    max-width: 100%;
+    height: auto;
+    filter: none;
+    transition: transform 0.4s ease;
+}
+
+.renovation-car-wrap:hover .renovation-car-img {
+    transform: translateY(-4px);
+    filter: none;
+}
+
+/* Feature Item Rows (Right Column) */
+.feature-item-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    padding-left: 1rem;
+}
+
+.feature-item-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+    background: rgba(24, 29, 38, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+    .feature-item-row:hover {
+        background: var(--bg-dark-card-hover);
+        border-color: rgba(0, 168, 255, 0.4);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 168, 255, 0.15);
+        transform: translateX(8px);
+    }
+
+.feature-item-icon {
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    background: var(--accent-blue-btn);
+    box-shadow: 0 0 15px rgba(0, 114, 245, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-size: 1.35rem;
+    transition: transform 0.3s ease;
+}
+
+.feature-item-row:hover .feature-item-icon {
+    transform: scale(1.1) rotate(5deg);
+    background: var(--neon-cyan);
+    color: #06080b;
+    box-shadow: 0 0 20px var(--neon-cyan);
+}
+
+.feature-item-heading {
+    font-size: 1.15rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: #ffffff;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+}
+
+.feature-item-text {
+    font-size: 0.88rem;
+    line-height: 1.65;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+/* ==========================================================================
+   8. Full-Featured Interactive Status Lookup Section (On Landing Page)
+   ========================================================================== */
+.quick-lookup-banner {
+    position: relative;
+    background: linear-gradient(145deg, #0b111a 0%, #060a10 100%);
+    border-top: 1px solid rgba(0, 168, 255, 0.2);
+    border-bottom: 1px solid rgba(0, 168, 255, 0.2);
+    padding: 5rem 0;
+    box-shadow: inset 0 0 60px rgba(0, 168, 255, 0.06);
+}
+
+.quick-lookup-card {
+    background: transparent !important;
+    backdrop-filter: blur(16px);
+    border: 1.5px solid rgba(0, 168, 255, 0.45) !important;
+    border-radius: 16px;
+    padding: 2.5rem;
+    box-shadow: 0 0 30px rgba(0, 168, 255, 0.15);
+}
+
+.quick-lookup-input-group {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.quick-lookup-input {
+    flex: 1;
+    min-width: 260px;
+    background: transparent !important;
+    border: 1.5px solid rgba(0, 168, 255, 0.45) !important;
+    border-radius: 9999px !important; /* Rounded pill input */
+    color: #ffffff !important;
+    font-family: var(--font-primary) !important;
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+    padding: 0.85rem 1.5rem !important;
+    transition: all 0.3s ease !important;
+}
+
+    .quick-lookup-input:focus {
+        border-color: var(--neon-cyan) !important;
+        box-shadow: 0 0 20px rgba(0, 210, 255, 0.55) !important;
+        background: rgba(0, 210, 255, 0.05) !important;
+    }
+
+    .quick-lookup-input::placeholder {
+        color: #64748b !important;
+        font-weight: 400 !important;
+    }
+
+.btn-quick-lookup-submit {
+    padding: 0.85rem 2.2rem;
+    font-family: var(--font-primary);
+    font-size: 0.88rem;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #ffffff;
+    background: var(--accent-blue-btn);
+    border: none;
+    border-radius: 9999px; /* Rounded pill */
+    box-shadow: 0 0 15px rgba(0, 114, 245, 0.55);
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+    .btn-quick-lookup-submit:hover {
+        background: var(--neon-cyan);
+        color: #06080b;
+        box-shadow: 0 0 25px var(--neon-cyan);
+        transform: translateY(-2px);
+    }
+
+    .btn-quick-lookup-submit:disabled {
+        cursor: wait;
+        opacity: 0.82;
+    }
+
+    .btn-quick-lookup-submit.is-loading::before {
+        content: "";
+        width: 0.9rem;
+        height: 0.9rem;
+        border: 2px solid currentColor;
+        border-right-color: transparent;
+        border-radius: 50%;
+        animation: tracker-spin 0.7s linear infinite;
+    }
+
+.quick-lookup-help,
+.quick-lookup-error {
+    font-size: 0.78rem;
+    margin-top: 0.65rem;
+}
+
+.quick-lookup-help {
+    color: var(--text-muted);
+}
+
+.quick-lookup-error {
+    color: #fca5a5;
+    font-weight: 600;
+}
+
+@keyframes tracker-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Status Tracker Result Panels (Inside Landing Section) */
+.tracker-result-shell {
+    margin-top: 2.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: 2.5rem;
+}
+
+.tracker-lookup-message {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.25rem;
+    border-radius: 12px;
+}
+
+.tracker-lookup-message-warning {
+    color: #fbbf24;
+    background: rgba(234, 179, 8, 0.1);
+    border: 1px solid rgba(234, 179, 8, 0.5);
+}
+
+.tracker-status-badge {
+    font-size: 0.82rem;
+    padding: 0.5rem 1rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.tracker-vehicle-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    background: rgba(24, 31, 44, 0.7);
+    border: 1px solid rgba(0, 168, 255, 0.3);
+    border-radius: 12px;
+    padding: 1.5rem 2rem;
+    margin-bottom: 2rem;
+}
+
+.tracker-plate-badge {
+    font-size: clamp(1.4rem, 3vw, 2.2rem);
+    font-weight: 900;
+    letter-spacing: 2px;
+    color: #ffffff;
+    font-family: var(--font-primary);
+    text-transform: uppercase;
+}
+
+.tracker-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.tracker-meta-card {
+    background: rgba(14, 19, 28, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    padding: 1.1rem;
+}
+
+.tracker-meta-label {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.3rem;
+}
+
+.tracker-meta-value {
+    display: block;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+/* Illuminated Horizontal/Vertical Status Timeline */
+.tracker-timeline-wrap {
+    background: rgba(14, 19, 28, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    padding: 2rem 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.tracker-timeline-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1.5rem;
+    position: relative;
+}
+
+.tracker-timeline-item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.tracker-timeline-dot {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #1e293b;
+    border: 2px solid #475569;
+    margin-bottom: 0.8rem;
+    z-index: 2;
+    transition: all 0.3s ease;
+}
+
+.tracker-timeline-item.completed .tracker-timeline-dot {
+    background: #0284c7;
+    border-color: #38bdf8;
+    box-shadow: 0 0 12px rgba(56, 189, 248, 0.6);
+}
+
+.tracker-timeline-item.current .tracker-timeline-dot {
+    background: #22c55e;
+    border-color: #86efac;
+    box-shadow: 0 0 16px rgba(34, 197, 94, 0.8);
+    transform: scale(1.25);
+    animation: pulse-green 1.5s infinite alternate;
+}
+
+.tracker-timeline-name {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #ffffff;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.tracker-timeline-sub {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+}
+
+@keyframes pulse-green {
+    0% {
+        box-shadow: 0 0 8px rgba(34, 197, 94, 0.5);
+    }
+
+    100% {
+        box-shadow: 0 0 20px rgba(34, 197, 94, 0.9);
+    }
+}
+
+/* Service History Item List */
+.tracker-history-table {
+    display: grid;
+    gap: 0.75rem;
+}
+
+.tracker-history-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(14, 19, 28, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    transition: border-color 0.3s ease;
+}
+
+    .tracker-history-row:hover {
+        border-color: rgba(0, 168, 255, 0.4);
+    }
+
+/* ==========================================================================
+   9. Testimonials Section (Matching Demo 3-Column Layout)
+   ========================================================================== */
+.testimonials-section {
+    position: relative;
+    background-color: #090b10;
+    padding: 6.5rem 0 7.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.testimonials-header {
+    text-align: center;
+    margin-bottom: 4.5rem;
+}
+
+.testimonials-badge-img {
+    height: 32px;
+    margin-bottom: 1rem;
+    filter: drop-shadow(0 0 8px rgba(0, 168, 255, 0.5));
+}
+
+.testimonials-title {
+    font-family: 'Ethnocentric', var(--font-primary);
+    font-size: clamp(1.8rem, 3.2vw, 2.5rem);
+    font-weight: 400;
+    letter-spacing: 3px;
+    color: #ffffff;
+    text-transform: uppercase;
+}
+
+.testimonial-card {
+    background: var(--bg-dark-card);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 14px;
+    padding: 2.5rem 2rem;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+}
+
+    .testimonial-card:hover {
+        background: var(--bg-dark-card-hover);
+        border-color: rgba(0, 168, 255, 0.5);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 0 0 25px rgba(0, 168, 255, 0.2);
+        transform: translateY(-8px);
+    }
+
+.testimonial-quote-icon {
+    font-size: 3rem;
+    line-height: 1;
+    color: var(--neon-blue);
+    margin-bottom: 1.25rem;
+    opacity: 0.9;
+    text-shadow: 0 0 15px var(--neon-blue-glow);
+}
+
+.testimonial-quote-text {
+    font-size: 0.92rem;
+    line-height: 1.75;
+    color: var(--text-muted);
+    font-style: italic;
+    margin-bottom: 2rem;
+}
+
+.testimonial-author-box {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: 1.25rem;
+}
+
+.testimonial-author-name {
+    font-size: 0.95rem;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    color: #00d2ff;
+    text-transform: uppercase;
+    margin-bottom: 0.2rem;
+}
+
+.testimonial-author-role {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-dark-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* ==========================================================================
+   10. Automotive Footer
+   ========================================================================== */
+.automotive-footer {
+    background: #06080b;
+    border-top: 1px solid rgba(0, 168, 255, 0.2);
+    padding: 5rem 0 2.5rem;
+    color: var(--text-muted);
+}
+
+.footer-brand-title {
+    font-family: 'Ethnocentric', var(--font-primary);
+    font-size: 1.6rem;
+    font-weight: 400;
+    letter-spacing: 2px;
+    color: #ffffff;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+}
+
+.footer-heading {
+    font-family: 'Ethnocentric', var(--font-primary);
+    font-size: 0.88rem;
+    font-weight: 400;
+    letter-spacing: 1.5px;
+    color: #ffffff;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    position: relative;
+    padding-bottom: 0.5rem;
+}
+
+    .footer-heading::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 35px;
+        height: 2px;
+        background: var(--neon-cyan);
+        box-shadow: 0 0 8px var(--neon-cyan);
+    }
+
+.footer-links-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+    .footer-links-list li {
+        margin-bottom: 0.75rem;
+    }
+
+    .footer-links-list a {
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 0.88rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+        .footer-links-list a:hover {
+            color: var(--neon-cyan);
+            padding-left: 6px;
+            text-shadow: 0 0 10px rgba(0, 210, 255, 0.5);
+        }
+
+.footer-bottom-bar {
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    margin-top: 3.5rem;
+    padding-top: 2rem;
+    font-size: 0.82rem;
+    color: var(--text-dark-muted);
+}
+
+/* ==========================================================================
+   11. Scroll Reveal Animations (IntersectionObserver)
+   ========================================================================== */
+.reveal {
+    opacity: 0;
+    transform: translateY(35px);
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
+}
+
+    .reveal.active {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+.reveal-left {
+    opacity: 0;
+    transform: translateX(-50px);
+    transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
+}
+
+    .reveal-left.active {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+.reveal-right {
+    opacity: 0;
+    transform: translateX(50px);
+    transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
+}
+
+    .reveal-right.active {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+.delay-100 {
+    transition-delay: 0.1s;
+}
+
+.delay-200 {
+    transition-delay: 0.2s;
+}
+
+.delay-300 {
+    transition-delay: 0.3s;
+}
+
+.delay-400 {
+    transition-delay: 0.4s;
+}
+
+/* Responsive Tweaks */
+@media (max-width: 991px) {
+    .hero-slider-dots {
+        display: none;
+    }
+
+    .feature-item-list {
+        padding-left: 0;
+        margin-top: 2rem;
+    }
+
+    .tracker-timeline-list {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .tracker-vehicle-banner {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    /* Navbar responsive */
+    .main-navbar-sticky .navbar-brand {
+        font-size: 1.25rem;
+    }
+
+    .brand-title-text {
+        font-size: 1.1rem;
+    }
+
+    .btn-nav-status-pill {
+        display: none !important;
+    }
+
+    /* Renovation section */
+    .renovation-section {
+        padding: 3rem 0 4rem;
+    }
+
+    .renovation-left-box {
+        padding: 1.5rem;
+    }
+
+    .renovation-title {
+        font-size: clamp(1.3rem, 4vw, 2rem);
+    }
+
+    /* Status tracker */
+    .quick-lookup-banner {
+        padding: 3rem 0;
+    }
+
+    .quick-lookup-card {
+        padding: 1.75rem;
+    }
+
+    .quick-lookup-input-group {
+        flex-direction: column;
+    }
+
+    .quick-lookup-input {
+        min-width: 100% !important;
+    }
+
+    .btn-quick-lookup-submit {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* Testimonials */
+    .testimonials-section {
+        padding: 4rem 0 5rem;
+    }
+
+    /* Footer */
+    .automotive-footer {
+        padding: 3rem 0 2rem;
+    }
+
+    .footer-bottom-bar {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+}
+
+@media (max-width: 768px) {
+    .main-navbar-sticky .container-fluid {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+
+    .btn-template-menu span:first-child {
+        display: none;
+    }
+
+    .btn-nav-glow-login span,
+    .btn-nav-glow-register span {
+        display: none;
+    }
+
+    .btn-nav-glow-login,
+    .btn-nav-glow-register {
+        padding: 0.5rem 0.75rem !important;
+    }
+
+    .renovation-car-img {
+        max-width: 90%;
+    }
+
+    .feature-item-row {
+        padding: 1.15rem;
+        gap: 1rem;
+    }
+
+    .feature-item-heading {
+        font-size: 1rem;
+    }
+
+    .tracker-meta-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .testimonials-header {
+        margin-bottom: 2.5rem;
+    }
+
+    .testimonials-title {
+        font-size: clamp(1.4rem, 5vw, 2rem);
+    }
+}
+
+@media (max-width: 480px) {
+    .main-navbar-sticky {
+        padding: 0.5rem 0 !important;
+    }
+
+    .brand-car-emblem {
+        width: 48px;
+        height: 12px;
+    }
+
+    .brand-title-text {
+        font-size: 0.95rem;
+    }
+
+    .renovation-section {
+        padding: 2rem 0 3rem;
+    }
+
+    .renovation-left-box {
+        padding: 1.25rem 1rem;
+    }
+
+    .feature-item-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.1rem;
+    }
+
+    .quick-lookup-card {
+        padding: 1.25rem;
+        border-radius: 12px;
+    }
+
+    .testimonial-card {
+        padding: 1.75rem 1.25rem;
+    }
+
+    .tracker-meta-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .tracker-vehicle-banner {
+        padding: 1rem;
+    }
+
+    .tracker-plate-badge {
+        font-size: 1.2rem;
+    }
+
+    .garij-offcanvas {
+        width: 100vw !important;
+    }
+
+    .footer-heading {
+        font-size: 0.8rem;
+    }
+}
+
+/* ==========================================================================
+   THEME TOGGLE BUTTON COMPONENT
+   ========================================================================== */
+.theme-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    padding: 0.45rem 0.95rem;
+    border-radius: 9999px;
+    border: 1px solid var(--border-dark);
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-light);
+    font-family: var(--font-primary);
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    backdrop-filter: blur(8px);
+    text-decoration: none;
+    user-select: none;
+    outline: none;
+}
+
+    .theme-toggle-btn:hover {
+        background: rgba(0, 210, 255, 0.15);
+        border-color: var(--neon-cyan);
+        color: #ffffff;
+        box-shadow: 0 0 14px rgba(0, 210, 255, 0.3);
+        transform: translateY(-1px);
+    }
+
+.theme-toggle-icon {
+    font-size: 0.95rem;
+    display: inline-block;
+    transition: transform 0.35s ease;
+}
+
+.theme-toggle-btn:hover .theme-toggle-icon {
+    transform: rotate(25deg) scale(1.15);
+}
+
+/* Utility classes for theme-specific display */
+.light-only {
+    display: none !important;
+}
+
+.light-only-flex {
+    display: none !important;
+}
+
+[data-theme="light"] .light-only {
+    display: block !important;
+}
+
+[data-theme="light"] .light-only-flex {
+    display: flex !important;
+}
+
+[data-theme="light"] .dark-only {
+    display: none !important;
+}
+
+/* Base Subpage & Section Classes (Dark Mode Default) */
+.landing-subpage-container {
+    background: linear-gradient(180deg, #07090e 0%, #0d111a 100%);
+    min-height: 80vh;
+}
+
+.services-home-section {
+    background-color: #0b0d12;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.pricing-home-section {
+    background-color: #07090e;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.pricing-showcase-card,
+.pricing-main-card,
+.subpage-callout-card {
+    background: linear-gradient(145deg, #11151f 0%, #0d1017 100%);
+}
+
+@media (max-width: 991.98px) {
+    #landingNavbarNav {
+        background: rgba(11, 14, 19, 0.98);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-radius: 16px;
+        padding: 1.25rem;
+        margin-top: 0.75rem;
+        border: 1px solid rgba(0, 168, 255, 0.2);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+    }
+
+        #landingNavbarNav .nav-link {
+            padding: 0.65rem 1rem !important;
+            font-size: 0.9rem;
+        }
+}
+
+/* ==========================================================================
+   LIGHT MODE DESIGN SYSTEM — MINIMAL, ELEGANT, BRIGHT THEME COLORS
+   Zero images, clean crisp white and porcelain surfaces, energetic cyan & blue
+   ========================================================================== */
+:root[data-theme="light"],
+[data-theme="light"] {
+    color-scheme: light;
+    --bg-dark-hero: #edf2f7;
+    --bg-dark-section: #e2e8f0;
+    --bg-dark-card: #ffffff;
+    --bg-dark-card-hover: #ffffff;
+    --bg-navbar: rgba(255, 255, 255, 0.96);
+    --neon-blue: #0284c7;
+    --neon-cyan: #00b4d8;
+    --neon-blue-glow: rgba(2, 132, 199, 0.2);
+    --neon-cyan-glow: rgba(0, 180, 216, 0.25);
+    --neon-blue-subtle: rgba(2, 132, 199, 0.08);
+    --accent-blue-btn: #0284c7;
+    --accent-blue-hover: #0369a1;
+    --text-pure: #0f172a;
+    --text-light: #1e293b;
+    --text-muted: #475569;
+    --text-dark-muted: #64748b;
+    --border-dark: #cbd5e1;
+    --border-glow: #0284c7;
+}
+
+    /* 1. Complete image-free mandate in Light Mode */
+    [data-theme="light"] img:not(.brand-logo-keep) {
+        display: none !important;
+    }
+
+    [data-theme="light"] .theme-img,
+    [data-theme="light"] .renovation-car-wrap,
+    [data-theme="light"] .testimonials-badge-img {
+        display: none !important;
+    }
+
+    /* 2. Body & Global Colors in Light Mode */
+    [data-theme="light"] body.landing-page-body {
+        background-color: #edf2f7 !important;
+        color: #1e293b !important;
+    }
+
+    [data-theme="light"] .theme-toggle-btn {
+        background: #ffffff !important;
+        border: 1.5px solid #cbd5e1 !important;
+        color: #0f172a !important;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04) !important;
+    }
+
+        [data-theme="light"] .theme-toggle-btn:hover {
+            background: rgba(2, 132, 199, 0.08) !important;
+            border-color: #0284c7 !important;
+            color: #0284c7 !important;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.15) !important;
+        }
+
+    /* 3. Sticky Navbar in Light Mode */
+    [data-theme="light"] .main-navbar-sticky {
+        background: rgba(255, 255, 255, 0.96) !important;
+        border-bottom: 1px solid #cbd5e1 !important;
+        box-shadow: 0 2px 14px rgba(15, 23, 42, 0.06) !important;
+        backdrop-filter: blur(16px) !important;
+    }
+
+    [data-theme="light"] .navbar-nav .nav-link {
+        color: #334155 !important;
+        font-weight: 600;
+    }
+
+        [data-theme="light"] .navbar-nav .nav-link:hover,
+        [data-theme="light"] .navbar-nav .nav-link.active {
+            color: #0284c7 !important;
+        }
+
+        [data-theme="light"] .navbar-nav .nav-link::after {
+            background: #0284c7 !important;
+        }
+
+    [data-theme="light"] .brand-title-text,
+    [data-theme="light"] .brand-title {
+        color: #0f172a !important;
+        text-shadow: none !important;
+    }
+
+    [data-theme="light"] .brand-car-emblem path:first-child {
+        stroke: #0284c7 !important;
+    }
+
+    [data-theme="light"] .brand-car-emblem path:last-child {
+        stroke: #64748b !important;
+        stroke-opacity: 0.8 !important;
+    }
+
+    [data-theme="light"] .btn-nav-status-pill {
+        background: rgba(2, 132, 199, 0.08) !important;
+        border: 1px solid rgba(2, 132, 199, 0.25) !important;
+        color: #0284c7 !important;
+    }
+
+        [data-theme="light"] .btn-nav-status-pill:hover {
+            background: #0284c7 !important;
+            color: #ffffff !important;
+        }
+
+            [data-theme="light"] .btn-nav-status-pill:hover i {
+                color: #ffffff !important;
+            }
+
+    [data-theme="light"] .btn-nav-glow-login {
+        background: #ffffff !important;
+        border: 1px solid #cbd5e1 !important;
+        color: #0f172a !important;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04) !important;
+    }
+
+        [data-theme="light"] .btn-nav-glow-login:hover {
+            background: #f1f5f9 !important;
+            border-color: #0284c7 !important;
+            color: #0284c7 !important;
+        }
+
+    [data-theme="light"] .btn-nav-glow-register {
+        background: linear-gradient(135deg, #0284c7, #00b4d8) !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 14px rgba(2, 132, 199, 0.3) !important;
+    }
+
+    [data-theme="light"] .btn-template-menu {
+        border-color: #cbd5e1 !important;
+        background: #ffffff !important;
+        color: #0f172a !important;
+    }
+
+        [data-theme="light"] .btn-template-menu .bar-line {
+            background: #0f172a !important;
+        }
+
+    [data-theme="light"] .garij-offcanvas {
+        background: #ffffff !important;
+        border-left: 1px solid #e2e8f0 !important;
+        color: #0f172a !important;
+    }
+
+    [data-theme="light"] .offcanvas-nav-link {
+        color: #0f172a !important;
+    }
+
+        [data-theme="light"] .offcanvas-nav-link:hover {
+            color: #0284c7 !important;
+        }
+
+    [data-theme="light"] .offcanvas-quick-actions {
+        background: #f8fafc !important;
+        border: 1px solid #e2e8f0 !important;
+    }
+
+    /* 4. Hero Section in Light Mode (No factory photo, clean minimal gradient) */
+    [data-theme="light"] .hero-template-section {
+        background: #f8fafc !important;
+        background-image: none !important;
+        border-bottom: 1px solid #e2e8f0 !important;
+    }
+
+    [data-theme="light"] .hero-template-overlay {
+        display: none !important;
+    }
+
+    [data-theme="light"] .hero-slide-title {
+        color: #0f172a !important;
+        text-shadow: none !important;
+    }
+
+    [data-theme="light"] .hero-slide-kicker {
+        color: #0284c7 !important;
+        background: rgba(2, 132, 199, 0.09) !important;
+        border: 1px solid rgba(2, 132, 199, 0.25) !important;
+        box-shadow: none !important;
+    }
+
+    [data-theme="light"] .hero-slide-subtext {
+        color: #475569 !important;
+    }
+
+    [data-theme="light"] .btn-hero-book-repair {
+        background: linear-gradient(135deg, #0284c7, #00b4d8) !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 18px rgba(2, 132, 199, 0.35) !important;
+    }
+
+        [data-theme="light"] .btn-hero-book-repair:hover {
+            box-shadow: 0 6px 24px rgba(2, 132, 199, 0.5) !important;
+        }
+
+    [data-theme="light"] .btn-hero-slider {
+        background: #ffffff !important;
+        border: 1px solid #cbd5e1 !important;
+        color: #0f172a !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+    }
+
+        [data-theme="light"] .btn-hero-slider:hover {
+            background: #0284c7 !important;
+            border-color: #0284c7 !important;
+            color: #ffffff !important;
+        }
+
+    [data-theme="light"] .slide-indicator {
+        background-color: #cbd5e1 !important;
+    }
+
+        [data-theme="light"] .slide-indicator.active {
+            background-color: #0284c7 !important;
+            box-shadow: 0 0 10px rgba(2, 132, 199, 0.5) !important;
+        }
+
+    /* 5. "You Need Renovation?" Section in Light Mode */
+    [data-theme="light"] .renovation-section {
+        background-color: #f8fafc !important;
+        border-top: 1px solid #e2e8f0 !important;
+        border-bottom: 1px solid #e2e8f0 !important;
+    }
+
+    [data-theme="light"] .renovation-left-box {
+        border-color: rgba(2, 132, 199, 0.3) !important;
+        background: #ffffff !important;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04) !important;
+    }
+
+    [data-theme="light"] .renovation-title {
+        color: #0284c7 !important;
+    }
+
+        [data-theme="light"] .renovation-title .text-white {
+            color: #0f172a !important;
+        }
+
+    [data-theme="light"] .renovation-desc {
+        color: #475569 !important;
+    }
+
+    [data-theme="light"] .feature-item-row {
+        background: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03) !important;
+    }
+
+    [data-theme="light"] .feature-item-heading {
+        color: #0f172a !important;
+    }
+
+    [data-theme="light"] .feature-item-text {
+        color: #64748b !important;
+    }
+
+    [data-theme="light"] .feature-item-icon {
+        background: rgba(2, 132, 199, 0.1) !important;
+        color: #0284c7 !important;
+        border: 1px solid rgba(2, 132, 199, 0.25) !important;
+    }
+
+/* Minimal Stats Grid for Renovation section in Light Mode (replaces car image) */
+.renovation-minimal-metrics {
+    display: none;
+}
+
+[data-theme="light"] .renovation-minimal-metrics {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.renovation-metric-tile {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+    padding: 1.25rem;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+    transition: transform 0.25s ease, border-color 0.25s ease;
+}
+
+    .renovation-metric-tile:hover {
+        transform: translateY(-2px);
+        border-color: #0284c7;
+    }
+
+.renovation-metric-num {
+    font-size: 1.85rem;
+    font-weight: 800;
+    color: #0284c7;
+    line-height: 1.1;
+    font-family: var(--font-heading);
+}
+
+.renovation-metric-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 0.35rem;
+}
+
+/* 6. Live Telemetry / Status Tracker in Light Mode */
+[data-theme="light"] .quick-lookup-banner {
+    background-color: #edf2f7 !important;
+}
+
+[data-theme="light"] .quick-lookup-card {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    box-shadow: 0 10px 32px rgba(15, 23, 42, 0.09) !important;
+}
+
+    [data-theme="light"] .quick-lookup-card h3 {
+        color: #0f172a !important;
+    }
+
+    [data-theme="light"] .quick-lookup-card p {
+        color: #475569 !important;
+    }
+
+[data-theme="light"] .quick-lookup-input {
+    background: #ffffff !important;
+    border: 1.5px solid #cbd5e1 !important;
+    color: #0f172a !important;
+}
+
+    [data-theme="light"] .quick-lookup-input::placeholder {
+        color: #475569 !important;
+        opacity: 1 !important;
+        -webkit-text-fill-color: #475569 !important;
+    }
+
+    [data-theme="light"] .quick-lookup-input:focus {
+        background: #ffffff !important;
+        border-color: #0284c7 !important;
+        box-shadow: 0 0 0 0.2rem rgba(2, 132, 199, 0.15) !important;
+    }
+
+[data-theme="light"] .btn-quick-lookup-submit {
+    background: linear-gradient(135deg, #0284c7, #00b4d8) !important;
+    color: #ffffff !important;
+}
+
+[data-theme="light"] .tracker-result-shell {
+    background: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+}
+
+[data-theme="light"] .tracker-vehicle-banner {
+    background: #ffffff !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+}
+
+[data-theme="light"] .tracker-plate-badge {
+    background: rgba(2, 132, 199, 0.1) !important;
+    color: #0284c7 !important;
+    border: 1px solid rgba(2, 132, 199, 0.3) !important;
+}
+
+[data-theme="light"] .tracker-meta-card {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+}
+
+[data-theme="light"] .tracker-meta-label {
+    color: #64748b !important;
+}
+
+[data-theme="light"] .tracker-meta-value {
+    color: #0f172a !important;
+}
+
+[data-theme="light"] .tracker-timeline-wrap {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+}
+
+    [data-theme="light"] .tracker-timeline-wrap h5 {
+        color: #0f172a !important;
+    }
+
+[data-theme="light"] .tracker-timeline-item.completed .tracker-timeline-dot {
+    background: #0284c7 !important;
+    border-color: #0284c7 !important;
+}
+
+[data-theme="light"] .tracker-timeline-item.current .tracker-timeline-dot {
+    border-color: #0284c7 !important;
+    box-shadow: 0 0 10px rgba(2, 132, 199, 0.4) !important;
+}
+
+[data-theme="light"] .tracker-timeline-name {
+    color: #0f172a !important;
+}
+
+[data-theme="light"] .tracker-timeline-sub {
+    color: #64748b !important;
+}
+
+[data-theme="light"] .tracker-history-row {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+}
+
+/* 7. Testimonials, Services & Pricing in Light Mode */
+[data-theme="light"] .testimonials-section {
+    background-color: #edf2f7 !important;
+    border-top: 1px solid #cbd5e1 !important;
+}
+
+[data-theme="light"] .testimonials-title {
+    color: #0f172a !important;
+}
+
+[data-theme="light"] .testimonial-card {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    box-shadow: 0 6px 24px rgba(15, 23, 42, 0.07) !important;
+}
+
+[data-theme="light"] .testimonial-quote-icon {
+    color: #0284c7 !important;
+}
+
+[data-theme="light"] .testimonial-quote-text {
+    color: #334155 !important;
+}
+
+[data-theme="light"] .testimonial-author-name {
+    color: #0f172a !important;
+}
+
+[data-theme="light"] .testimonial-author-role {
+    color: #0284c7 !important;
+}
+
+[data-theme="light"] #services,
+[data-theme="light"] .services-home-section {
+    background-color: #edf2f7 !important;
+    background-image: none !important;
+    border-top: 1px solid #cbd5e1 !important;
+    border-bottom: 1px solid #cbd5e1 !important;
+}
+
+    [data-theme="light"] #services h2,
+    [data-theme="light"] .services-home-section h2 {
+        color: #0f172a !important;
+    }
+
+    [data-theme="light"] #services p,
+    [data-theme="light"] .services-home-section p {
+        color: #475569 !important;
+    }
+
+    [data-theme="light"] #services .rounded-3,
+    [data-theme="light"] .services-home-section .rounded-3 {
+        background: #ffffff !important;
+        border: 1px solid #cbd5e1 !important;
+        box-shadow: 0 4px 18px rgba(15, 23, 42, 0.07) !important;
+    }
+
+        [data-theme="light"] #services .rounded-3 h4,
+        [data-theme="light"] .services-home-section .rounded-3 h4 {
+            color: #0f172a !important;
+        }
+
+        [data-theme="light"] #services .rounded-3 .text-info,
+        [data-theme="light"] .services-home-section .rounded-3 .text-info {
+            color: #0284c7 !important;
+        }
+
+[data-theme="light"] #pricing,
+[data-theme="light"] .pricing-home-section {
+    background-color: #e4ecf4 !important;
+    background-image: none !important;
+    border-top: 1px solid #cbd5e1 !important;
+    border-bottom: 1px solid #cbd5e1 !important;
+}
+
+    [data-theme="light"] #pricing h2,
+    [data-theme="light"] .pricing-home-section h2 {
+        color: #0f172a !important;
+    }
+
+    [data-theme="light"] #pricing .rounded-4,
+    [data-theme="light"] .pricing-home-section .rounded-4,
+    [data-theme="light"] .pricing-showcase-card,
+    [data-theme="light"] .pricing-main-card,
+    [data-theme="light"] .subpage-callout-card {
+        background: #ffffff !important;
+        background-image: none !important;
+        border: 2px solid rgba(2, 132, 199, 0.45) !important;
+        box-shadow: 0 16px 42px rgba(15, 23, 42, 0.12) !important;
+    }
+
+        [data-theme="light"] #pricing h3,
+        [data-theme="light"] .pricing-showcase-card h3,
+        [data-theme="light"] .pricing-main-card h3 {
+            color: #0f172a !important;
+            text-shadow: none !important;
+        }
+
+        [data-theme="light"] #pricing ul li,
+        [data-theme="light"] .pricing-showcase-card ul li,
+        [data-theme="light"] .pricing-main-card ul li {
+            color: #334155 !important;
+        }
+
+            [data-theme="light"] #pricing ul li i,
+            [data-theme="light"] .pricing-showcase-card ul li i,
+            [data-theme="light"] .pricing-main-card ul li i {
+                color: #0284c7 !important;
+            }
+
+        [data-theme="light"] #pricing .bg-dark,
+        [data-theme="light"] .pricing-home-section .bg-dark,
+        [data-theme="light"] .pricing-main-card .bg-dark {
+            background: #f1f5f9 !important;
+            border: 1px solid #cbd5e1 !important;
+        }
+
+        [data-theme="light"] #pricing .display-5,
+        [data-theme="light"] .pricing-home-section .display-5,
+        [data-theme="light"] .pricing-main-card .display-5 {
+            color: #0284c7 !important;
+        }
+
+/* Subpage Containers in Light Mode */
+[data-theme="light"] .landing-subpage-container {
+    background: #edf2f7 !important;
+    background-image: none !important;
+}
+
+[data-theme="light"] #landingNavbarNav {
+    background: rgba(255, 255, 255, 0.98);
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 15px 35px rgba(15, 23, 42, 0.09);
+}
+
+/* 8. Automotive Footer & Preloader in Light Mode */
+[data-theme="light"] .automotive-footer {
+    background-color: #e2e8f0 !important;
+    border-top: 1px solid #cbd5e1 !important;
+    color: #475569 !important;
+}
+
+    [data-theme="light"] .automotive-footer strong,
+    [data-theme="light"] .automotive-footer a {
+        color: #0f172a !important;
+    }
+
+[data-theme="light"] #page-preloader {
+    background: #ffffff !important;
+}
+
+/* 9. General Bootstrap Utility Adaptations in Light Mode */
+[data-theme="light"] .bg-dark {
+    background-color: #ffffff !important;
+}
+
+    [data-theme="light"] .bg-dark.bg-opacity-25,
+    [data-theme="light"] .bg-dark.bg-opacity-50,
+    [data-theme="light"] .bg-dark.bg-opacity-75 {
+        background-color: #f8fafc !important;
+    }
+
+[data-theme="light"] .border-secondary,
+[data-theme="light"] .border-secondary.border-opacity-25,
+[data-theme="light"] .border-secondary.border-opacity-30,
+[data-theme="light"] .border-secondary.border-opacity-50 {
+    border-color: #e2e8f0 !important;
+}
+
+[data-theme="light"] .text-white,
+[data-theme="light"] .text-light,
+[data-theme="light"] h1,
+[data-theme="light"] h2,
+[data-theme="light"] h3,
+[data-theme="light"] h4,
+[data-theme="light"] h5,
+[data-theme="light"] h6 {
+    color: #0f172a !important;
+    text-shadow: none !important;
+}
+
+[data-theme="light"] .text-secondary,
+[data-theme="light"] .text-muted,
+[data-theme="light"] .text-white-50,
+[data-theme="light"] p {
+    color: #475569 !important;
+}
+
+[data-theme="light"] .text-info {
+    color: #0284c7 !important;
+}
+
+[data-theme="light"] .form-control.bg-dark,
+[data-theme="light"] .form-select.bg-dark,
+[data-theme="light"] .input-group-text.bg-dark {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    border-color: #cbd5e1 !important;
+}
+
+    [data-theme="light"] .form-control.bg-dark:focus,
+    [data-theme="light"] .form-select.bg-dark:focus {
+        background-color: #ffffff !important;
+        color: #0f172a !important;
+        border-color: #0284c7 !important;
+        box-shadow: 0 0 0 0.2rem rgba(2, 132, 199, 0.15) !important;
+    }
+
+    /* 10. Placeholder Text Contrast in Light Mode */
+    [data-theme="light"] ::placeholder,
+    [data-theme="light"] input::placeholder,
+    [data-theme="light"] textarea::placeholder,
+    [data-theme="light"] .form-control::placeholder,
+    [data-theme="light"] .form-control.bg-dark::placeholder {
+        color: #475569 !important;
+        opacity: 1 !important;
+        -webkit-text-fill-color: #475569 !important;
+    }

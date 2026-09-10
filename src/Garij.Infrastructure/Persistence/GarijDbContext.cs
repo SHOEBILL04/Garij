@@ -41,6 +41,8 @@ public class GarijDbContext : IdentityDbContext<IdentityUser>
 
     public DbSet<Notification> Notifications => Set<Notification>();
 
+    public DbSet<ProjectPurchase> ProjectPurchases => Set<ProjectPurchase>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

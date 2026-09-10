@@ -3,47 +3,96 @@
 
 @{
     ViewData["Title"] = "Parts Inventory";
+    var canManage = User.IsInRole("Admin") || User.IsInRole("FrontDesk");
 }
 
-<h1>Parts Inventory</h1>
+<div class="app-page-header">
+    <div>
+        <h1 class="app-page-title">Parts Inventory</h1>
+        <p class="app-page-subtitle">
+            @(canManage ? "Stock levels, pricing, and reorder thresholds." : "Browse available parts. Use \"Log Parts\" from a job to record what you used.")
+        </p>
+    </div>
+    @if (canManage)
+    {
+        <a asp-action="Create" class="app-btn app-btn-primary"><i class="bi bi-plus-lg"></i> Add New Part</a>
+    }
+</div>
 
-<p>
-    <a asp-action="Create" class="btn btn-primary">Add Part</a>
-</p>
-
-<table class="table table-striped align-middle">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Part Number</th>
-            <th>Unit Price</th>
-            <th>Quantity In Stock</th>
-            <th>Reorder Level</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var part in Model)
-        {
-            var isLowStock = part.QuantityInStock <= part.ReorderLevel;
-            <tr class="@(isLowStock ? "table-warning" : "")">
-                <td>@part.Name</td>
-                <td>@part.PartNumber</td>
-                <td>@part.UnitPrice.ToString("C")</td>
-                <td>
-                    @part.QuantityInStock
-                    @if (isLowStock)
+<div class="app-table-wrap">
+    <div class="table-responsive">
+        <table class="app-table mb-0">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Part Number</th>
+                    <th>Unit Price</th>
+                    <th>Quantity In Stock</th>
+                    <th>Reorder Level</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="6">
+                            <div class="app-empty-state">
+                                <i class="bi bi-box-seam"></i>
+                                No parts in inventory yet.
+                            </div>
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var part in Model)
                     {
-                        <span class="badge bg-warning text-dark ms-1">Low stock</span>
+                        var isLowStock = part.QuantityInStock <= part.ReorderLevel;
+                        <tr class="@(isLowStock ? "row-warning" : "")">
+                            <td class="text-white fw-semibold">@part.Name</td>
+                            <td class="font-monospace">@part.PartNumber</td>
+                            <td>@part.UnitPrice.ToString("C")</td>
+                            <td>
+                                @if (canManage)
+                                {
+                                    <div class="d-flex align-items-center gap-2">
+                                        <form asp-action="AdjustStock" method="post">
+                                            <input type="hidden" name="id" value="@part.Id" />
+                                            <input type="hidden" name="delta" value="-1" />
+                                            <button type="submit" class="app-btn app-btn-outline app-btn-sm" title="Decrease stock by 1" @(part.QuantityInStock <= 0 ? "disabled" : "")>-</button>
+                                        </form>
+                                        <span style="min-width: 2ch; text-align: center;">@part.QuantityInStock</span>
+                                        <form asp-action="AdjustStock" method="post">
+                                            <input type="hidden" name="id" value="@part.Id" />
+                                            <input type="hidden" name="delta" value="1" />
+                                            <button type="submit" class="app-btn app-btn-outline app-btn-sm" title="Increase stock by 1">+</button>
+                                        </form>
+                                    </div>
+                                }
+                                else
+                                {
+                                    @part.QuantityInStock
+                                }
+                                @if (isLowStock)
+                                {
+                                    <span class="app-badge app-badge-warning ms-1">Low stock</span>
+                                }
+                            </td>
+                            <td>@part.ReorderLevel</td>
+                            <td class="text-end">
+                                <div class="d-flex gap-2 justify-content-end flex-wrap">
+                                    <a asp-action="Details" asp-route-id="@part.Id" class="app-btn app-btn-outline app-btn-sm">Details</a>
+                                    @if (canManage)
+                                    {
+                                        <a asp-action="Edit" asp-route-id="@part.Id" class="app-btn app-btn-outline app-btn-sm">Edit</a>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
                     }
-                </td>
-                <td>@part.ReorderLevel</td>
-                <td class="text-end">
-                    <a asp-action="Details" asp-route-id="@part.Id" class="btn btn-sm btn-outline-secondary">Details</a>
-                    <a asp-action="Edit" asp-route-id="@part.Id" class="btn btn-sm btn-outline-secondary">Edit</a>
-                    <a asp-action="Delete" asp-route-id="@part.Id" class="btn btn-sm btn-outline-danger">Delete</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,56 @@
+@model Garij.Application.DTOs.JobPartUsedDto
+@using Garij.Application.DTOs
+
+@{
+    ViewData["Title"] = "Log Parts Used";
+    var job = ViewBag.ServiceJob as ServiceJobDto;
+}
+
+<div class="app-page-header">
+    <div>
+        <h1 class="app-page-title">Log Parts Used</h1>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="app-card">
+            @if (job != null)
+            {
+                <div class="app-card mb-4" style="background: rgba(255,255,255,0.04);">
+                    <div class="fw-bold text-info mb-1">Booking Reference: @job.BookingReference</div>
+                    <div class="small text-white"><strong>Vehicle:</strong> @job.VehiclePlateNumber (@job.VehicleDescription)</div>
+                    <div class="small text-white"><strong>Customer:</strong> @job.CustomerName</div>
+                </div>
+            }
+
+            <form asp-action="LogUsage" method="post">
+                <input type="hidden" asp-for="ServiceJobId" />
+                <div asp-validation-summary="ModelOnly" class="app-alert-danger" role="alert"></div>
+
+                <div class="app-form-group">
+                    <label asp-for="PartId" class="app-form-label">Part</label>
+                    <select asp-for="PartId" asp-items="ViewBag.Parts" class="app-form-select">
+                        <option value="">-- Choose Part --</option>
+                    </select>
+                    <span asp-validation-for="PartId" class="app-field-error"></span>
+                </div>
+
+                <div class="app-form-group">
+                    <label asp-for="QuantityUsed" class="app-form-label">Quantity Used</label>
+                    <input asp-for="QuantityUsed" class="app-form-control" placeholder="e.g. 2" min="1" />
+                    <span asp-validation-for="QuantityUsed" class="app-field-error"></span>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-3">
+                    <a asp-controller="ServiceJob" asp-action="Details" asp-route-id="@Model.ServiceJobId" class="app-btn app-btn-outline">Cancel</a>
+                    <button type="submit" class="app-btn app-btn-primary"><i class="bi bi-check-lg"></i> Log Part Usage</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

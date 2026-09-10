@@ -1,0 +1,75 @@
+@{
+    var currentStart = Context.Request.Query["start"].ToString();
+    var currentEnd = Context.Request.Query["end"].ToString();
+    var action = ViewContext.RouteData.Values["action"]?.ToString() ?? "Index";
+}
+
+<div class="app-card mb-4 no-print border border-secondary border-opacity-25">
+    <form method="get" asp-action="@action" class="row g-3 align-items-end" id="dateFilterForm">
+        <div class="col-sm-6 col-md-3">
+            <label for="filterStartDate" class="app-form-label small text-secondary">From Date</label>
+            <input type="date" class="app-form-control form-control-sm" id="filterStartDate" name="start" value="@currentStart" />
+        </div>
+        <div class="col-sm-6 col-md-3">
+            <label for="filterEndDate" class="app-form-label small text-secondary">To Date</label>
+            <input type="date" class="app-form-control form-control-sm" id="filterEndDate" name="end" value="@currentEnd" />
+        </div>
+        <div class="col-md-6 d-flex align-items-center gap-2 flex-wrap">
+            <button type="submit" class="app-btn app-btn-primary app-btn-sm d-inline-flex align-items-center gap-1">
+                <i class="bi bi-funnel"></i> Apply Filter
+            </button>
+            <a asp-action="@action" class="app-btn app-btn-outline app-btn-sm text-secondary border-secondary">Reset</a>
+            <button type="button" class="app-btn app-btn-outline app-btn-sm text-info border-info ms-auto" onclick="window.print()">
+                <i class="bi bi-printer me-1"></i> Print
+            </button>
+        </div>
+        <div class="col-12 pt-1 border-top border-secondary border-opacity-10 d-flex align-items-center gap-2 flex-wrap">
+            <span class="small text-secondary me-1">Quick Presets:</span>
+            <button type="button" class="badge bg-secondary bg-opacity-25 text-light border-0 py-1 px-2 cursor-pointer" onclick="setPreset('this-month')">This Month</button>
+            <button type="button" class="badge bg-secondary bg-opacity-25 text-light border-0 py-1 px-2 cursor-pointer" onclick="setPreset('last-month')">Last Month</button>
+            <button type="button" class="badge bg-secondary bg-opacity-25 text-light border-0 py-1 px-2 cursor-pointer" onclick="setPreset('last-30')">Last 30 Days</button>
+            <button type="button" class="badge bg-secondary bg-opacity-25 text-light border-0 py-1 px-2 cursor-pointer" onclick="setPreset('ytd')">Year to Date</button>
+            <button type="button" class="badge bg-secondary bg-opacity-25 text-light border-0 py-1 px-2 cursor-pointer" onclick="setPreset('all')">All Time</button>
+        </div>
+    </form>
+</div>
+
+<script>
+function setPreset(preset) {
+    const now = new Date();
+    const startInput = document.getElementById('filterStartDate');
+    const endInput = document.getElementById('filterEndDate');
+    
+    function fmt(d) {
+        const yr = d.getFullYear();
+        const mo = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${yr}-${mo}-${day}`;
+    }
+
+    if (preset === 'this-month') {
+        const first = new Date(now.getFullYear(), now.getMonth(), 1);
+        const last = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+        startInput.value = fmt(first);
+        endInput.value = fmt(last);
+    } else if (preset === 'last-month') {
+        const first = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+        const last = new Date(now.getFullYear(), now.getMonth(), 0);
+        startInput.value = fmt(first);
+        endInput.value = fmt(last);
+    } else if (preset === 'last-30') {
+        const thirtyAgo = new Date();
+        thirtyAgo.setDate(now.getDate() - 30);
+        startInput.value = fmt(thirtyAgo);
+        endInput.value = fmt(now);
+    } else if (preset === 'ytd') {
+        const firstOfYear = new Date(now.getFullYear(), 0, 1);
+        startInput.value = fmt(firstOfYear);
+        endInput.value = fmt(now);
+    } else if (preset === 'all') {
+        startInput.value = '';
+        endInput.value = '';
+    }
+    document.getElementById('dateFilterForm').submit();
+}
+</script>

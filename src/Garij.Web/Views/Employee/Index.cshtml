@@ -1,0 +1,208 @@
+@model IEnumerable<Garij.Domain.Entities.User>
+@using Garij.Domain.Enums
+
+@{
+    ViewData["Title"] = "Workshop Employees";
+    var currentRole = ViewBag.SelectedRole as UserRole?;
+    var search = ViewBag.Search as string;
+    var isAdmin = User.IsInRole("Admin");
+    var isFrontDesk = User.IsInRole("FrontDesk");
+}
+
+<div class="app-page-header d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+    <div>
+        <h1 class="app-page-title d-flex align-items-center gap-2">
+            <i class="bi bi-people-fill text-info"></i> Workshop Employees
+        </h1>
+        <p class="app-page-subtitle mb-0">Overview of all workshop personnel, contact information, operational roles, and assignments.</p>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+        @if (isAdmin || isFrontDesk)
+        {
+            <a asp-controller="ServiceJob" asp-action="AddEmployee" class="app-btn app-btn-primary">
+                <i class="bi bi-person-plus-fill me-1"></i> Add Employee
+            </a>
+        }
+        @if (isAdmin)
+        {
+            <a asp-controller="Admin" asp-action="ManageRoles" class="app-btn app-btn-outline">
+                <i class="bi bi-person-badge me-1"></i> Manage Roles
+            </a>
+        }
+    </div>
+</div>
+
+<!-- Metrics Row -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <a asp-action="Index" class="text-decoration-none">
+            <div class="app-card p-3 text-center h-100 @(currentRole == null && string.IsNullOrEmpty(search) ? "border-info" : "")" style="transition: transform 0.2s;">
+                <div class="text-secondary small text-uppercase fw-semibold mb-1">Total Staff</div>
+                <div class="display-6 fw-bold text-white">@ViewBag.TotalCount</div>
+            </div>
+        </a>
+    </div>
+    <div class="col-6 col-md-3">
+        <a asp-action="Index" asp-route-role="@UserRole.Admin" class="text-decoration-none">
+            <div class="app-card p-3 text-center h-100 @(currentRole == UserRole.Admin ? "border-primary" : "")" style="transition: transform 0.2s;">
+                <div class="text-secondary small text-uppercase fw-semibold mb-1">Administrators</div>
+                <div class="display-6 fw-bold text-primary">@ViewBag.AdminCount</div>
+            </div>
+        </a>
+    </div>
+    <div class="col-6 col-md-3">
+        <a asp-action="Index" asp-route-role="@UserRole.FrontDesk" class="text-decoration-none">
+            <div class="app-card p-3 text-center h-100 @(currentRole == UserRole.FrontDesk ? "border-info" : "")" style="transition: transform 0.2s;">
+                <div class="text-secondary small text-uppercase fw-semibold mb-1">Front Desk</div>
+                <div class="display-6 fw-bold text-info">@ViewBag.FrontDeskCount</div>
+            </div>
+        </a>
+    </div>
+    <div class="col-6 col-md-3">
+        <a asp-action="Index" asp-route-role="@UserRole.Mechanic" class="text-decoration-none">
+            <div class="app-card p-3 text-center h-100 @(currentRole == UserRole.Mechanic ? "border-warning" : "")" style="transition: transform 0.2s;">
+                <div class="text-secondary small text-uppercase fw-semibold mb-1">Mechanics</div>
+                <div class="display-6 fw-bold text-warning">@ViewBag.MechanicCount</div>
+            </div>
+        </a>
+    </div>
+</div>
+
+<!-- Search & Filters -->
+<div class="app-card mb-4 p-3">
+    <form method="get" asp-action="Index" class="row g-2 align-items-center">
+        <div class="col-md-5">
+            <div class="input-group">
+                <span class="input-group-text bg-transparent border-secondary border-opacity-50 text-secondary">
+                    <i class="bi bi-search"></i>
+                </span>
+                <input type="text" name="search" class="form-control app-input" placeholder="Search by name, email, or phone..." value="@search" />
+            </div>
+        </div>
+        <div class="col-md-4">
+            <select name="role" class="form-select app-input">
+                <option value="">All Roles</option>
+                <option value="Admin" selected="@(currentRole == UserRole.Admin ? "selected" : null)">Administrator</option>
+                <option value="FrontDesk" selected="@(currentRole == UserRole.FrontDesk ? "selected" : null)">Front Desk</option>
+                <option value="Mechanic" selected="@(currentRole == UserRole.Mechanic ? "selected" : null)">Mechanic</option>
+            </select>
+        </div>
+        <div class="col-md-3 d-flex gap-2">
+            <button type="submit" class="app-btn app-btn-primary flex-grow-1">
+                Filter
+            </button>
+            @if (!string.IsNullOrEmpty(search) || currentRole.HasValue)
+            {
+                <a asp-action="Index" class="app-btn app-btn-outline" title="Reset Filters">
+                    <i class="bi bi-x-lg"></i>
+                </a>
+            }
+        </div>
+    </form>
+</div>
+
+<!-- Employees Grid -->
+@if (!Model.Any())
+{
+    <div class="app-card py-5 text-center">
+        <i class="bi bi-people display-4 text-secondary mb-3 d-block"></i>
+        <h5 class="text-white">No employees found</h5>
+        <p class="text-secondary small mb-3">No team members match your filter criteria.</p>
+        <a asp-action="Index" class="app-btn app-btn-outline">Clear Filters</a>
+    </div>
+}
+else
+{
+    <div class="row g-4">
+        @foreach (var emp in Model)
+        {
+            var initial = string.IsNullOrWhiteSpace(emp.FullName) ? "?" : emp.FullName.Substring(0, 1).ToUpper();
+            var activeJobsCount = emp.MechanicAssignments.Count(a => a.ServiceJob != null && a.ServiceJob.Status != JobStatus.Completed && a.ServiceJob.Status != JobStatus.Cancelled);
+            var totalJobsCount = emp.MechanicAssignments.Count;
+
+            <div class="col-md-6 col-lg-4">
+                <div class="app-card h-100 d-flex flex-column justify-content-between p-4 position-relative">
+                    <div>
+                        <!-- Header: Avatar + Name + Role -->
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 fw-bold fs-5"
+                                 style="width: 52px; height: 52px; background: rgba(6, 182, 212, 0.15); border: 2px solid @(emp.Role == UserRole.Admin ? "#3b82f6" : (emp.Role == UserRole.FrontDesk ? "#06b6d4" : "#f59e0b")); color: @(emp.Role == UserRole.Admin ? "#60a5fa" : (emp.Role == UserRole.FrontDesk ? "#22d3ee" : "#fbbf24"));">
+                                @initial
+                            </div>
+                            <div class="overflow-hidden">
+                                <h5 class="text-white fw-bold mb-1 text-truncate" title="@emp.FullName">@emp.FullName</h5>
+                                @switch (emp.Role)
+                                {
+                                    case UserRole.Admin:
+                                        <span class="badge bg-primary px-2 py-1"><i class="bi bi-shield-lock me-1"></i>Administrator</span>
+                                        break;
+                                    case UserRole.FrontDesk:
+                                        <span class="badge bg-info text-dark px-2 py-1"><i class="bi bi-clipboard-check me-1"></i>Front Desk</span>
+                                        break;
+                                    case UserRole.Mechanic:
+                                        <span class="badge bg-warning text-dark px-2 py-1"><i class="bi bi-wrench me-1"></i>Certified Mechanic</span>
+                                        break;
+                                    default:
+                                        <span class="badge bg-secondary">@emp.Role</span>
+                                        break;
+                                }
+                            </div>
+                        </div>
+
+                        <!-- Contact Details -->
+                        <div class="border-top border-secondary border-opacity-25 pt-3 mb-3">
+                            <div class="d-flex align-items-center gap-2 mb-2 text-truncate" title="@emp.Email">
+                                <i class="bi bi-envelope text-info flex-shrink-0"></i>
+                                <a href="mailto:@emp.Email" class="text-light text-decoration-none small text-truncate">@emp.Email</a>
+                            </div>
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <i class="bi bi-telephone text-info flex-shrink-0"></i>
+                                <span class="text-secondary small">@(string.IsNullOrWhiteSpace(emp.PhoneNumber) ? "No phone provided" : emp.PhoneNumber)</span>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="bi bi-calendar-event text-secondary flex-shrink-0"></i>
+                                <span class="text-secondary small">Joined @emp.CreatedAt.ToString("MMM dd, yyyy")</span>
+                            </div>
+                        </div>
+
+                        <!-- Role & Workload Highlight -->
+                        <div class="p-2 rounded mb-3" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.06);">
+                            @if (emp.Role == UserRole.Mechanic)
+                            {
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="small text-secondary">Active Assignments:</span>
+                                    <span class="badge @(activeJobsCount > 0 ? "bg-warning text-dark" : "bg-secondary")">@activeJobsCount Active (@totalJobsCount Total)</span>
+                                </div>
+                            }
+                            else if (emp.Role == UserRole.FrontDesk)
+                            {
+                                <div class="small text-secondary">
+                                    <i class="bi bi-check2-circle text-info me-1"></i>Customer Intake, Bookings &amp; Invoicing
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="small text-secondary">
+                                    <i class="bi bi-check2-circle text-primary me-1"></i>Full System &amp; Workshop Oversight
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Action Button -->
+                    <div class="d-flex gap-2 mt-2">
+                        <a asp-action="Details" asp-route-id="@emp.Id" class="app-btn app-btn-outline w-100 text-center">
+                            <i class="bi bi-eye me-1"></i> View Details
+                        </a>
+                        @if (emp.Role == UserRole.Mechanic)
+                        {
+                            <a asp-controller="ServiceJob" asp-action="Index" class="app-btn app-btn-primary flex-shrink-0" title="Assign to a job">
+                                <i class="bi bi-plus-lg"></i>
+                            </a>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

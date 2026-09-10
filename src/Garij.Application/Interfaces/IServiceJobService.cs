@@ -9,6 +9,9 @@ public interface IServiceJobService
 
     Task<IEnumerable<ServiceJobDto>> GetServiceJobsByStatusAsync(JobStatus status);
 
+    Task<IEnumerable<ServiceJobDto>> GetFilteredServiceJobsAsync(JobStatus? status = null, int? mechanicId = null, string? sortBy = null, string? searchTerm = null)
+        => GetAllServiceJobsAsync();
+
     Task<ServiceJobDto?> GetServiceJobByIdAsync(int id);
 
     Task<ServiceJobDto?> GetServiceJobByBookingReferenceAsync(string bookingReference);
@@ -23,7 +26,13 @@ public interface IServiceJobService
 
     Task<MechanicAssignmentDto> AssignMechanicAsync(int serviceJobId, int userId, RoleInJob roleInJob);
 
+    Task<MechanicAssignmentDto> UpdateMechanicAssignmentRoleAsync(int assignmentId, RoleInJob roleInJob);
+
     Task RemoveMechanicAssignmentAsync(int assignmentId);
 
     Task<IEnumerable<MechanicAssignmentDto>> GetAssignmentsByServiceJobAsync(int serviceJobId);
+
+    Task<IEnumerable<ServiceJobDto>> GetJobsByMechanicAsync(int mechanicUserId);
+
+    Task<ServiceJobDto> SaveDiagnosticNotesAsync(int serviceJobId, string notes);
 }

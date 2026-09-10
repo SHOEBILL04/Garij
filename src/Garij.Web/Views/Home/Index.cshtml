@@ -1,0 +1,533 @@
+@model StatusLookupViewModel
+@using Garij.Domain.Enums
+@using Garij.Web.Helpers
+@{
+    Layout = "_LandingLayout";
+    ViewData["Title"] = "Creative & Professional Mechanic Services";
+    
+    var currentJob = Model?.CurrentJob;
+    var vehicle = Model?.Vehicle;
+    var statusOrder = StatusLookupViewModel.TimelineStatuses;
+    var currentIndex = currentJob is null ? -1 : statusOrder.ToList().IndexOf(currentJob.Status);
+    var isCancelled = currentJob?.Status == JobStatus.Cancelled;
+
+}
+
+<!-- ==========================================================================
+     1. HERO SECTION (Matching Automotive Robotic Factory Template)
+     ========================================================================== -->
+<section id="hero" class="hero-template-section">
+    <div class="hero-template-overlay"></div>
+
+    <div class="hero-content-wrapper">
+        <div class="hero-slides-container">
+            <!-- Slide 1: Primary Template Headline (Matches Mockup Image 1) -->
+            <div class="hero-slide-item active" data-slide-index="0">
+                <h1 class="hero-slide-title">
+                    <span class="d-block">Drive Better With</span>
+                    <span class="d-block">Expert Car Repair.</span>
+                </h1>
+                <p class="hero-slide-subtext">
+                    From engine diagnostics to full-service fixes, we bring your vehicle back to life.
+                </p>
+                <div class="hero-slide-actions">
+                    <a href="#status-tracker" class="btn-hero-book-repair">
+                        <span>Book Your Repair</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Slide 2: Creative & Professional (Current Design Writing) -->
+            <div class="hero-slide-item" data-slide-index="1">
+                <div class="hero-slide-kicker">GARIJ WORKSHOP</div>
+                <h2 class="hero-slide-title">
+                    <span class="d-block">Creative &amp;</span>
+                    <span class="d-block">Professional.</span>
+                </h2>
+                <p class="hero-slide-subtext">
+                    Comprehensive restorations, high-precision electronic diagnostics, suspension recalibration, and bespoke performance tuning.
+                </p>
+                <div class="hero-slide-actions">
+                    <a href="#services" class="btn-hero-book-repair">
+                        <span>Explore Services</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Slide 3: Heritage & Integrity (Current Design Writing) -->
+            <div class="hero-slide-item" data-slide-index="2">
+                <div class="hero-slide-kicker">PRECISION CRAFTSMANSHIP</div>
+                <h2 class="hero-slide-title">
+                    <span class="d-block">25 Years Reputation</span>
+                    <span class="d-block">Full Integrity.</span>
+                </h2>
+                <p class="hero-slide-subtext">
+                    Complete transparency with digital work orders, itemized genuine parts logs, upfront pricing, and live telemetry tracking.
+                </p>
+                <div class="hero-slide-actions">
+                    <a href="#status-tracker" class="btn-hero-book-repair">
+                        <span>Track Vehicle Status</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom-Right Slider Navigation Controls (Matching Mockup Image 1) -->
+    <div class="hero-slider-nav">
+        <div class="hero-slide-indicators d-none d-sm-flex">
+            <span class="slide-indicator active" data-index="0" title="Slide 1"></span>
+            <span class="slide-indicator" data-index="1" title="Slide 2"></span>
+            <span class="slide-indicator" data-index="2" title="Slide 3"></span>
+        </div>
+        <button type="button" class="btn-hero-slider" id="heroPrevBtn" aria-label="Previous Slide">
+            <i class="bi bi-arrow-left"></i>
+        </button>
+        <button type="button" class="btn-hero-slider" id="heroNextBtn" aria-label="Next Slide">
+            <i class="bi bi-arrow-right"></i>
+        </button>
+    </div>
+</section>
+
+<!-- ==========================================================================
+     2. "YOU NEED RENOVATION?" SECTION
+     ========================================================================== -->
+<section id="about" class="renovation-section">
+    <div class="container px-lg-5">
+        <div class="row align-items-center g-5">
+            <!-- Left Column: Geometric Blue Frame + Text + Neon Tuned Car -->
+            <div class="col-lg-6 reveal-left">
+                <div class="renovation-left-box">
+                    <h2 class="renovation-title">
+                        YOU NEED<br />
+                        <span class="text-white">RENOVATION?</span>
+                    </h2>
+                    <p class="renovation-desc">
+                        Our master technicians and certified mechanics deliver comprehensive restorations, high-precision electronic diagnostics, suspension recalibration, and bespoke performance tuning. From vintage classics to modern hypercars, we bring engineering excellence to every bolt.
+                    </p>
+                </div>
+
+                <!-- Automotive Renovation & Mechanics Illustration (Dark Mode Only) -->
+                <div class="renovation-car-wrap dark-only">
+                    <img src="~/images/renovation-mechanics-car.png" asp-append-version="true" alt="Automotive Renovation, Diagnostics and Performance Workshop Craftsmanship" class="renovation-car-img" />
+                </div>
+
+                <!-- Minimal Elegant Stats Grid for Light Mode (Zero Images, High Aesthetic) -->
+                <div class="renovation-minimal-metrics light-only">
+                    <div class="renovation-metric-tile">
+                        <div class="renovation-metric-num">25+</div>
+                        <div class="renovation-metric-label">Years Reputation</div>
+                    </div>
+                    <div class="renovation-metric-tile">
+                        <div class="renovation-metric-num">99.8%</div>
+                        <div class="renovation-metric-label">Diagnostic Accuracy</div>
+                    </div>
+                    <div class="renovation-metric-tile">
+                        <div class="renovation-metric-num">10k+</div>
+                        <div class="renovation-metric-label">Repairs Completed</div>
+                    </div>
+                    <div class="renovation-metric-tile">
+                        <div class="renovation-metric-num">100%</div>
+                        <div class="renovation-metric-label">Genuine Parts</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: 3 Feature Rows with Blue Icons -->
+            <div class="col-lg-6 reveal-right">
+                <div class="feature-item-list">
+                    <!-- Feature 1: 25 Years Reputation -->
+                    <div class="feature-item-row">
+                        <div class="feature-item-icon">
+                            <i class="bi bi-award-fill"></i>
+                        </div>
+                        <div>
+                            <h3 class="feature-item-heading">25 YEARS REPUTATION</h3>
+                            <p class="feature-item-text">
+                                Over two decades of trusted automotive craftsmanship. We combine legacy mechanical mastery with cutting-edge telemetry diagnostic tools for guaranteed satisfaction.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Feature 2: Full Integrity -->
+                    <div class="feature-item-row delay-100">
+                        <div class="feature-item-icon">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                        <div>
+                            <h3 class="feature-item-heading">FULL INTEGRITY</h3>
+                            <p class="feature-item-text">
+                                Complete transparency from intake to handoff. Every service job includes digital work orders, itemized genuine parts logs, and upfront pricing with zero hidden surcharges.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Feature 3: Quick & Efficient -->
+                    <div class="feature-item-row delay-200">
+                        <div class="feature-item-icon">
+                            <i class="bi bi-lightning-charge-fill"></i>
+                        </div>
+                        <div>
+                            <h3 class="feature-item-heading">QUICK &amp; EFFICIENT</h3>
+                            <p class="feature-item-text">
+                                Streamlined workshop workflows and dedicated parts inventory allow rapid turnaround times. Track your repair stages in real-time right from our public portal.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==========================================================================
+     3. LIVE VEHICLE STATUS LOOKUP SECTION (Integrated On Landing Page)
+     ========================================================================== -->
+<section id="status-tracker" class="quick-lookup-banner">
+    <div class="container px-lg-5">
+        <div class="quick-lookup-card reveal">
+            <!-- Search Form Row -->
+            <div class="row align-items-center g-4">
+                <div class="col-lg-5">
+                    <span class="text-info fw-bold small text-uppercase letter-spacing-2">
+                        <i class="bi bi-radar me-1"></i> LIVE TELEMETRY PORTAL
+                    </span>
+                    <h3 class="h2 text-white fw-bold mt-1 mb-2">Track Vehicle Service Status</h3>
+                    <p class="text-secondary small mb-0">
+                        Enter your booking reference (e.g., <code class="text-info">GRJ-2026-0001</code>) or license plate (e.g., <code class="text-info">DHA-2026</code>) to view live job progress.
+                    </p>
+                </div>
+                <div class="col-lg-7">
+                    <form asp-controller="Home" asp-action="Index" method="get" data-lookup-form novalidate>
+                        <label for="statusLookupQuery" class="visually-hidden">Booking reference or license plate</label>
+                        <div class="quick-lookup-input-group">
+                            <input type="text"
+                                   id="statusLookupQuery"
+                                   name="query"
+                                   value="@Model?.Query"
+                                   class="form-control quick-lookup-input"
+                                   placeholder="GRJ-2026-0001 or DHA-2026..."
+                                   aria-describedby="statusLookupHelp statusLookupError"
+                                   autocomplete="off"
+                                   required />
+                            <button type="submit" class="btn-quick-lookup-submit" data-lookup-submit>
+                                <i class="bi bi-search"></i>
+                                <span data-lookup-submit-text>Track Status</span>
+                            </button>
+                        </div>
+                        <p id="statusLookupHelp" class="quick-lookup-help mb-0">You can use either identifier; no account is required.</p>
+                        <p id="statusLookupError" class="quick-lookup-error mb-0" role="alert" hidden></p>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Search Results Display (Rendered In-Place) -->
+            @if (Model?.WasSearched == true)
+            {
+                <div class="tracker-result-shell reveal" aria-live="polite" aria-atomic="true" tabindex="-1">
+                    @if (!string.IsNullOrWhiteSpace(Model.Message))
+                    {
+                        <!-- Not Found Warning Card -->
+                        <div class="tracker-lookup-message tracker-lookup-message-warning">
+                            <i class="bi bi-exclamation-triangle-fill fs-2"></i>
+                            <div>
+                                <h5 class="fw-bold mb-1">No Booking or Vehicle Found</h5>
+                                <p class="mb-0 text-white-50 small">@Model.Message Please double check your booking reference code or license plate number.</p>
+                            </div>
+                        </div>
+                    }
+                    else if (vehicle is not null)
+                    {
+                        <!-- Vehicle Summary Banner -->
+                        <div class="tracker-vehicle-banner">
+                            <div>
+                                <span class="text-info small text-uppercase fw-bold letter-spacing-2">Registered Vehicle</span>
+                                <div class="tracker-plate-badge">@vehicle.LicensePlateNumber</div>
+                                <div class="text-light fs-5 fw-semibold mt-1">@vehicle.Year @vehicle.Make @vehicle.Model</div>
+                                <div class="text-secondary small mt-1">Color: <span class="text-light">@(vehicle.Color ?? "N/A")</span> | VIN: <span class="text-light">@(vehicle.Vin ?? "N/A")</span></div>
+                            </div>
+                            @if (currentJob is not null)
+                            {
+                                <div class="text-end">
+                                    <span class="app-badge @StatusBadgeHelper.BadgeClass(currentJob.Status) tracker-status-badge">
+                                        @StatusBadgeHelper.DisplayName(currentJob.Status)
+                                    </span>
+                                </div>
+                            }
+                        </div>
+
+                        @if (currentJob is not null)
+                        {
+                            <!-- Job Meta Grid -->
+                            <div class="tracker-meta-grid">
+                                <div class="tracker-meta-card">
+                                    <span class="tracker-meta-label">Booking Reference</span>
+                                    <span class="tracker-meta-value text-info font-monospace">@currentJob.BookingReference</span>
+                                </div>
+                                <div class="tracker-meta-card">
+                                    <span class="tracker-meta-label">Job Type</span>
+                                    <span class="tracker-meta-value">@currentJob.JobType</span>
+                                </div>
+                                <div class="tracker-meta-card">
+                                    <span class="tracker-meta-label">Date Received</span>
+                                    <span class="tracker-meta-value">@currentJob.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</span>
+                                </div>
+                                <div class="tracker-meta-card">
+                                    <span class="tracker-meta-label">Completion Date</span>
+                                    <span class="tracker-meta-value">@(currentJob.CompletedAt?.ToLocalTime().ToString("dd MMM yyyy") ?? "In Progress")</span>
+                                </div>
+                            </div>
+
+                            <!-- Step-by-Step Status Timeline -->
+                            <div class="tracker-timeline-wrap">
+                                <h5 class="text-white fw-bold mb-4 d-flex align-items-center gap-2">
+                                    <i class="bi bi-clock-history text-info"></i>
+                                    <span>LIVE SERVICE STAGE TIMELINE</span>
+                                </h5>
+
+                                <ol class="tracker-timeline-list">
+                                    @for (var i = 0; i < statusOrder.Count; i++)
+                                    {
+                                        var status = statusOrder[i];
+                                        var isStepCompleted = !isCancelled && i < currentIndex;
+                                        var isStepCurrent = !isCancelled && i == currentIndex;
+                                        var itemClass = isStepCompleted ? "completed" : isStepCurrent ? "current" : "upcoming";
+
+                                        <li class="tracker-timeline-item @itemClass">
+                                            <div class="tracker-timeline-dot"></div>
+                                            <div class="tracker-timeline-name">@StatusBadgeHelper.DisplayName(status)</div>
+                                            <div class="tracker-timeline-sub">
+                                                @(isStepCompleted ? "Completed" : isStepCurrent ? "In Progress" : "Pending")
+                                            </div>
+                                        </li>
+                                    }
+                                    @if (isCancelled)
+                                    {
+                                        <li class="tracker-timeline-item">
+                                            <div class="tracker-timeline-dot" style="background:#dc2626; border-color:#f87171;"></div>
+                                            <div class="tracker-timeline-name text-danger">Cancelled</div>
+                                            <div class="tracker-timeline-sub">Service cancelled</div>
+                                        </li>
+                                    }
+                                </ol>
+                            </div>
+                        }
+
+                        <!-- Service History Records -->
+                        @if (Model.ServiceHistory.Any())
+                        {
+                            <div class="mt-4">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 class="text-white fw-bold mb-0">
+                                        <i class="bi bi-journal-text text-info me-2"></i>COMPLETE SERVICE HISTORY
+                                    </h5>
+                                    <span class="badge bg-secondary rounded-pill">@Model.ServiceHistory.Count Record(s)</span>
+                                </div>
+
+                                <div class="tracker-history-table">
+                                    @foreach (var history in Model.ServiceHistory)
+                                    {
+                                        <div class="tracker-history-row">
+                                            <div>
+                                                <strong class="font-monospace text-info fs-6">@history.BookingReference</strong>
+                                                <div class="text-muted small mt-1">@history.JobType &bull; @history.VehicleDescription</div>
+                                            </div>
+                                            <div class="text-end">
+                                                <span class="app-badge @StatusBadgeHelper.BadgeClass(history.Status)">@StatusBadgeHelper.DisplayName(history.Status)</span>
+                                                <div class="text-secondary small">@history.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- ==========================================================================
+     4. WORKSHOP SERVICES HIGHLIGHTS
+     ========================================================================== -->
+<section id="services" class="services-home-section py-5">
+    <div class="container px-lg-5 py-4">
+        <div class="text-center mb-5 reveal">
+            <span class="text-info text-uppercase fw-bold letter-spacing-2 small">Precision Engineering</span>
+            <h2 class="text-white fw-bold display-6 mt-1">SPECIALIZED AUTOMOTIVE SERVICES</h2>
+            <p class="text-secondary mx-auto" style="max-width: 600px;">
+                State-of-the-art diagnostic machinery combined with certified master mechanics to handle any automotive challenge.
+            </p>
+        </div>
+
+        <div class="row g-4">
+            <!-- Service 1 -->
+            <div class="col-md-6 col-lg-4 reveal delay-100">
+                <div class="p-4 h-100 rounded-3 border border-secondary border-opacity-25" style="background: rgba(24, 29, 38, 0.4); transition: transform 0.3s ease;">
+                    <div class="text-info fs-2 mb-3"><i class="bi bi-cpu"></i></div>
+                    <h4 class="text-white fw-bold h5">Computer Diagnostics &amp; ECU</h4>
+                    <p class="text-secondary small mb-0">Advanced OBD-II telemetry diagnostics, fault clearing, firmware optimization, and custom ECU remapping for peak efficiency.</p>
+                </div>
+            </div>
+
+            <!-- Service 2 -->
+            <div class="col-md-6 col-lg-4 reveal delay-200">
+                <div class="p-4 h-100 rounded-3 border border-secondary border-opacity-25" style="background: rgba(24, 29, 38, 0.4); transition: transform 0.3s ease;">
+                    <div class="text-info fs-2 mb-3"><i class="bi bi-disc"></i></div>
+                    <h4 class="text-white fw-bold h5">Braking &amp; Performance Rotors</h4>
+                    <p class="text-secondary small mb-0">Ceramic brake pad replacements, rotor resurfacing, braided brake line installation, and ABS hydraulic system bleed services.</p>
+                </div>
+            </div>
+
+            <!-- Service 3 -->
+            <div class="col-md-6 col-lg-4 reveal delay-300">
+                <div class="p-4 h-100 rounded-3 border border-secondary border-opacity-25" style="background: rgba(24, 29, 38, 0.4); transition: transform 0.3s ease;">
+                    <div class="text-info fs-2 mb-3"><i class="bi bi-speedometer"></i></div>
+                    <h4 class="text-white fw-bold h5">Engine Overhaul &amp; Tuning</h4>
+                    <p class="text-secondary small mb-0">Complete teardown, cylinder honing, forged piston assembly, turbocharger spool setup, and dynamometer tuning.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==========================================================================
+     5. TESTIMONIALS SECTION
+     ========================================================================== -->
+<section id="testimonials" class="testimonials-section">
+    <div class="container px-lg-5">
+        <!-- Section Header with Winged Badge (Dark) & Minimal Emblem (Light) -->
+        <div class="testimonials-header reveal">
+            <img src="~/images/testimonial-badge.svg" alt="Testimonials Winged Insignia" class="testimonials-badge-img dark-only" />
+            <div class="light-only mb-3">
+                <span class="badge rounded-pill px-3 py-2 text-uppercase fw-bold letter-spacing-2" style="background: rgba(2, 132, 199, 0.1); color: #0284c7; border: 1px solid rgba(2, 132, 199, 0.25);">
+                    <i class="bi bi-star-fill text-warning me-1"></i> Verified Client Endorsements
+                </span>
+            </div>
+            <h2 class="testimonials-title">TESTIMONIALS</h2>
+        </div>
+
+        <!-- 3 Column Cards -->
+        <div class="row g-4">
+            <!-- Testimonial 1: Rahim -->
+            <div class="col-lg-4 col-md-6 reveal-left">
+                <div class="testimonial-card">
+                    <div class="testimonial-quote-icon">
+                        <i class="bi bi-quote"></i>
+                    </div>
+                    <p class="testimonial-quote-text">
+                        "Garij transformed our entire fleet maintenance workflow. The live status tracker kept us updated every step of the way, and their engine overhaul brought our commercial vehicles back to peak performance."
+                    </p>
+                    <div class="testimonial-author-box">
+                        <div class="testimonial-author-name">RAHIM</div>
+                        <div class="testimonial-author-role">Fleet Director</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Testimonial 2: Karim -->
+            <div class="col-lg-4 col-md-6 reveal">
+                <div class="testimonial-card">
+                    <div class="testimonial-quote-icon">
+                        <i class="bi bi-quote"></i>
+                    </div>
+                    <p class="testimonial-quote-text">
+                        "Found Garij through a friend when my car had persistent suspension and transmission issues. Their diagnostic precision and transparency are unmatched. Fair pricing, genuine parts, and fast turnaround."
+                    </p>
+                    <div class="testimonial-author-box">
+                        <div class="testimonial-author-name">KARIM</div>
+                        <div class="testimonial-author-role">Automotive Enthusiast</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Testimonial 3: Rahman -->
+            <div class="col-lg-4 col-md-6 reveal-right">
+                <div class="testimonial-card">
+                    <div class="testimonial-quote-icon">
+                        <i class="bi bi-quote"></i>
+                    </div>
+                    <p class="testimonial-quote-text">
+                        "Exceptional service from the Tejgaon workshop team. The ECU performance tuning and complete brake restoration gave my vehicle new life. Clean facility, highly skilled mechanics, and total professionalism."
+                    </p>
+                    <div class="testimonial-author-box">
+                        <div class="testimonial-author-name">RAHMAN</div>
+                        <div class="testimonial-author-role">Corporate Executive</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==========================================================================
+     6. LIFETIME LICENSE & PRICING SECTION
+     ========================================================================== -->
+<section id="pricing" class="pricing-home-section py-5">
+    <div class="container px-lg-5 py-4">
+        <div class="text-center mb-5 reveal">
+            <span class="text-info text-uppercase fw-bold letter-spacing-2 small">Transparent Ownership</span>
+            <h2 class="text-white fw-bold display-6 mt-1">ONE-TIME PURCHASE &bull; LIFETIME ACCESS</h2>
+            <p class="text-secondary mx-auto" style="max-width: 600px;">
+                No monthly subscriptions or recurring fees. Acquire the complete Garij Intelligent Vehicle Workshop software with a single payment and run your operations without limits.
+            </p>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-8 reveal">
+                <div class="pricing-showcase-card p-4 p-md-5 rounded-4 border border-info border-opacity-30 shadow-lg position-relative overflow-hidden">
+                    
+                    <div class="row align-items-center g-4">
+                        <div class="col-md-7">
+                            <span class="badge bg-info text-dark px-3 py-1 rounded-pill fw-bold small mb-2">COMPLETE COMMERCIAL LICENSE</span>
+                            <h3 class="text-white fw-bold h4 mb-3">All-Inclusive Workshop Suite</h3>
+                            
+                            <ul class="list-unstyled text-light small d-flex flex-column gap-2 mb-0">
+                                <li class="d-flex align-items-center gap-2">
+                                    <i class="bi bi-check-circle-fill text-info"></i>
+                                    <span>Unlimited customer &amp; vehicle management</span>
+                                </li>
+                                <li class="d-flex align-items-center gap-2">
+                                    <i class="bi bi-check-circle-fill text-info"></i>
+                                    <span>Mobile-friendly mechanic job board with strict state machine</span>
+                                </li>
+                                <li class="d-flex align-items-center gap-2">
+                                    <i class="bi bi-check-circle-fill text-info"></i>
+                                    <span>Automated parts stock deduction &amp; reorder threshold alerts</span>
+                                </li>
+                                <li class="d-flex align-items-center gap-2">
+                                    <i class="bi bi-check-circle-fill text-info"></i>
+                                    <span>Integrated Google Gemini AI diagnostic intelligence</span>
+                                </li>
+                                <li class="d-flex align-items-center gap-2">
+                                    <i class="bi bi-check-circle-fill text-info"></i>
+                                    <span>Transactional invoicing with atomic rollbacks</span>
+                                </li>
+                                <li class="d-flex align-items-center gap-2">
+                                    <i class="bi bi-check-circle-fill text-info"></i>
+                                    <span>Public telemetry lookup portal for clients</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="col-md-5 text-center text-md-end">
+                            <div class="p-4 rounded-3 bg-dark bg-opacity-75 border border-secondary border-opacity-30 text-center">
+                                <span class="text-secondary small fw-bold text-uppercase letter-spacing-1">One-Time Payment</span>
+                                <div class="my-2">
+                                    <span class="display-5 text-info fw-extrabold">$499</span>
+                                    <span class="text-secondary small">/ lifetime</span>
+                                </div>
+                                <p class="text-white-50 small mb-3">Pay once, use forever. Zero monthly subscription fees.</p>
+                                <a asp-controller="Purchase" asp-action="Index" class="btn btn-info btn-lg w-100 fw-bold text-dark text-uppercase shadow letter-spacing-1 py-2 fs-6">
+                                    <i class="bi bi-cart-check-fill me-2"></i>Buy License
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

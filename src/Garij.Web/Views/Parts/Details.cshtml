@@ -5,30 +5,42 @@
     ViewData["Title"] = "Part Details";
 }
 
-<h1>Part Details</h1>
+@{
+    var canManage = User.IsInRole("Admin") || User.IsInRole("FrontDesk");
+}
 
-<dl class="row">
-    <dt class="col-sm-3">@Html.DisplayNameFor(m => m.Name)</dt>
-    <dd class="col-sm-9">@Model.Name</dd>
+<div class="app-page-header">
+    <div>
+        <h1 class="app-page-title">@Model.Name</h1>
+    </div>
+    @if (canManage)
+    {
+        <div class="d-flex gap-2">
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="app-btn app-btn-outline">Edit</a>
+        </div>
+    }
+</div>
 
-    <dt class="col-sm-3">@Html.DisplayNameFor(m => m.PartNumber)</dt>
-    <dd class="col-sm-9">@Model.PartNumber</dd>
+<div class="app-card" style="max-width: 640px;">
+    <dl class="row mb-0">
+        <dt class="col-sm-4 app-page-subtitle">@Html.DisplayNameFor(m => m.PartNumber)</dt>
+        <dd class="col-sm-8 text-white font-monospace">@Model.PartNumber</dd>
 
-    <dt class="col-sm-3">@Html.DisplayNameFor(m => m.UnitPrice)</dt>
-    <dd class="col-sm-9">@Model.UnitPrice.ToString("C")</dd>
+        <dt class="col-sm-4 app-page-subtitle">@Html.DisplayNameFor(m => m.UnitPrice)</dt>
+        <dd class="col-sm-8 text-white">@Model.UnitPrice.ToString("C")</dd>
 
-    <dt class="col-sm-3">@Html.DisplayNameFor(m => m.QuantityInStock)</dt>
-    <dd class="col-sm-9">
-        @Model.QuantityInStock
-        @if (Model.QuantityInStock <= Model.ReorderLevel)
-        {
-            <span class="badge bg-warning text-dark ms-1">Low stock</span>
-        }
-    </dd>
+        <dt class="col-sm-4 app-page-subtitle">@Html.DisplayNameFor(m => m.QuantityInStock)</dt>
+        <dd class="col-sm-8 text-white">
+            @Model.QuantityInStock
+            @if (Model.QuantityInStock <= Model.ReorderLevel)
+            {
+                <span class="app-badge app-badge-warning ms-1">Low stock</span>
+            }
+        </dd>
 
-    <dt class="col-sm-3">@Html.DisplayNameFor(m => m.ReorderLevel)</dt>
-    <dd class="col-sm-9">@Model.ReorderLevel</dd>
-</dl>
+        <dt class="col-sm-4 app-page-subtitle">@Html.DisplayNameFor(m => m.ReorderLevel)</dt>
+        <dd class="col-sm-8 text-white mb-0">@Model.ReorderLevel</dd>
+    </dl>
+</div>
 
-<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>
-<a asp-action="Index" class="btn btn-secondary">Back to List</a>
+<a asp-action="Index" class="app-btn app-btn-outline mt-3 d-inline-flex">Back to List</a>

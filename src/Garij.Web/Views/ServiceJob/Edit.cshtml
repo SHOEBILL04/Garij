@@ -5,52 +5,51 @@
     ViewData["Title"] = $"Edit Service Job - {Model.BookingReference}";
 }
 
-<div class="container py-4">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-secondary text-white py-3">
-                    <h2 class="h5 card-title mb-0"><i class="bi bi-pencil-square me-2"></i>Edit Service Job (@Model.BookingReference)</h2>
+<div class="app-page-header">
+    <div>
+        <h1 class="app-page-title">Edit Service Job <span class="font-monospace text-info">(@Model.BookingReference)</span></h1>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="app-card">
+            <form asp-action="Edit" method="post">
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="VehicleId" />
+                <input type="hidden" asp-for="BookingReference" />
+
+                <div asp-validation-summary="ModelOnly" class="app-alert-danger" role="alert"></div>
+
+                <div class="app-form-group">
+                    <label class="app-form-label">Vehicle</label>
+                    <input class="app-form-control" value="@Model.VehiclePlateNumber - @Model.VehicleDescription" readonly />
                 </div>
-                <div class="card-body p-4">
-                    <form asp-action="Edit" method="post">
-                        <input type="hidden" asp-for="Id" />
-                        <input type="hidden" asp-for="VehicleId" />
-                        <input type="hidden" asp-for="BookingReference" />
 
-                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
-
-                        <div class="mb-3">
-                            <label class="form-label text-muted">Vehicle</label>
-                            <input class="form-control" value="@Model.VehiclePlateNumber - @Model.VehicleDescription" readonly />
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="JobType" class="form-label fw-bold">Job Type</label>
-                                <select asp-for="JobType" asp-items="Html.GetEnumSelectList<JobType>()" class="form-select"></select>
-                                <span asp-validation-for="JobType" class="text-danger small"></span>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="Status" class="form-label fw-bold">Current Status</label>
-                                <select asp-for="Status" asp-items="Html.GetEnumSelectList<JobStatus>()" class="form-select"></select>
-                                <span asp-validation-for="Status" class="text-danger small"></span>
-                            </div>
-                        </div>
-
-                        <div class="mb-4">
-                            <label asp-for="DiagnosticNotes" class="form-label fw-bold">Diagnostic Notes</label>
-                            <textarea asp-for="DiagnosticNotes" class="form-control" rows="4"></textarea>
-                            <span asp-validation-for="DiagnosticNotes" class="text-danger small"></span>
-                        </div>
-
-                        <div class="d-flex justify-content-end gap-2">
-                            <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Cancel</a>
-                            <button type="submit" class="btn btn-primary px-4">Save Changes</button>
-                        </div>
-                    </form>
+                <div class="row">
+                    <div class="col-md-6 app-form-group">
+                        <label asp-for="JobType" class="app-form-label">Job Type</label>
+                        <select asp-for="JobType" asp-items="Html.GetEnumSelectList<JobType>()" class="app-form-select"></select>
+                        <span asp-validation-for="JobType" class="app-field-error"></span>
+                    </div>
+                    <div class="col-md-6 app-form-group">
+                        <label asp-for="Status" class="app-form-label">Current Status</label>
+                        <select asp-for="Status" asp-items="Html.GetEnumSelectList<JobStatus>()" class="app-form-select"></select>
+                        <span asp-validation-for="Status" class="app-field-error"></span>
+                    </div>
                 </div>
-            </div>
+
+                <div class="app-form-group">
+                    <label asp-for="DiagnosticNotes" class="app-form-label">Diagnostic Notes</label>
+                    <textarea asp-for="DiagnosticNotes" class="app-form-control" rows="4" placeholder="Describe customer requests or diagnostic observations..."></textarea>
+                    <span asp-validation-for="DiagnosticNotes" class="app-field-error"></span>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-3">
+                    <a asp-action="Details" asp-route-id="@Model.Id" class="app-btn app-btn-outline">Cancel</a>
+                    <button type="submit" class="app-btn app-btn-primary">Save Changes</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

@@ -5,45 +5,48 @@
     ViewData["Title"] = "Edit Part";
 }
 
-<h1>Edit Part</h1>
-
-<form asp-action="Edit" method="post">
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <input type="hidden" asp-for="Id" />
-
-    <div class="mb-3">
-        <label asp-for="Name" class="form-label"></label>
-        <input asp-for="Name" class="form-control" />
-        <span asp-validation-for="Name" class="text-danger"></span>
+<div class="app-page-header">
+    <div>
+        <h1 class="app-page-title">Edit Part</h1>
     </div>
+</div>
 
-    <div class="mb-3">
-        <label asp-for="PartNumber" class="form-label"></label>
-        <input asp-for="PartNumber" class="form-control" />
-        <span asp-validation-for="PartNumber" class="text-danger"></span>
-    </div>
+<div class="app-card" style="max-width: 640px;">
+    <form asp-action="Edit" method="post">
+        <div asp-validation-summary="ModelOnly" class="app-alert-danger"></div>
+        <input type="hidden" asp-for="Id" />
 
-    <div class="mb-3">
-        <label asp-for="UnitPrice" class="form-label"></label>
-        <input asp-for="UnitPrice" class="form-control" />
-        <span asp-validation-for="UnitPrice" class="text-danger"></span>
-    </div>
+        <div class="app-form-group">
+            <label asp-for="Name" class="app-form-label"></label>
+            <input asp-for="Name" class="app-form-control" placeholder="e.g. Premium Brake Pads Front Set" />
+            <span asp-validation-for="Name" class="app-field-error"></span>
+        </div>
 
-    <div class="mb-3">
-        <label asp-for="QuantityInStock" class="form-label"></label>
-        <input asp-for="QuantityInStock" class="form-control" />
-        <span asp-validation-for="QuantityInStock" class="text-danger"></span>
-    </div>
+        <div class="app-form-group">
+            <label asp-for="PartNumber" class="app-form-label"></label>
+            <input asp-for="PartNumber" class="app-form-control" placeholder="e.g. BRK-PAD-F" />
+            <span asp-validation-for="PartNumber" class="app-field-error"></span>
+        </div>
 
-    <div class="mb-3">
-        <label asp-for="ReorderLevel" class="form-label"></label>
-        <input asp-for="ReorderLevel" class="form-control" />
-        <span asp-validation-for="ReorderLevel" class="text-danger"></span>
-    </div>
+        <div class="app-form-group">
+            <label asp-for="UnitPrice" class="app-form-label"></label>
+            <input asp-for="UnitPrice" class="app-form-control" placeholder="e.g. 60.00" />
+            <span asp-validation-for="UnitPrice" class="app-field-error"></span>
+        </div>
 
-    <button type="submit" class="btn btn-primary">Save</button>
-    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
-</form>
+        <div class="app-form-group">
+            <label asp-for="ReorderLevel" class="app-form-label"></label>
+            <input asp-for="ReorderLevel" class="app-form-control" placeholder="e.g. 5" />
+            <span asp-validation-for="ReorderLevel" class="app-field-error"></span>
+            <div class="app-page-subtitle small mt-1">Stock quantity is adjusted from the Parts list using the +/- controls, not here.</div>
+        </div>
+
+        <div class="d-flex gap-2 mt-3">
+            <button type="submit" class="app-btn app-btn-primary">Save</button>
+            <a asp-action="Index" class="app-btn app-btn-outline">Cancel</a>
+        </div>
+    </form>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

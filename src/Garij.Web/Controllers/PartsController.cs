@@ -4,17 +4,20 @@ using Garij.Domain.Exceptions;
 using Garij.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Garij.Web.Controllers;
 
-[Authorize(Roles = nameof(UserRole.Admin) + "," + nameof(UserRole.FrontDesk) + "," + nameof(UserRole.Mechanic))]
+[Authorize]
 public class PartsController : Controller
 {
     private readonly IPartsInventoryService _partsInventoryService;
+    private readonly IServiceJobService _serviceJobService;
 
-    public PartsController(IPartsInventoryService partsInventoryService)
+    public PartsController(IPartsInventoryService partsInventoryService, IServiceJobService serviceJobService)
     {
         _partsInventoryService = partsInventoryService;
+        _serviceJobService = serviceJobService;
     }
 
     [HttpGet]
@@ -37,6 +40,7 @@ public class PartsController : Controller
     }
 
     [HttpGet]
+    [Authorize(Roles = nameof(UserRole.Admin) + "," + nameof(UserRole.FrontDesk))]
     public IActionResult Create()
     {
         return View();
@@ -44,6 +48,7 @@ public class PartsController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = nameof(UserRole.Admin) + "," + nameof(UserRole.FrontDesk))]
     public async Task<IActionResult> Create(PartDto part)
     {
         if (!ModelState.IsValid)
@@ -72,6 +77,7 @@ public class PartsController : Controller
     }
 
     [HttpGet]
+    [Authorize(Roles = nameof(UserRole.Admin) + "," + nameof(UserRole.FrontDesk))]
     public async Task<IActionResult> Edit(int id)
     {
         var part = await _partsInventoryService.GetPartByIdAsync(id);
@@ -85,6 +91,7 @@ public class PartsController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = nameof(UserRole.Admin) + "," + nameof(UserRole.FrontDesk))]
     public async Task<IActionResult> Edit(int id, PartDto part)
     {
         if (id != part.Id)
@@ -117,23 +124,83 @@ public class PartsController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    [HttpGet]
-    public async Task<IActionResult> Delete(int id)
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Authorize(Roles = nameof(UserRole.Admin) + "," + nameof(UserRole.FrontDesk))]
+    public async Task<IActionResult> AdjustStock(int id, int delta)
     {
-        var part = await _partsInventoryService.GetPartByIdAsync(id);
-        if (part is null)
+        try
+        {
+            await _partsInventoryService.AdjustStockAsync(id, delta);
+        }
+        catch (Exception ex)
+        {
+            TempData["ErrorMessage"] = ex.Message;
+        }
+
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> LogUsage(int serviceJobId)
+    {
+        var job = await _serviceJobService.GetServiceJobByIdAsync(serviceJobId);
+        if (job is null)
         {
             return NotFound();
         }
 
-        return View(part);
+        ViewBag.ServiceJob = job;
+        await PopulatePartsDropDownList();
+
+        return View(new JobPartUsedDto { ServiceJobId = serviceJobId, QuantityUsed = 1 });
     }
 
-    [HttpPost, ActionName("Delete")]
+    [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> DeleteConfirmed(int id)
+    public async Task<IActionResult> LogUsage(JobPartUsedDto model)
     {
-        await _partsInventoryService.DeletePartAsync(id);
-        return RedirectToAction(nameof(Index));
+        if (model.PartId <= 0)
+        {
+            ModelState.AddModelError(nameof(model.PartId), "Please select a part.");
+        }
+
+        if (model.QuantityUsed <= 0)
+        {
+            ModelState.AddModelError(nameof(model.QuantityUsed), "Quantity must be at least 1.");
+        }
+
+        if (!ModelState.IsValid)
+        {
+            ViewBag.ServiceJob = await _serviceJobService.GetServiceJobByIdAsync(model.ServiceJobId);
+            await PopulatePartsDropDownList(model.PartId);
+            return View(model);
+        }
+
+        try
+        {
+            await _partsInventoryService.RecordPartUsageAsync(model);
+            TempData["SuccessMessage"] = "Part usage logged.";
+            return RedirectToAction("Details", "ServiceJob", new { id = model.ServiceJobId });
+        }
+        catch (Exception ex)
+        {
+            ModelState.AddModelError(string.Empty, ex.Message);
+            ViewBag.ServiceJob = await _serviceJobService.GetServiceJobByIdAsync(model.ServiceJobId);
+            await PopulatePartsDropDownList(model.PartId);
+            return View(model);
+        }
+    }
+
+    private async Task PopulatePartsDropDownList(object? selectedPart = null)
+    {
+        var parts = await _partsInventoryService.GetAllPartsAsync();
+        var partList = parts.Select(p => new
+        {
+            p.Id,
+            DisplayText = $"{p.Name} ({p.PartNumber}) - {p.UnitPrice:C} - {p.QuantityInStock} in stock"
+        }).OrderBy(p => p.DisplayText);
+
+        ViewBag.Parts = new SelectList(partList, "Id", "DisplayText", selectedPart);
     }
 }

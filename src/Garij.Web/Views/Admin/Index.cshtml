@@ -1,101 +1,123 @@
 @{
     ViewData["Title"] = "Admin Dashboard";
+    var garageName = ViewBag.GarageName as string ?? "Garij Master Workshop";
 }
 
-<div class="p-4 mb-4 rounded-4 text-white bg-dark bg-gradient">
-    <h1 class="fw-bold mb-1"><i class="bi bi-shield-lock me-2"></i>Admin Dashboard</h1>
-    <p class="mb-0 fs-6 text-white-50">
-        Full system oversight: manage staff accounts and roles, and reach every
-        operational module without restriction.
-    </p>
+<div class="app-card mb-4" style="background: linear-gradient(135deg, rgba(0,114,245,0.18), rgba(0,210,255,0.08)); border-color: rgba(0,168,255,0.35);">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+            <h1 class="app-page-title"><i class="bi bi-shield-lock me-2 text-info"></i>Admin Dashboard</h1>
+            <p class="app-page-subtitle mt-1 mb-0">
+                Full system oversight: customize your garage branding, manage staff accounts and roles, and oversee all operations.
+            </p>
+        </div>
+        <a asp-action="GarageSettings" class="app-btn app-btn-primary">
+            <i class="bi bi-pen-fill me-1"></i> Rename Garage
+        </a>
+    </div>
 </div>
 
-<h2 class="h5 text-muted mb-3">Staff Administration</h2>
+<!-- Garage Identity & Branding Banner -->
+<div class="app-card mb-4 border-info border-opacity-25" style="background: radial-gradient(circle at top left, rgba(6,182,212,0.12), transparent 70%);">
+    <div class="row align-items-center g-3">
+        <div class="col-md-7">
+            <span class="text-secondary small text-uppercase font-monospace d-block mb-1">
+                <i class="bi bi-building-gear text-info me-1"></i> Registered Workshop Identity
+            </span>
+            <h3 class="text-white fw-bold mb-1 text-uppercase">@garageName</h3>
+            <p class="text-secondary small mb-0">
+                This business name is displayed at the top of the navigation bar for you and all your workshop employees.
+            </p>
+        </div>
+        <div class="col-md-5">
+            <form asp-action="UpdateGarageName" method="post" class="d-flex gap-2">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="returnUrl" value="/Admin" />
+                <input type="text" name="workshopName" class="form-control form-control-sm bg-dark text-light border-secondary" value="@garageName" placeholder="New garage name" required />
+                <button type="submit" class="app-btn app-btn-outline app-btn-sm text-nowrap">
+                    <i class="bi bi-check-lg me-1"></i> Update
+                </button>
+                <a asp-action="GarageSettings" class="app-btn app-btn-outline app-btn-sm text-nowrap" title="Full settings">
+                    <i class="bi bi-gear"></i>
+                </a>
+            </form>
+        </div>
+    </div>
+</div>
+
+<h2 class="app-page-title mb-3" style="font-size: 1.2rem;">Staff Administration</h2>
 <div class="row row-cols-1 row-cols-md-3 g-3 mb-4">
     <div class="col">
-        <div class="card h-100 border-0 shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title"><i class="bi bi-people me-2"></i>Manage Users</h5>
-                <p class="card-text text-muted">View and manage staff accounts.</p>
-                <a asp-controller="Admin" asp-action="ManageUsers" class="btn btn-outline-dark btn-sm">Open</a>
-            </div>
+        <div class="app-card h-100">
+            <h5 class="text-white fw-bold mb-2"><i class="bi bi-people me-2 text-info"></i>Manage Users</h5>
+            <p class="app-page-subtitle">View and manage staff accounts.</p>
+            <a asp-controller="Admin" asp-action="ManageUsers" class="app-btn app-btn-outline app-btn-sm">Open</a>
         </div>
     </div>
     <div class="col">
-        <div class="card h-100 border-0 shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title"><i class="bi bi-person-badge me-2"></i>Manage Roles</h5>
-                <p class="card-text text-muted">Assign Admin, Front Desk, or Mechanic roles to staff.</p>
-                <a asp-controller="Admin" asp-action="ManageRoles" class="btn btn-outline-dark btn-sm">Open</a>
-            </div>
+        <div class="app-card h-100">
+            <h5 class="text-white fw-bold mb-2"><i class="bi bi-person-badge me-2 text-info"></i>Manage Roles</h5>
+            <p class="app-page-subtitle">Assign Admin, Front Desk, or Mechanic roles to staff.</p>
+            <a asp-controller="Admin" asp-action="ManageRoles" class="app-btn app-btn-outline app-btn-sm">Open</a>
+        </div>
+    </div>
+    <div class="col">
+        <div class="app-card h-100">
+            <h5 class="text-white fw-bold mb-2"><i class="bi bi-person-plus me-2 text-info"></i>Create Staff User</h5>
+            <p class="app-page-subtitle">Add a receptionist or mechanic with email &amp; password.</p>
+            <a asp-controller="Admin" asp-action="CreateUser" class="app-btn app-btn-primary app-btn-sm">Create Account</a>
         </div>
     </div>
 </div>
 
-<h2 class="h5 text-muted mb-3">Operations</h2>
+<h2 class="app-page-title mb-3" style="font-size: 1.2rem;">Operations</h2>
 <div class="row row-cols-1 row-cols-md-4 g-3">
     <div class="col">
-        <div class="card h-100 border-0 shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title"><i class="bi bi-person-lines-fill me-2"></i>Customers</h5>
-                <a asp-controller="Customer" asp-action="Index" class="btn btn-outline-secondary btn-sm">Open</a>
-            </div>
+        <div class="app-card h-100">
+            <h5 class="text-white fw-bold mb-2"><i class="bi bi-person-lines-fill me-2 text-info"></i>Customers</h5>
+            <a asp-controller="Customer" asp-action="Index" class="app-btn app-btn-outline app-btn-sm">Open</a>
         </div>
     </div>
     <div class="col">
-        <div class="card h-100 border-0 shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title"><i class="bi bi-car-front me-2"></i>Vehicles</h5>
-                <a asp-controller="Vehicle" asp-action="Index" class="btn btn-outline-secondary btn-sm">Open</a>
-            </div>
+        <div class="app-card h-100">
+            <h5 class="text-white fw-bold mb-2"><i class="bi bi-car-front me-2 text-info"></i>Vehicles</h5>
+            <a asp-controller="Vehicle" asp-action="Index" class="app-btn app-btn-outline app-btn-sm">Open</a>
         </div>
     </div>
     <div class="col">
-        <div class="card h-100 border-0 shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title"><i class="bi bi-wrench-adjustable me-2"></i>Service Jobs</h5>
-                <a asp-controller="ServiceJob" asp-action="Index" class="btn btn-outline-secondary btn-sm">Open</a>
-            </div>
+        <div class="app-card h-100">
+            <h5 class="text-white fw-bold mb-2"><i class="bi bi-wrench-adjustable me-2 text-info"></i>Service Jobs</h5>
+            <a asp-controller="ServiceJob" asp-action="Index" class="app-btn app-btn-outline app-btn-sm">Open</a>
         </div>
     </div>
     <div class="col">
-        <div class="card h-100 border-0 shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title"><i class="bi bi-tools me-2"></i>Mechanics</h5>
-                <a asp-controller="Mechanic" asp-action="Index" class="btn btn-outline-secondary btn-sm">Open</a>
-            </div>
+        <div class="app-card h-100">
+            <h5 class="text-white fw-bold mb-2"><i class="bi bi-tools me-2 text-info"></i>Mechanics</h5>
+            <a asp-controller="Mechanic" asp-action="Index" class="app-btn app-btn-outline app-btn-sm">Open</a>
         </div>
     </div>
     <div class="col">
-        <div class="card h-100 border-0 shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title"><i class="bi bi-box-seam me-2"></i>Parts</h5>
-                <a asp-controller="Parts" asp-action="Index" class="btn btn-outline-secondary btn-sm">Open</a>
-            </div>
+        <div class="app-card h-100">
+            <h5 class="text-white fw-bold mb-2"><i class="bi bi-box-seam me-2 text-info"></i>Parts</h5>
+            <a asp-controller="Parts" asp-action="Index" class="app-btn app-btn-outline app-btn-sm">Open</a>
         </div>
     </div>
     <div class="col">
-        <div class="card h-100 border-0 shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title"><i class="bi bi-receipt me-2"></i>Billing</h5>
-                <a asp-controller="Billing" asp-action="Index" class="btn btn-outline-secondary btn-sm">Open</a>
-            </div>
+        <div class="app-card h-100">
+            <h5 class="text-white fw-bold mb-2"><i class="bi bi-receipt me-2 text-info"></i>Billing</h5>
+            <a asp-controller="Billing" asp-action="Index" class="app-btn app-btn-outline app-btn-sm">Open</a>
         </div>
     </div>
     <div class="col">
-        <div class="card h-100 border-0 shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title"><i class="bi bi-bell me-2"></i>Notifications</h5>
-                <a asp-controller="Notification" asp-action="Index" class="btn btn-outline-secondary btn-sm">Open</a>
-            </div>
+        <div class="app-card h-100">
+            <h5 class="text-white fw-bold mb-2"><i class="bi bi-bell me-2 text-info"></i>Notifications</h5>
+            <a asp-controller="Notification" asp-action="Index" class="app-btn app-btn-outline app-btn-sm">Open</a>
         </div>
     </div>
     <div class="col">
-        <div class="card h-100 border-0 shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title"><i class="bi bi-graph-up me-2"></i>Reports</h5>
-                <a asp-controller="Report" asp-action="Index" class="btn btn-outline-secondary btn-sm">Open</a>
-            </div>
+        <div class="app-card h-100">
+            <h5 class="text-white fw-bold mb-2"><i class="bi bi-graph-up me-2 text-info"></i>Reports</h5>
+            <a asp-controller="Report" asp-action="Index" class="app-btn app-btn-outline app-btn-sm">Open</a>
         </div>
     </div>
 </div>

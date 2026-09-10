@@ -19,4 +19,20 @@ public class InvoiceDto
     public PaymentStatus PaymentStatus { get; set; }
 
     public DateTime IssuedAt { get; set; }
+
+    public string BookingReference { get; set; } = string.Empty;
+
+    public string CustomerName { get; set; } = string.Empty;
+
+    public string VehicleDescription { get; set; } = string.Empty;
+
+    public List<InvoiceLineItemDto> ServiceLines { get; set; } = new();
+
+    public List<InvoiceLineItemDto> PartLines { get; set; } = new();
+
+    public List<PaymentTransactionDto> Payments { get; set; } = new();
+
+    public decimal AmountPaid { get; set; }
+
+    public decimal OutstandingBalance { get; set; }
 }

@@ -12,4 +12,7 @@ public class InvoiceRepository : Repository<Invoice>, IInvoiceRepository
 
     public async Task<Invoice?> GetByServiceJobIdAsync(int serviceJobId) =>
         await DbSet.FirstOrDefaultAsync(i => i.ServiceJobId == serviceJobId);
+
+    public async Task<Invoice?> GetByIdWithPaymentsAsync(int id) =>
+        await DbSet.Include(i => i.PaymentTransactions).FirstOrDefaultAsync(i => i.Id == id);
 }

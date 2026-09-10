@@ -2,4 +2,20 @@
     ViewData["Title"] = "Low Stock Report";
 }
 
-<h1>Low Stock Report</h1>
+<div class="app-page-header">
+    <div>
+        <h1 class="app-page-title">Low Stock Report</h1>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-controller="Parts" asp-action="Index" class="app-btn app-btn-outline">View Parts Inventory</a>
+        <a asp-action="Index" class="app-btn app-btn-outline">Back to Reports</a>
+    </div>
+</div>
+
+<div class="app-card">
+    <div class="app-empty-state">
+        <i class="bi bi-box-seam"></i>
+        This report isn't built yet.
+        <div class="small mt-1">In the meantime, the Parts Inventory page already flags any part at or below its reorder level.</div>
+    </div>
+</div>

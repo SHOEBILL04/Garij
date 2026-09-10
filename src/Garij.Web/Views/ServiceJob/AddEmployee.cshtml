@@ -1,0 +1,93 @@
+@model Garij.Web.Models.CreateStaffUserViewModel
+@using Garij.Domain.Enums
+@{
+    ViewData["Title"] = "Add Garage Employee";
+}
+
+<div class="app-page-header d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+    <div>
+        <h1 class="app-page-title"><i class="bi bi-person-plus-fill me-2 text-info"></i>Add Garage Employee</h1>
+        <p class="app-page-subtitle">Create a staff account with email &amp; password and assign their role in your garage.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="Index" class="app-btn app-btn-outline">
+            <i class="bi bi-arrow-left me-1"></i> Back to Service Jobs
+        </a>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="app-card">
+            <div class="d-flex align-items-center gap-3 mb-4 pb-3 border-bottom border-secondary border-opacity-25">
+                <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; background: rgba(6, 182, 212, 0.15); border: 1px solid rgba(6, 182, 212, 0.4);">
+                    <i class="bi bi-person-badge text-info fs-4"></i>
+                </div>
+                <div>
+                    <h5 class="text-white mb-0 fw-bold">Employee Account Credentials</h5>
+                    <p class="text-secondary small mb-0">The staff member will use these credentials to log in to your garage platform.</p>
+                </div>
+            </div>
+
+            <form asp-action="AddEmployee" method="post">
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger p-3 rounded-3 small mb-4"></div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label asp-for="FullName" class="form-label text-light small fw-semibold">Full Name *</label>
+                        <input asp-for="FullName" class="form-control bg-dark text-light border-secondary" placeholder="e.g. David Vance" required />
+                        <span asp-validation-for="FullName" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Email" class="form-label text-light small fw-semibold">Email Address (Login Username) *</label>
+                        <input asp-for="Email" type="email" class="form-control bg-dark text-light border-secondary" placeholder="david.vance@garage.com" required />
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="PhoneNumber" class="form-label text-light small fw-semibold">Phone Number *</label>
+                        <input asp-for="PhoneNumber" class="form-control bg-dark text-light border-secondary" placeholder="+880 1711-234567" required />
+                        <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Role" class="form-label text-light small fw-semibold">Assigned Garage Role *</label>
+                        <select asp-for="Role" class="form-select bg-dark text-light border-secondary">
+                            <option value="@UserRole.Mechanic" selected>Certified Mechanic (Job Board, Inspection &amp; Repairs)</option>
+                            <option value="@UserRole.FrontDesk">Front Desk (Reception, Bookings &amp; Invoicing)</option>
+                            <option value="@UserRole.Admin">Administrator (Workshop Management &amp; System Oversight)</option>
+                        </select>
+                        <span asp-validation-for="Role" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Password" class="form-label text-light small fw-semibold">Account Password *</label>
+                        <input asp-for="Password" type="password" class="form-control bg-dark text-light border-secondary font-monospace" placeholder="Minimum 6 characters" required />
+                        <span asp-validation-for="Password" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="ConfirmPassword" class="form-label text-light small fw-semibold">Confirm Password *</label>
+                        <input asp-for="ConfirmPassword" type="password" class="form-control bg-dark text-light border-secondary font-monospace" placeholder="Repeat password" required />
+                        <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="alert alert-info bg-opacity-10 bg-info text-info border-info border-opacity-25 mt-4 p-3 rounded-3 small">
+                    <i class="bi bi-info-circle-fill me-2"></i>
+                    <strong>Garage License Included:</strong> This employee account will be automatically covered under your garage's lifetime license and will not be required to make any payment.
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top border-secondary border-opacity-25">
+                    <a asp-action="Index" class="app-btn app-btn-outline">Cancel</a>
+                    <button type="submit" class="app-btn app-btn-primary">
+                        <i class="bi bi-check-circle-fill me-1"></i> Create Employee Account
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

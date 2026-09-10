@@ -3,15 +3,21 @@
     ViewData["Title"] = "Delete Customer";
 }
 
-<h1 class="h3 mb-3">Delete Customer</h1>
-
-<div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-<div class="alert alert-warning">
-    Delete @Model.FullName? Customers with vehicles cannot be deleted.
+<div class="app-page-header">
+    <div>
+        <h1 class="app-page-title">Delete Customer</h1>
+    </div>
 </div>
 
-<form asp-action="Delete" method="post">
-    <input asp-for="Id" type="hidden" />
-    <button type="submit" class="btn btn-danger">Delete</button>
-    <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Cancel</a>
-</form>
+<div class="app-card" style="max-width: 640px;">
+    <div asp-validation-summary="ModelOnly" class="app-alert-danger"></div>
+    <div class="app-alert-danger">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>Delete @Model.FullName? Customers with vehicles cannot be deleted.
+    </div>
+
+    <form asp-action="Delete" method="post" class="d-flex gap-2">
+        <input asp-for="Id" type="hidden" />
+        <button type="submit" class="app-btn app-btn-danger">Delete</button>
+        <a asp-action="Details" asp-route-id="@Model.Id" class="app-btn app-btn-outline">Cancel</a>
+    </form>
+</div>

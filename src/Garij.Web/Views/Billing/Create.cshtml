@@ -1,5 +1,34 @@
+@model int
+
 @{
     ViewData["Title"] = "Generate Invoice";
 }
 
-<h1>Generate Invoice</h1>
+<div class="app-page-header">
+    <div>
+        <h1 class="app-page-title">Generate Invoice</h1>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="app-card">
+            <h2 class="app-card-heading"><i class="bi bi-receipt-cutoff me-2 text-info"></i>Generate Invoice</h2>
+            <form asp-action="Create" method="post">
+                <div asp-validation-summary="ModelOnly" class="app-alert-danger" role="alert"></div>
+
+                <p class="text-light">
+                    Generate an invoice for <strong>Service Job #@Model</strong>? This sums every logged
+                    service and part on the job, calculates tax, and marks the job
+                    <span class="app-badge app-badge-success">Completed</span>. This cannot be undone from here.
+                </p>
+
+                <input type="hidden" name="serviceJobId" value="@Model" />
+                <div class="d-flex justify-content-end gap-2 mt-3">
+                    <a asp-action="Index" class="app-btn app-btn-outline">Cancel</a>
+                    <button type="submit" class="app-btn app-btn-primary"><i class="bi bi-check-circle"></i> Generate Invoice</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

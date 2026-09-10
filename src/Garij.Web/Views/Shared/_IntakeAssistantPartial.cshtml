@@ -1,0 +1,356 @@
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+@{
+    var antiForgeryToken = Antiforgery.GetAndStoreTokens(Context).RequestToken;
+}
+
+<div class="app-card border border-info border-opacity-50 mb-4 bg-dark bg-opacity-25" id="aiIntakeAssistantCard">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+        <div class="d-flex align-items-center gap-2">
+            <div class="rounded-circle d-flex align-items-center justify-content-center bg-info bg-opacity-10" style="width: 34px; height: 34px; border: 1px solid rgba(6, 182, 212, 0.4);">
+                <i class="bi bi-robot text-info"></i>
+            </div>
+            <div>
+                <h5 class="mb-0 text-white fw-bold d-flex align-items-center gap-2" style="font-size: 1rem;">
+                    Gemini Smart Intake Assistant
+                    <span class="badge bg-info bg-opacity-25 text-info border border-info border-opacity-50" style="font-size: 0.7rem; letter-spacing: 0.5px;">ADVISORY ONLY</span>
+                </h5>
+                <span class="small" style="color: #94a3b8;">Grounded on workshop Service Catalog. Human confirmation required before saving.</span>
+            </div>
+        </div>
+        <button type="button" class="app-btn app-btn-outline app-btn-sm text-info border-info" id="btnSyncFromNotes" title="Copy text from Diagnostic Notes field below">
+            <i class="bi bi-arrow-down-up me-1"></i> Use Notes
+        </button>
+    </div>
+
+    <!-- Complaint input -->
+    <div class="mb-3">
+        <label for="aiComplaintInput" class="app-form-label small text-info fw-semibold">Customer Complaint &amp; Vehicle Symptoms</label>
+        <textarea id="aiComplaintInput" class="app-form-control text-white" rows="2" style="color: #ffffff !important; background-color: rgba(15, 23, 42, 0.85); border-color: rgba(6, 182, 212, 0.4);" placeholder="e.g. Grinding noise when braking from front wheels, engine vibrating at idle..."></textarea>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <button type="button" class="app-btn app-btn-primary app-btn-sm d-inline-flex align-items-center gap-2" id="btnRunAiIntake">
+            <span class="spinner-border spinner-border-sm d-none" id="aiSpinner" role="status" aria-hidden="true"></span>
+            <i class="bi bi-stars" id="aiStarsIcon"></i>
+            <span>Analyze &amp; Suggest Services</span>
+        </button>
+    </div>
+
+    <!-- Live Status / Error Notification Box (High Contrast) -->
+    <div id="aiStatusBox" class="mt-2 d-none">
+        <div id="aiStatusAlert" class="alert py-2 px-3 small mb-0 d-flex align-items-center gap-2" role="alert">
+            <i id="aiStatusIcon" class="bi fs-6 flex-shrink-0"></i>
+            <span id="aiStatusText" class="fw-semibold"></span>
+        </div>
+    </div>
+
+    <!-- AI Results Section -->
+    <div id="aiResultsContainer" class="mt-3 d-none">
+        <hr class="border-secondary opacity-25" />
+
+        <!-- Warning / Discarded Banner -->
+        <div id="aiWarningBanner" class="alert py-2 px-3 small d-none mb-3" style="background-color: rgba(245, 158, 11, 0.2); border: 1px solid rgba(245, 158, 11, 0.6); color: #fef08a !important;" role="alert">
+            <i class="bi bi-shield-exclamation me-1 text-warning"></i>
+            <span id="aiWarningText" style="color: #fef08a !important;"></span>
+        </div>
+
+        <!-- Summary -->
+        <div class="p-3 rounded border border-secondary border-opacity-25 mb-3" style="background-color: rgba(15, 23, 42, 0.7);">
+            <div class="text-info small fw-bold text-uppercase" style="letter-spacing: 0.5px;">Diagnostic Assessment</div>
+            <div class="small mt-1" id="aiSummaryText" style="color: #f8fafc !important; font-size: 0.92rem; line-height: 1.6;"></div>
+        </div>
+
+        <!-- Clarifying Questions -->
+        <div id="aiQuestionsWrapper" class="mb-3 d-none">
+            <div class="text-info small fw-bold mb-1">
+                <i class="bi bi-question-circle me-1"></i> Recommended Clarifying Questions for Customer:
+            </div>
+            <ul class="list-unstyled mb-0 ps-2" id="aiQuestionsList"></ul>
+        </div>
+
+        <!-- Service Suggestions Checklist -->
+        <div class="mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <div class="text-info small fw-bold">
+                    <i class="bi bi-check2-circle me-1"></i> Suggested Catalog Services (Select to confirm):
+                </div>
+                <span class="small text-white font-monospace fw-bold" id="aiTotalPreview"></span>
+            </div>
+
+            <div class="d-flex flex-column gap-2" id="aiSuggestionsList"></div>
+        </div>
+
+        <!-- Action / Confirmation Step -->
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 pt-2 border-top border-secondary border-opacity-25">
+            <div class="small" style="color: #94a3b8;">
+                <i class="bi bi-info-circle me-1 text-info"></i> Confirmed suggestions will be appended into the Diagnostic Notes below.
+            </div>
+            <button type="button" class="app-btn app-btn-primary app-btn-sm" id="btnConfirmAppend">
+                <i class="bi bi-check-lg me-1"></i> Confirm &amp; Append to Notes
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const btnRun = document.getElementById("btnRunAiIntake");
+    const btnSync = document.getElementById("btnSyncFromNotes");
+    const btnConfirm = document.getElementById("btnConfirmAppend");
+    const complaintInput = document.getElementById("aiComplaintInput");
+    const spinner = document.getElementById("aiSpinner");
+    const starsIcon = document.getElementById("aiStarsIcon");
+    const statusBox = document.getElementById("aiStatusBox");
+    const statusAlert = document.getElementById("aiStatusAlert");
+    const statusIcon = document.getElementById("aiStatusIcon");
+    const statusText = document.getElementById("aiStatusText");
+    const resultsContainer = document.getElementById("aiResultsContainer");
+    const summaryText = document.getElementById("aiSummaryText");
+    const questionsWrapper = document.getElementById("aiQuestionsWrapper");
+    const questionsList = document.getElementById("aiQuestionsList");
+    const suggestionsList = document.getElementById("aiSuggestionsList");
+    const warningBanner = document.getElementById("aiWarningBanner");
+    const warningText = document.getElementById("aiWarningText");
+    const totalPreview = document.getElementById("aiTotalPreview");
+
+    // Amendment 5: Verify real DOM ID of DiagnosticNotes textarea
+    const notesEl = document.getElementById("DiagnosticNotes") || document.querySelector('textarea[name="DiagnosticNotes"]');
+
+    function setStatus(msg, type) {
+        if (!msg) {
+            statusBox.classList.add("d-none");
+            return;
+        }
+        statusBox.classList.remove("d-none");
+        statusText.textContent = msg;
+
+        if (type === "error") {
+            statusAlert.className = "alert py-2 px-3 small mb-0 d-flex align-items-start gap-2 border-danger";
+            statusAlert.style.backgroundColor = "rgba(220, 38, 38, 0.25)";
+            statusAlert.style.border = "1px solid rgba(248, 113, 113, 0.6)";
+            statusAlert.style.color = "#ffffff";
+            statusIcon.className = "bi bi-exclamation-octagon-fill text-danger fs-6 flex-shrink-0 mt-1";
+            statusText.style.color = "#ffffff";
+        } else if (type === "loading") {
+            statusAlert.className = "alert py-2 px-3 small mb-0 d-flex align-items-center gap-2 border-info";
+            statusAlert.style.backgroundColor = "rgba(6, 182, 212, 0.2)";
+            statusAlert.style.border = "1px solid rgba(6, 182, 212, 0.6)";
+            statusAlert.style.color = "#e0f2fe";
+            statusIcon.className = "bi bi-arrow-repeat text-info fs-6 flex-shrink-0";
+            statusText.style.color = "#e0f2fe";
+        } else if (type === "success") {
+            statusAlert.className = "alert py-2 px-3 small mb-0 d-flex align-items-center gap-2 border-success";
+            statusAlert.style.backgroundColor = "rgba(34, 197, 94, 0.2)";
+            statusAlert.style.border = "1px solid rgba(74, 222, 128, 0.6)";
+            statusAlert.style.color = "#f0fdf4";
+            statusIcon.className = "bi bi-check-circle-fill text-success fs-6 flex-shrink-0";
+            statusText.style.color = "#f0fdf4";
+        } else if (type === "warning") {
+            statusAlert.className = "alert py-2 px-3 small mb-0 d-flex align-items-center gap-2 border-warning";
+            statusAlert.style.backgroundColor = "rgba(245, 158, 11, 0.25)";
+            statusAlert.style.border = "1px solid rgba(251, 191, 36, 0.6)";
+            statusAlert.style.color = "#fef3c7";
+            statusIcon.className = "bi bi-exclamation-triangle-fill text-warning fs-6 flex-shrink-0";
+            statusText.style.color = "#fef3c7";
+        } else {
+            statusAlert.className = "alert py-2 px-3 small mb-0 d-flex align-items-center gap-2 border-secondary";
+            statusAlert.style.backgroundColor = "rgba(100, 116, 139, 0.25)";
+            statusAlert.style.border = "1px solid rgba(148, 163, 184, 0.5)";
+            statusAlert.style.color = "#ffffff";
+            statusIcon.className = "bi bi-info-circle flex-shrink-0 text-info";
+            statusText.style.color = "#ffffff";
+        }
+    }
+
+    btnSync?.addEventListener("click", function () {
+        if (notesEl && notesEl.value.trim().length > 0) {
+            complaintInput.value = notesEl.value.trim();
+            complaintInput.focus();
+            setStatus("Loaded symptoms from Diagnostic Notes.", "info");
+            setTimeout(() => { setStatus("", "hide"); }, 3000);
+        } else {
+            setStatus("Diagnostic Notes below is currently empty.", "warning");
+            setTimeout(() => { setStatus("", "hide"); }, 3000);
+        }
+    });
+
+    btnRun?.addEventListener("click", async function () {
+        const text = complaintInput.value.trim();
+        if (!text) {
+            setStatus("Please enter symptoms or complaints first.", "warning");
+            complaintInput.focus();
+            return;
+        }
+
+        btnRun.disabled = true;
+        spinner.classList.remove("d-none");
+        starsIcon.classList.add("d-none");
+        setStatus("Consulting Gemini AI with live catalog...", "loading");
+        resultsContainer.classList.add("d-none");
+        warningBanner.classList.add("d-none");
+
+        try {
+            const response = await fetch("/IntakeAssistant/Suggest", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "RequestVerificationToken": "@antiForgeryToken"
+                },
+                body: JSON.stringify({ complaintText: text })
+            });
+
+            if (!response.ok) {
+                const errData = await response.json().catch(() => null);
+                throw new Error(errData?.errorMessage || ("Server returned status " + response.status));
+            }
+
+            const data = await response.json();
+            if (!data.success) {
+                setStatus(data.errorMessage || "AI suggestion generation failed.", "error");
+                if (data.isConfigured === false) {
+                    warningBanner.classList.remove("d-none");
+                    warningText.textContent = data.errorMessage;
+                }
+                return;
+            }
+
+            // Populate UI
+            setStatus("Suggestions ready for review.", "success");
+            summaryText.textContent = data.summary || "No specific assessment summary returned.";
+
+            // Warnings / discarded invalid check
+            if (data.discardedInvalidCount > 0 || (data.warnings && data.warnings.length > 0)) {
+                warningBanner.classList.remove("d-none");
+                warningText.textContent = data.warnings.join(" ");
+            }
+
+            // Clarifying questions
+            questionsList.innerHTML = "";
+            if (data.clarifyingQuestions && data.clarifyingQuestions.length > 0) {
+                questionsWrapper.classList.remove("d-none");
+                data.clarifyingQuestions.forEach(q => {
+                    const li = document.createElement("li");
+                    li.className = "small mb-1";
+                    li.style.color = "#f1f5f9";
+                    li.innerHTML = '<i class="bi bi-chat-dots me-1 text-info"></i> <span style="color: #f1f5f9 !important;">' + escapeHtml(q) + '</span>';
+                    questionsList.appendChild(li);
+                });
+            } else {
+                questionsWrapper.classList.add("d-none");
+            }
+
+            // Suggestions checklist
+            suggestionsList.innerHTML = "";
+            if (data.suggestions && data.suggestions.length > 0) {
+                data.suggestions.forEach((item, index) => {
+                    const confPercent = Math.round(item.confidence * 100);
+                    const confBadgeClass = confPercent >= 80 ? "bg-success" : (confPercent >= 60 ? "bg-info" : "bg-secondary");
+
+                    const row = document.createElement("div");
+                    row.className = "p-2 rounded bg-dark border border-secondary border-opacity-50 d-flex align-items-start gap-2";
+                    row.innerHTML = `
+                        <div class="form-check mt-1">
+                            <input class="form-check-input ai-suggestion-check" type="checkbox" id="sugCheck_${index}" checked
+                                   data-id="${item.serviceCatalogId}"
+                                   data-name="${escapeHtml(item.serviceName)}"
+                                   data-price="${item.basePrice}"
+                                   data-duration="${item.estimatedDurationMinutes}"
+                                   data-reason="${escapeHtml(item.reason)}">
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-center flex-wrap gap-1">
+                                <label class="form-check-label text-white fw-bold small mb-0" for="sugCheck_${index}">
+                                    ${escapeHtml(item.serviceName)}
+                                </label>
+                                <div class="d-flex align-items-center gap-1">
+                                    <span class="badge ${confBadgeClass} bg-opacity-25 text-${confBadgeClass.replace('bg-','')} border border-${confBadgeClass.replace('bg-','')} border-opacity-50" style="font-size: 0.68rem;">
+                                        ${confPercent}% match
+                                    </span>
+                                    <span class="font-monospace text-info small fw-bold">$${item.basePrice.toFixed(2)}</span>
+                                </div>
+                            </div>
+                            <div class="small mt-1" style="color: #cbd5e1 !important;">${escapeHtml(item.reason)}</div>
+                            <div class="small" style="color: #38bdf8 !important; font-size: 0.75rem;">
+                                <i class="bi bi-clock me-1"></i>Est. ${item.estimatedDurationMinutes} mins
+                            </div>
+                        </div>
+                    `;
+                    suggestionsList.appendChild(row);
+                });
+
+                updateTotalPreview();
+                document.querySelectorAll(".ai-suggestion-check").forEach(cb => {
+                    cb.addEventListener("change", updateTotalPreview);
+                });
+            } else {
+                suggestionsList.innerHTML = '<div class="small p-2" style="color: #f1f5f9;">No matching services found in catalog.</div>';
+                totalPreview.textContent = "";
+            }
+
+            resultsContainer.classList.remove("d-none");
+        } catch (err) {
+            setStatus("Error: " + err.message, "error");
+        } finally {
+            btnRun.disabled = false;
+            spinner.classList.add("d-none");
+            starsIcon.classList.remove("d-none");
+        }
+    });
+
+    function updateTotalPreview() {
+        let total = 0;
+        let checkedCount = 0;
+        document.querySelectorAll(".ai-suggestion-check:checked").forEach(cb => {
+            total += parseFloat(cb.getAttribute("data-price") || 0);
+            checkedCount++;
+        });
+        totalPreview.textContent = `Selected: ${checkedCount} | Est. Total: $${total.toFixed(2)}`;
+    }
+
+    btnConfirm?.addEventListener("click", function () {
+        const checked = Array.from(document.querySelectorAll(".ai-suggestion-check:checked"));
+        if (checked.length === 0) {
+            alert("Please select at least one suggestion to confirm.");
+            return;
+        }
+
+        if (!notesEl) {
+            alert("Could not locate the Diagnostic Notes textarea.");
+            return;
+        }
+
+        const lines = [];
+        lines.push("--- AI Suggested Services (Confirmed by Staff) ---");
+        checked.forEach(cb => {
+            const name = cb.getAttribute("data-name");
+            const price = parseFloat(cb.getAttribute("data-price") || 0).toFixed(2);
+            const dur = cb.getAttribute("data-duration");
+            const reason = cb.getAttribute("data-reason");
+            lines.push(`• ${name} ($${price}, ~${dur} min): ${reason}`);
+        });
+
+        const assessmentSummary = summaryText.textContent.trim();
+        if (assessmentSummary) {
+            lines.push(`Assessment: ${assessmentSummary}`);
+        }
+        lines.push("-------------------------------------------------");
+
+        const formattedText = lines.join("\n");
+        if (notesEl.value.trim().length > 0) {
+            notesEl.value = notesEl.value.trim() + "\n\n" + formattedText;
+        } else {
+            notesEl.value = formattedText;
+        }
+
+        notesEl.focus();
+        notesEl.scrollIntoView({ behavior: "smooth", block: "center" });
+
+        setStatus("Appended confirmed suggestions to Diagnostic Notes.", "success");
+    });
+
+    function escapeHtml(str) {
+        if (!str) return "";
+        return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+});
+</script>

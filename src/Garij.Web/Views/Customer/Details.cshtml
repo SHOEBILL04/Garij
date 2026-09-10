@@ -4,56 +4,71 @@
     var vehicles = ViewBag.Vehicles as IEnumerable<VehicleDto> ?? Enumerable.Empty<VehicleDto>();
 }
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="h3 mb-0">@Model.FullName</h1>
+<div class="app-page-header">
     <div>
-        <a asp-controller="Vehicle" asp-action="Create" asp-route-customerId="@Model.Id" class="btn btn-primary">Add Vehicle</a>
-        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Edit</a>
+        <h1 class="app-page-title">@Model.FullName</h1>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-controller="Vehicle" asp-action="Create" asp-route-customerId="@Model.Id" class="app-btn app-btn-primary"><i class="bi bi-plus-lg"></i> Add Vehicle</a>
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="app-btn app-btn-outline">Edit</a>
     </div>
 </div>
 
 @if (TempData["SuccessMessage"] is string message)
 {
-    <div class="alert alert-success">@message</div>
+    <div class="app-alert-success"><span><i class="bi bi-check-circle-fill me-2"></i>@message</span></div>
 }
 
-<dl class="row">
-    <dt class="col-sm-3">Email</dt>
-    <dd class="col-sm-9">@Model.Email</dd>
-    <dt class="col-sm-3">Phone</dt>
-    <dd class="col-sm-9">@Model.PhoneNumber</dd>
-    <dt class="col-sm-3">Address</dt>
-    <dd class="col-sm-9">@Model.Address</dd>
-</dl>
-
-<h2 class="h5 mt-4">Vehicles</h2>
-<div class="table-responsive">
-    <table class="table table-striped align-middle">
-        <thead>
-            <tr>
-                <th>Plate</th>
-                <th>Vehicle</th>
-                <th>Color</th>
-                <th class="text-end">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        @foreach (var vehicle in vehicles)
-        {
-            <tr>
-                <td>@vehicle.LicensePlateNumber</td>
-                <td>@vehicle.Year @vehicle.Make @vehicle.Model</td>
-                <td>@vehicle.Color</td>
-                <td class="text-end">
-                    <a asp-controller="Vehicle" asp-action="Details" asp-route-id="@vehicle.Id" class="btn btn-sm btn-outline-primary">Details</a>
-                </td>
-            </tr>
-        }
-        </tbody>
-    </table>
+<div class="app-card mb-4">
+    <dl class="row mb-0">
+        <dt class="col-sm-3 app-page-subtitle">Email</dt>
+        <dd class="col-sm-9 text-white">@Model.Email</dd>
+        <dt class="col-sm-3 app-page-subtitle">Phone</dt>
+        <dd class="col-sm-9 text-white">@Model.PhoneNumber</dd>
+        <dt class="col-sm-3 app-page-subtitle">Address</dt>
+        <dd class="col-sm-9 text-white mb-0">@Model.Address</dd>
+    </dl>
 </div>
 
-@if (!vehicles.Any())
-{
-    <div class="alert alert-info">This customer does not have any vehicles yet.</div>
-}
+<h2 class="app-page-title" style="font-size: 1.3rem;">Vehicles</h2>
+<div class="app-table-wrap">
+    <div class="table-responsive">
+        <table class="app-table mb-0">
+            <thead>
+                <tr>
+                    <th>Plate</th>
+                    <th>Vehicle</th>
+                    <th>Color</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!vehicles.Any())
+                {
+                    <tr>
+                        <td colspan="4">
+                            <div class="app-empty-state">
+                                <i class="bi bi-car-front"></i>
+                                This customer does not have any vehicles yet.
+                            </div>
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var vehicle in vehicles)
+                    {
+                        <tr>
+                            <td class="text-white fw-semibold font-monospace">@vehicle.LicensePlateNumber</td>
+                            <td>@vehicle.Year @vehicle.Make @vehicle.Model</td>
+                            <td>@vehicle.Color</td>
+                            <td class="text-end">
+                                <a asp-controller="Vehicle" asp-action="Details" asp-route-id="@vehicle.Id" class="app-btn app-btn-outline app-btn-sm">Details</a>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

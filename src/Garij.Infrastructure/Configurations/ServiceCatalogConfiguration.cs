@@ -14,6 +14,12 @@ public class ServiceCatalogConfiguration : IEntityTypeConfiguration<ServiceCatal
         builder.Property(sc => sc.Description).HasMaxLength(1000);
         builder.Property(sc => sc.BasePrice).HasColumnType("decimal(18,2)");
 
+        builder.ToTable(t =>
+        {
+            t.HasCheckConstraint("CK_ServiceCatalog_BasePrice", "\"BasePrice\" >= 0");
+            t.HasCheckConstraint("CK_ServiceCatalog_EstimatedDurationMinutes", "\"EstimatedDurationMinutes\" > 0");
+        });
+
         builder.HasMany(sc => sc.JobServiceDetails)
             .WithOne(jsd => jsd.ServiceCatalog)
             .HasForeignKey(jsd => jsd.ServiceCatalogId)

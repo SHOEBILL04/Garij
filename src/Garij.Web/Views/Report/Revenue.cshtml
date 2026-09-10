@@ -1,5 +1,261 @@
+@model Garij.Application.DTOs.RevenueReportDto
 @{
-    ViewData["Title"] = "Revenue Report";
+    ViewData["Title"] = "Monthly Revenue Report";
+
+    // Combine monthly labels across billed and collected
+    var allMonths = Model.MonthlyBilledBreakdown.Select(b => new { b.Year, b.Month, b.MonthName })
+        .Union(Model.MonthlyCollectedBreakdown.Select(c => new { c.Year, c.Month, c.MonthName }))
+        .OrderBy(m => m.Year).ThenBy(m => m.Month)
+        .ToList();
+
+    var labelsJson = System.Text.Json.JsonSerializer.Serialize(allMonths.Select(m => m.MonthName));
+    var billedGrossJson = System.Text.Json.JsonSerializer.Serialize(allMonths.Select(m => {
+        var b = Model.MonthlyBilledBreakdown.FirstOrDefault(x => x.Year == m.Year && x.Month == m.Month);
+        return b?.GrossRevenue ?? 0m;
+    }));
+    var collectedJson = System.Text.Json.JsonSerializer.Serialize(allMonths.Select(m => {
+        var c = Model.MonthlyCollectedBreakdown.FirstOrDefault(x => x.Year == m.Year && x.Month == m.Month);
+        return c?.CollectedAmount ?? 0m;
+    }));
 }
 
-<h1>Revenue Report</h1>
+<style>
+    @@media print {
+        header, nav, footer, .no-print, .app-btn, .navbar, .brand-title, .theme-toggle {
+            display: none !important;
+        }
+        body {
+            background: #ffffff !important;
+            color: #000000 !important;
+            font-size: 12pt;
+        }
+        .app-card {
+            border: 1px solid #ccc !important;
+            background: #ffffff !important;
+            color: #000000 !important;
+            box-shadow: none !important;
+            break-inside: avoid;
+        }
+        .text-white, .text-light, .text-info, .text-secondary {
+            color: #000000 !important;
+        }
+        table {
+            width: 100% !important;
+            border-collapse: collapse !important;
+        }
+        table, th, td {
+            border: 1px solid #333 !important;
+            color: #000000 !important;
+            padding: 6px !important;
+        }
+        .print-header {
+            display: block !important;
+            margin-bottom: 20px;
+        }
+    }
+    .print-header {
+        display: none;
+    }
+</style>
+
+<div class="print-header">
+    <h2>Garij Workshop — Executive Revenue Report</h2>
+    <p>Period: @Model.PeriodStart.ToShortDateString() — @Model.PeriodEnd.ToShortDateString() | Generated: @DateTime.UtcNow.ToString("g") UTC</p>
+</div>
+
+<div class="app-page-header no-print">
+    <div>
+        <h1 class="app-page-title">Executive Revenue Report</h1>
+        <p class="app-page-subtitle">Side-by-side comparison of Billed Revenue (Accrual) and Collected Revenue (Cash).</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="Index" class="app-btn app-btn-outline">Back to Reports</a>
+    </div>
+</div>
+
+@await Html.PartialAsync("_DateRangeFilterPartial")
+
+<!-- Summary KPI Cards -->
+<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-xl-6 g-3 mb-4">
+    <div class="col">
+        <div class="app-card h-100 p-3">
+            <span class="text-secondary small text-uppercase">Billed Net (Pre-Tax)</span>
+            <h3 class="text-white fw-bold font-monospace mt-1 mb-0">$@Model.TotalBilledNet.ToString("N2")</h3>
+            <span class="small text-muted">SubTotal of issued invoices</span>
+        </div>
+    </div>
+    <div class="col">
+        <div class="app-card h-100 p-3 border-info border-opacity-25">
+            <span class="text-info small text-uppercase fw-semibold">Billed Gross (Total)</span>
+            <h3 class="text-info fw-bold font-monospace mt-1 mb-0">$@Model.TotalBilledGross.ToString("N2")</h3>
+            <span class="small text-muted">Incl. tax (non-void invoices)</span>
+        </div>
+    </div>
+    <div class="col">
+        <div class="app-card h-100 p-3 border-success border-opacity-25">
+            <span class="text-success small text-uppercase fw-semibold">Cash Collected</span>
+            <h3 class="text-success fw-bold font-monospace mt-1 mb-0">$@Model.TotalCollected.ToString("N2")</h3>
+            <span class="small text-muted">Cleared payment transactions</span>
+        </div>
+    </div>
+    <div class="col">
+        <div class="app-card h-100 p-3">
+            <span class="text-secondary small text-uppercase">Invoices Issued</span>
+            <h3 class="text-white fw-bold font-monospace mt-1 mb-0">@Model.TotalInvoices</h3>
+            <span class="small text-muted">Pending, partial &amp; paid</span>
+        </div>
+    </div>
+    <div class="col">
+        <div class="app-card h-100 p-3">
+            <span class="text-secondary small text-uppercase">Avg Invoice Value</span>
+            <h3 class="text-white fw-bold font-monospace mt-1 mb-0">$@Model.AverageInvoiceValue.ToString("N2")</h3>
+            <span class="small text-muted">Average gross ticket size</span>
+        </div>
+    </div>
+    <div class="col">
+        <div class="app-card h-100 p-3 border-danger border-opacity-25">
+            <span class="text-danger small text-uppercase fw-semibold">Refunded / Voided Invoices</span>
+            <h3 class="text-danger fw-bold font-monospace mt-1 mb-0">$@Model.RefundedGrossAmount.ToString("N2")</h3>
+            <span class="small text-muted">@Model.RefundedInvoiceCount invoice(s) excluded from billed</span>
+        </div>
+    </div>
+</div>
+
+<div class="app-card p-3 mb-4 border-secondary border-opacity-25 bg-dark bg-opacity-25">
+    <div class="d-flex align-items-start gap-2">
+        <i class="bi bi-info-circle text-info mt-1"></i>
+        <div class="small text-secondary">
+            <strong class="text-light">Reporting Basis:</strong> Billed revenue excludes invoices currently marked Refunded; collected revenue records all payments received in the period regardless of the invoice's current status; the system does not store refund timestamps, so an invoice refunded after the reporting period will still have its original payments counted as collected.
+        </div>
+    </div>
+</div>
+
+<!-- Chart Section -->
+@if (allMonths.Count > 0)
+{
+    <div class="app-card mb-4 no-print">
+        <h5 class="text-white fw-bold mb-3"><i class="bi bi-bar-chart-line me-2 text-info"></i>Revenue Trajectory (Billed Gross vs Collected)</h5>
+        <div style="max-height: 280px; position: relative;">
+            <canvas id="revenueChart"></canvas>
+        </div>
+    </div>
+}
+
+<!-- Detailed Side-by-Side Table -->
+<div class="app-card">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="text-white fw-bold mb-0">Monthly Breakdown</h5>
+        <span class="badge bg-secondary bg-opacity-25 text-light">@allMonths.Count Month(s)</span>
+    </div>
+
+    @if (allMonths.Count == 0)
+    {
+        <div class="app-empty-state py-5">
+            <i class="bi bi-calendar-x fs-1 text-secondary mb-2"></i>
+            <div class="fw-semibold">No revenue data for selected date range.</div>
+            <div class="small text-secondary mt-1">Adjust dates above or clear filters to view historical revenue.</div>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-dark table-hover align-middle mb-0">
+                <thead>
+                    <tr class="text-secondary small text-uppercase border-secondary">
+                        <th>Period</th>
+                        <th class="text-end">Billed Net (Pre-Tax)</th>
+                        <th class="text-end text-info">Billed Gross</th>
+                        <th class="text-center">Invoices</th>
+                        <th class="text-end">Avg Ticket</th>
+                        <th class="text-end text-success">Cash Collected</th>
+                        <th class="text-center">Payments</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var m in allMonths)
+                    {
+                        var billed = Model.MonthlyBilledBreakdown.FirstOrDefault(x => x.Year == m.Year && x.Month == m.Month);
+                        var collected = Model.MonthlyCollectedBreakdown.FirstOrDefault(x => x.Year == m.Year && x.Month == m.Month);
+                        <tr>
+                            <td class="fw-semibold text-white">@m.MonthName</td>
+                            <td class="text-end font-monospace">$@((billed?.NetRevenue ?? 0m).ToString("N2"))</td>
+                            <td class="text-end font-monospace text-info fw-semibold">$@((billed?.GrossRevenue ?? 0m).ToString("N2"))</td>
+                            <td class="text-center font-monospace">@(billed?.InvoiceCount ?? 0)</td>
+                            <td class="text-end font-monospace">$@((billed?.AverageInvoiceValue ?? 0m).ToString("N2"))</td>
+                            <td class="text-end font-monospace text-success fw-semibold">$@((collected?.CollectedAmount ?? 0m).ToString("N2"))</td>
+                            <td class="text-center font-monospace">@(collected?.TransactionCount ?? 0)</td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr class="fw-bold text-white border-top border-secondary">
+                        <td>TOTAL</td>
+                        <td class="text-end font-monospace">$@Model.TotalBilledNet.ToString("N2")</td>
+                        <td class="text-end font-monospace text-info">$@Model.TotalBilledGross.ToString("N2")</td>
+                        <td class="text-center font-monospace">@Model.TotalInvoices</td>
+                        <td class="text-end font-monospace">$@Model.AverageInvoiceValue.ToString("N2")</td>
+                        <td class="text-end font-monospace text-success">$@Model.TotalCollected.ToString("N2")</td>
+                        <td class="text-center font-monospace">@Model.MonthlyCollectedBreakdown.Sum(c => c.TransactionCount)</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const ctx = document.getElementById('revenueChart');
+            if (!ctx) return;
+
+            const labels = @Html.Raw(labelsJson);
+            const billedData = @Html.Raw(billedGrossJson);
+            const collectedData = @Html.Raw(collectedJson);
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Billed Gross ($)',
+                            data: billedData,
+                            backgroundColor: 'rgba(6, 182, 212, 0.65)',
+                            borderColor: 'rgb(6, 182, 212)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Cash Collected ($)',
+                            data: collectedData,
+                            backgroundColor: 'rgba(34, 197, 94, 0.65)',
+                            borderColor: 'rgb(34, 197, 94)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(255, 255, 255, 0.08)' },
+                            ticks: { color: '#94a3b8' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#94a3b8' }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: { color: '#f8fafc' }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+}

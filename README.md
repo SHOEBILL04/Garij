@@ -41,6 +41,17 @@ The project follows a clean **3-Layer Architecture** (Presentation, Application,
 
 ---
 
+## 🌟 Key Features & Business Workflows
+
+- **Touch-Friendly Mechanic Job Board & State Machine**: Mobile-optimized dashboard for mechanics to manage assigned repair tasks, record diagnostic notes, and advance jobs through strict, validated state transitions (`Requested` &rarr; `InspectionPending` &rarr; `CustomerApprovalNeeded` &rarr; `InProgress` &rarr; `Completed`).
+- **Enforced Business Integrity Rules**: Hard pre-condition validation preventing job completion without logged parts used (`BR-008`), and enforcing lead mechanic uniqueness (`BR-003`).
+- **Transactional Invoice Generation**: Automated invoice calculation summing labor and logged parts with atomic database rollback protections (`BR-007`).
+- **Customer & Vehicle Intake**: Streamlined registration, unique booking reference generation (`GRJ-2026-XXXX`), and service history tracking.
+- **Parts Inventory & Reorder Alerts**: Inventory management with atomic stock deduction and automatic low-stock alerts.
+- **Public Booking Status Portal**: Mobile-first public portal for customers to track real-time repair progress via booking reference or license plate.
+
+---
+
 ## 📋 Prerequisites
 
 Before running the project, ensure you have installed:
@@ -120,7 +131,42 @@ garij/
 
 ---
 
+## 🤖 Smart Intake Gemini AI Assistant Setup (Issue #31)
+
+Garij includes a Google Gemini-backed Smart Intake Assistant that grounds diagnostic recommendations directly on the workshop's live `ServiceCatalog`. All suggestions are strictly **advisory** and require explicit staff confirmation before being appended into service job diagnostic notes.
+
+### 1. Obtaining an API Key
+1. Go to [Google AI Studio](https://aistudio.google.com/).
+2. Sign in with your Google account and click **Get API Key**.
+3. Create a new API key.
+
+### 2. Configuring via User Secrets (Local Development)
+Never commit your API key to source control. Set your secret locally in `src/Garij.Web`:
+
+```bash
+dotnet user-secrets set "GeminiSettings:ApiKey" "<YOUR_GEMINI_API_KEY>" --project src/Garij.Web
+```
+
+Verify your secret is active:
+```bash
+dotnet user-secrets list --project src/Garij.Web
+```
+
+If the API key is not configured, the assistant degrades gracefully with a helpful advisory message on the intake form without breaking normal job creation.
+
+### 3. Swapping to Another LLM Provider
+The AI engine is architected around the provider-agnostic `ILlmClient` interface (`Garij.Infrastructure.ExternalServices.Gemini.ILlmClient`).
+To switch from Google Gemini to OpenRouter, Anthropic, or local Ollama:
+1. Create a new implementation of `ILlmClient` (e.g. `OpenRouterClient.cs` or `OllamaClient.cs`) in `src/Garij.Infrastructure/ExternalServices/`.
+2. In `src/Garij.Web/Program.cs`, swap the typed client registration:
+   ```csharp
+   builder.Services.AddHttpClient<ILlmClient, OpenRouterClient>(client => { client.Timeout = TimeSpan.FromSeconds(30); });
+   ```
+The core `IntelligenceService` business logic and UI partial remain 100% unchanged.
+
+---
 
 ## 📄 License
+
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

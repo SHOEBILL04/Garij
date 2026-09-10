@@ -14,4 +14,6 @@ public interface IServiceJobRepository : IRepository<ServiceJob>
     Task<ServiceJob?> GetByIdWithDetailsAsync(int id);
 
     Task<IEnumerable<ServiceJob>> GetJobsByStatusAsync(JobStatus status);
+
+    Task<IEnumerable<ServiceJob>> GetJobsByMechanicAsync(int mechanicUserId);
 }

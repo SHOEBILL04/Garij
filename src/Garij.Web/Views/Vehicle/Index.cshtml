@@ -3,58 +3,76 @@
     ViewData["Title"] = "Vehicles";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="h3 mb-0">Vehicles</h1>
-    <a asp-action="Create" class="btn btn-primary">Add Vehicle</a>
+<div class="app-page-header">
+    <div>
+        <h1 class="app-page-title">Vehicles</h1>
+        <p class="app-page-subtitle">Registered vehicles across all customers.</p>
+    </div>
+    <a asp-action="Create" class="app-btn app-btn-primary"><i class="bi bi-plus-lg"></i> Add Vehicle</a>
 </div>
 
 @if (TempData["SuccessMessage"] is string message)
 {
-    <div class="alert alert-success">@message</div>
+    <div class="app-alert-success"><span><i class="bi bi-check-circle-fill me-2"></i>@message</span></div>
 }
 
-<form asp-action="Index" method="get" class="row g-2 mb-3">
-    <div class="col-md-5">
-        <label for="plateNumber" class="form-label">Search plate number</label>
-        <input id="plateNumber" name="plateNumber" value="@ViewData["PlateNumber"]" class="form-control" placeholder="BR-002" />
-    </div>
-    <div class="col-md-auto align-self-end">
-        <button type="submit" class="btn btn-outline-primary">Search</button>
-        <a asp-action="Index" class="btn btn-outline-secondary">Clear</a>
-    </div>
-</form>
-
-<div class="table-responsive">
-    <table class="table table-striped align-middle">
-        <thead>
-            <tr>
-                <th>Plate</th>
-                <th>Vehicle</th>
-                <th>Customer</th>
-                <th>VIN</th>
-                <th class="text-end">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        @foreach (var vehicle in Model)
-        {
-            <tr>
-                <td>@vehicle.LicensePlateNumber</td>
-                <td>@vehicle.Year @vehicle.Make @vehicle.Model</td>
-                <td>@vehicle.CustomerName</td>
-                <td>@vehicle.Vin</td>
-                <td class="text-end">
-                    <a asp-action="Details" asp-route-id="@vehicle.Id" class="btn btn-sm btn-outline-primary">Details</a>
-                    <a asp-action="Edit" asp-route-id="@vehicle.Id" class="btn btn-sm btn-outline-secondary">Edit</a>
-                    <a asp-action="Delete" asp-route-id="@vehicle.Id" class="btn btn-sm btn-outline-danger">Delete</a>
-                </td>
-            </tr>
-        }
-        </tbody>
-    </table>
+<div class="app-card mb-4 py-3">
+    <form asp-action="Index" method="get" class="row g-2 align-items-end">
+        <div class="col-md-5 app-form-group mb-0">
+            <label for="plateNumber" class="app-form-label">Search plate number</label>
+            <input id="plateNumber" name="plateNumber" value="@ViewData["PlateNumber"]" class="app-form-control" placeholder="BR-002" />
+        </div>
+        <div class="col-md-auto d-flex gap-2">
+            <button type="submit" class="app-btn app-btn-primary app-btn-sm">Search</button>
+            <a asp-action="Index" class="app-btn app-btn-outline app-btn-sm">Clear</a>
+        </div>
+    </form>
 </div>
 
-@if (!Model.Any())
-{
-    <div class="alert alert-info">No vehicles matched the current search.</div>
-}
+<div class="app-table-wrap">
+    <div class="table-responsive">
+        <table class="app-table mb-0">
+            <thead>
+                <tr>
+                    <th>Plate</th>
+                    <th>Vehicle</th>
+                    <th>Customer</th>
+                    <th>VIN</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="5">
+                            <div class="app-empty-state">
+                                <i class="bi bi-car-front"></i>
+                                No vehicles matched the current search.
+                            </div>
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var vehicle in Model)
+                    {
+                        <tr>
+                            <td class="text-white fw-semibold font-monospace">@vehicle.LicensePlateNumber</td>
+                            <td>@vehicle.Year @vehicle.Make @vehicle.Model</td>
+                            <td>@vehicle.CustomerName</td>
+                            <td>@vehicle.Vin</td>
+                            <td class="text-end">
+                                <div class="d-flex gap-2 justify-content-end flex-wrap">
+                                    <a asp-action="Details" asp-route-id="@vehicle.Id" class="app-btn app-btn-outline app-btn-sm">Details</a>
+                                    <a asp-action="Edit" asp-route-id="@vehicle.Id" class="app-btn app-btn-outline app-btn-sm">Edit</a>
+                                    <a asp-action="Delete" asp-route-id="@vehicle.Id" class="app-btn app-btn-danger app-btn-sm">Delete</a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

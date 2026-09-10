@@ -166,7 +166,7 @@ public class AuthorizationTests : IClassFixture<AuthorizationTestFactory>
         var client = CreateNonRedirectingClient();
         await LoginAsync(client, "mechanic@garij.com", "Mechanic@12345");
 
-        var response = await client.GetAsync("/");
+        var response = await client.GetAsync("/Dashboard");
 
         Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
         Assert.Contains("/Account/AccessDenied", response.Headers.Location!.ToString());
@@ -177,6 +177,16 @@ public class AuthorizationTests : IClassFixture<AuthorizationTestFactory>
     {
         var client = CreateNonRedirectingClient();
         await LoginAsync(client, "frontdesk@garij.com", "Staff@12345");
+
+        var response = await client.GetAsync("/Dashboard");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task PublicLandingPage_AllowsAnonymousAccess()
+    {
+        var client = CreateNonRedirectingClient();
 
         var response = await client.GetAsync("/");
 

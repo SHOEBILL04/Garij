@@ -1,175 +1,196 @@
 @model IEnumerable<Garij.Application.DTOs.ServiceJobDto>
 @using Garij.Domain.Enums
+@using Garij.Web.Helpers
 
 @{
     ViewData["Title"] = "Service Jobs";
     var selectedStatus = ViewBag.SelectedStatus as JobStatus?;
+    var selectedMechanicId = ViewBag.SelectedMechanicId as int?;
+    var mechanics = ViewBag.Mechanics as SelectList;
+    string selectedSortBy = (ViewBag.SelectedSortBy as string) ?? "date_desc";
+    string searchTerm = (ViewBag.SearchTerm as string) ?? "";
 }
 
-<div class="container-fluid px-4 py-3">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h1 class="h3 mb-0 text-gray-800">Service Jobs</h1>
-            <p class="text-muted small mb-0">Manage vehicle service jobs, track status progression, and assign mechanics.</p>
-        </div>
-        <a asp-action="Create" class="btn btn-primary shadow-sm">
-            <i class="bi bi-plus-lg me-1"></i> Create Service Job
+<div class="app-page-header d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+    <div>
+        <h1 class="app-page-title">Service Jobs</h1>
+        <p class="app-page-subtitle">Manage vehicle service jobs, track status progression, and assign mechanics.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="AddEmployee" class="app-btn app-btn-outline">
+            <i class="bi bi-person-plus-fill me-1 text-info"></i> Add Employee
+        </a>
+        <a asp-action="Create" class="app-btn app-btn-primary">
+            <i class="bi bi-plus-lg"></i> Create Service Job
         </a>
     </div>
+</div>
 
-    @if (TempData["SuccessMessage"] != null)
-    {
-        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
-            <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    }
-    @if (TempData["ErrorMessage"] != null)
-    {
-        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
-            <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["ErrorMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    }
-
-    <!-- Status Filter Pills -->
-    <div class="card shadow-sm mb-4 border-0">
-        <div class="card-body py-2">
-            <div class="d-flex flex-wrap align-items-center gap-2">
-                <span class="fw-semibold text-muted me-2"><i class="bi bi-funnel me-1"></i> Filter by Status:</span>
-                <a asp-action="Index" class="btn btn-sm @(!selectedStatus.HasValue ? "btn-dark" : "btn-outline-secondary")">
-                    All Jobs
-                </a>
-                @foreach (JobStatus status in Enum.GetValues(typeof(JobStatus)))
-                {
-                    var isSelected = selectedStatus.HasValue && selectedStatus.Value == status;
-                    var badgeClass = status switch
-                    {
-                        JobStatus.Requested => "btn-outline-warning text-dark",
-                        JobStatus.InspectionPending => "btn-outline-info",
-                        JobStatus.CustomerApprovalNeeded => "btn-outline-primary",
-                        JobStatus.InProgress => "btn-outline-primary",
-                        JobStatus.Completed => "btn-outline-success",
-                        JobStatus.Cancelled => "btn-outline-danger",
-                        _ => "btn-outline-secondary"
-                    };
-                    if (isSelected)
-                    {
-                        badgeClass = status switch
-                        {
-                            JobStatus.Requested => "btn-warning text-dark",
-                            JobStatus.InspectionPending => "btn-info text-white",
-                            JobStatus.CustomerApprovalNeeded => "btn-primary",
-                            JobStatus.InProgress => "btn-primary",
-                            JobStatus.Completed => "btn-success",
-                            JobStatus.Cancelled => "btn-danger",
-                            _ => "btn-secondary"
-                        };
-                    }
-
-                    <a asp-action="Index" asp-route-status="@status" class="btn btn-sm @badgeClass">
-                        @status
-                    </a>
-                }
-            </div>
-        </div>
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="app-alert-success">
+        <span><i class="bi bi-check-circle-fill me-2"></i>@TempData["SuccessMessage"]</span>
     </div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="app-alert-danger">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>@TempData["ErrorMessage"]
+    </div>
+}
 
-    <!-- Jobs Table -->
-    <div class="card shadow-sm border-0">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th class="ps-4">Booking Ref</th>
-                            <th>Vehicle & Customer</th>
-                            <th>Job Type</th>
-                            <th>Status</th>
-                            <th>Assigned Mechanics</th>
-                            <th>Created Date</th>
-                            <th class="text-end pe-4">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (!Model.Any())
+<!-- Filters, Sorting & Search Bar -->
+<div class="app-card mb-4 py-3">
+    <form method="get" asp-action="Index" class="row g-2 align-items-end mb-3">
+        <div class="col-12 col-sm-6 col-lg-3">
+            <label for="status" class="app-form-label small mb-1"><i class="bi bi-funnel me-1 text-info"></i>Status:</label>
+            <select name="status" id="status" class="app-form-select" onchange="this.form.submit()">
+                <option value="">-- All Statuses --</option>
+                @foreach (JobStatus st in Enum.GetValues(typeof(JobStatus)))
+                {
+                    if (selectedStatus.HasValue && selectedStatus.Value == st)
+                    {
+                        <option value="@st" selected="selected">@st</option>
+                    }
+                    else
+                    {
+                        <option value="@st">@st</option>
+                    }
+                }
+            </select>
+        </div>
+
+        <div class="col-12 col-sm-6 col-lg-3">
+            <label for="mechanicId" class="app-form-label small mb-1"><i class="bi bi-person-gear me-1 text-info"></i>Mechanic:</label>
+            <select name="mechanicId" id="mechanicId" class="app-form-select" onchange="this.form.submit()">
+                <option value="">-- All Mechanics --</option>
+                @if (mechanics != null)
+                {
+                    foreach (var item in mechanics)
+                    {
+                        if (selectedMechanicId?.ToString() == item.Value)
                         {
-                            <tr>
-                                <td colspan="7" class="text-center py-5 text-muted">
-                                    <i class="bi bi-inbox fs-1 d-block mb-2 text-secondary"></i>
-                                    No service jobs found @(selectedStatus.HasValue ? $"with status '{selectedStatus.Value}'" : "").
-                                </td>
-                            </tr>
+                            <option value="@item.Value" selected="selected">@item.Text</option>
                         }
                         else
                         {
-                            @foreach (var job in Model)
-                            {
-                                var statusBadge = job.Status switch
-                                {
-                                    JobStatus.Requested => "bg-warning text-dark",
-                                    JobStatus.InspectionPending => "bg-info text-dark",
-                                    JobStatus.CustomerApprovalNeeded => "bg-secondary",
-                                    JobStatus.InProgress => "bg-primary",
-                                    JobStatus.Completed => "bg-success",
-                                    JobStatus.Cancelled => "bg-danger",
-                                    _ => "bg-secondary"
-                                };
-
-                                <tr>
-                                    <td class="ps-4 fw-bold">
-                                        <a asp-action="Details" asp-route-id="@job.Id" class="text-decoration-none font-monospace">
-                                            @job.BookingReference
-                                        </a>
-                                    </td>
-                                    <td>
-                                        <div class="fw-semibold">@job.VehiclePlateNumber</div>
-                                        <div class="small text-muted">@job.VehicleDescription</div>
-                                        <div class="small text-secondary"><i class="bi bi-person me-1"></i>@job.CustomerName</div>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-light text-dark border">@job.JobType</span>
-                                    </td>
-                                    <td>
-                                        <span class="badge @statusBadge rounded-pill px-3 py-2">@job.Status</span>
-                                    </td>
-                                    <td>
-                                        @if (job.MechanicAssignments.Any())
-                                        {
-                                            @foreach (var m in job.MechanicAssignments)
-                                            {
-                                                <span class="badge bg-outline-dark text-dark border me-1 mb-1">
-                                                    <i class="bi bi-tools me-1"></i>@m.MechanicName (@m.RoleInJob)
-                                                </span>
-                                            }
-                                        }
-                                        else
-                                        {
-                                            <span class="text-muted small italic">Unassigned</span>
-                                        }
-                                    </td>
-                                    <td class="small text-muted">
-                                        @job.CreatedAt.ToString("MMM dd, yyyy HH:mm")
-                                    </td>
-                                    <td class="text-end pe-4">
-                                        <div class="btn-group btn-group-sm" role="group">
-                                            <a asp-action="Details" asp-route-id="@job.Id" class="btn btn-outline-primary" title="View Details">
-                                                View
-                                            </a>
-                                            <a asp-controller="Mechanic" asp-action="Assign" asp-route-serviceJobId="@job.Id" class="btn btn-outline-success" title="Assign Mechanic">
-                                                Assign
-                                            </a>
-                                            <a asp-action="Edit" asp-route-id="@job.Id" class="btn btn-outline-secondary" title="Edit Job">
-                                                Edit
-                                            </a>
-                                        </div>
-                                    </td>
-                                </tr>
-                            }
+                            <option value="@item.Value">@item.Text</option>
                         }
-                    </tbody>
-                </table>
+                    }
+                }
+            </select>
+        </div>
+
+        <div class="col-12 col-sm-6 col-lg-3">
+            <label for="sortBy" class="app-form-label small mb-1"><i class="bi bi-sort-down me-1 text-info"></i>Sort Date:</label>
+            <select name="sortBy" id="sortBy" class="app-form-select" onchange="this.form.submit()">
+                <!option value="date_desc" @(selectedSortBy == "date_desc" ? "selected" : "")>Newest First</!option>
+                <!option value="date_asc" @(selectedSortBy == "date_asc" ? "selected" : "")>Oldest First</!option>
+                <!option value="status" @(selectedSortBy == "status" ? "selected" : "")>By Status</!option>
+                <!option value="plate" @(selectedSortBy == "plate" ? "selected" : "")>By Plate</!option>
+            </select>
+        </div>
+
+        <div class="col-12 col-sm-6 col-lg-3">
+            <label for="search" class="app-form-label small mb-1"><i class="bi bi-search me-1 text-info"></i>Search:</label>
+            <div class="input-group">
+                <input type="text" name="search" id="search" class="app-form-control" placeholder="Plate, Ref, Owner..." value="@searchTerm" />
+                <button type="submit" class="app-btn app-btn-primary" title="Search">
+                    <i class="bi bi-search"></i>
+                </button>
             </div>
         </div>
+    </form>
+
+    <!-- Quick Status Filter Pills -->
+    <div class="d-flex flex-wrap align-items-center gap-2 pt-2 border-top border-secondary border-opacity-25">
+        <span class="app-page-subtitle me-2 mb-0"><i class="bi bi-tag me-1"></i>Quick Filter:</span>
+        <a asp-action="Index" asp-route-mechanicId="@selectedMechanicId" asp-route-sortBy="@selectedSortBy" asp-route-search="@searchTerm" class="app-filter-pill @(!selectedStatus.HasValue ? "active" : "")">All Jobs</a>
+        @foreach (JobStatus status in Enum.GetValues(typeof(JobStatus)))
+        {
+            var isSelected = selectedStatus.HasValue && selectedStatus.Value == status;
+            <a asp-action="Index" asp-route-status="@status" asp-route-mechanicId="@selectedMechanicId" asp-route-sortBy="@selectedSortBy" asp-route-search="@searchTerm" class="app-filter-pill @(isSelected ? "active" : "")">
+                @status
+            </a>
+        }
+    </div>
+</div>
+
+<!-- Jobs Table -->
+<div class="app-table-wrap">
+    <div class="table-responsive">
+        <table class="app-table mb-0">
+            <thead>
+                <tr>
+                    <th>Booking Ref</th>
+                    <th>Vehicle &amp; Customer</th>
+                    <th>Job Type</th>
+                    <th>Status</th>
+                    <th>Assigned Mechanics</th>
+                    <th>Created Date</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="7">
+                            <div class="app-empty-state">
+                                <i class="bi bi-inbox"></i>
+                                No service jobs found @(selectedStatus.HasValue ? $"with status '{selectedStatus.Value}'" : "").
+                            </div>
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var job in Model)
+                    {
+                        <tr>
+                            <td class="fw-bold">
+                                <a asp-action="Details" asp-route-id="@job.Id" class="text-info text-decoration-none font-monospace">
+                                    @job.BookingReference
+                                </a>
+                            </td>
+                            <td>
+                                <div class="fw-semibold text-white">@job.VehiclePlateNumber</div>
+                                <div class="small app-page-subtitle mt-0">@job.VehicleDescription</div>
+                                <div class="small app-page-subtitle mt-0"><i class="bi bi-person me-1"></i>@job.CustomerName</div>
+                            </td>
+                            <td>
+                                <span class="app-badge app-badge-neutral">@job.JobType</span>
+                            </td>
+                            <td>
+                                <span class="app-badge @StatusBadgeHelper.BadgeClass(job.Status)">@job.Status</span>
+                            </td>
+                            <td>
+                                @if (job.MechanicAssignments.Any())
+                                {
+                                    @foreach (var m in job.MechanicAssignments)
+                                    {
+                                        <span class="app-chip"><i class="bi bi-tools"></i>@m.MechanicName (@m.RoleInJob)</span>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="app-page-subtitle small fst-italic">Unassigned</span>
+                                }
+                            </td>
+                            <td class="small app-page-subtitle">
+                                @job.CreatedAt.ToString("MMM dd, yyyy HH:mm")
+                            </td>
+                            <td class="text-end">
+                                <div class="d-flex gap-2 justify-content-end flex-wrap">
+                                    <a asp-action="Details" asp-route-id="@job.Id" class="app-btn app-btn-outline app-btn-sm" title="View Details">View</a>
+                                    <a asp-controller="Mechanic" asp-action="Assign" asp-route-serviceJobId="@job.Id" class="app-btn app-btn-outline app-btn-sm" title="Assign Mechanic">Assign</a>
+                                    <a asp-action="Edit" asp-route-id="@job.Id" class="app-btn app-btn-outline app-btn-sm" title="Edit Job">Edit</a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
     </div>
 </div>

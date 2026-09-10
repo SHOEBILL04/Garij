@@ -1,5 +1,56 @@
+@using Garij.Application.DTOs
+
+@model IEnumerable<NotificationDto>
+
 @{
     ViewData["Title"] = "Notifications";
 }
 
-<h1>Notifications</h1>
+<div class="app-page-header">
+    <div>
+        <h1 class="app-page-title">Notifications</h1>
+        <p class="app-page-subtitle">Pending notifications awaiting staff approval before dispatch.</p>
+    </div>
+</div>
+
+<div class="app-table-wrap">
+    <div class="table-responsive">
+        <table class="app-table mb-0">
+            <thead>
+                <tr>
+                    <th>Service Job</th>
+                    <th>Message</th>
+                    <th>Created At</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="4">
+                            <div class="app-empty-state">
+                                <i class="bi bi-bell-slash"></i>
+                                No pending notifications.
+                            </div>
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var notification in Model)
+                    {
+                        <tr>
+                            <td class="text-white font-monospace">#@notification.ServiceJobId</td>
+                            <td>@notification.Message</td>
+                            <td class="app-page-subtitle">@notification.CreatedAt.ToString("g")</td>
+                            <td class="text-end">
+                                <a asp-action="Details" asp-route-id="@notification.Id" class="app-btn app-btn-outline app-btn-sm">Review</a>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

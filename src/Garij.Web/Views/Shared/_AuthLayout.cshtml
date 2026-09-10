@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Garij Intelligent Vehicle Workshop</title>
+
+    <!-- Google Fonts: Montserrat -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap CSS & Icons -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
+    <!-- Color Scheme & Instant Theme Initializer (Prevents FOUC) -->
+    <meta name="color-scheme" content="dark light" />
+    <script>
+        (function () {
+            var theme = localStorage.getItem('garij_theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+
+    <!-- Landing design tokens (fonts, palette) + Auth-specific styles -->
+    <link rel="stylesheet" href="~/css/landing.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/auth.css" asp-append-version="true" />
+</head>
+<body class="auth-page-body">
+
+    <div class="d-flex justify-content-between align-items-center position-fixed w-100 px-4 py-3" style="top: 0; left: 0; z-index: 50;">
+        <a class="auth-brand position-static" asp-controller="Home" asp-action="Index">
+            <div class="brand-emblem-wrap me-2">
+                <svg class="brand-car-emblem" viewBox="0 0 100 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 38px; height: 16px;">
+                    <path d="M 5 20 C 15 20, 24 18, 32 14 C 40 10, 47 4, 62 4 C 76 4, 83 9, 89 15 C 93 18, 96 20, 98 20" stroke="#00d2ff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M 35 13 C 42 8, 50 6, 61 6 C 71 6, 78 9, 83 14" stroke="#ffffff" stroke-width="1.4" stroke-linecap="round" stroke-opacity="0.75"/>
+                </svg>
+            </div>
+            <span class="font-ethnocentric">GARIJ</span>
+            <span class="brand-glow-dot"></span>
+        </a>
+        <button type="button" class="theme-toggle-btn ms-auto" data-theme-toggle title="Toggle Light / Dark Mode" aria-label="Toggle Light and Dark Mode">
+            <i class="bi bi-sun-fill theme-toggle-icon text-warning"></i>
+            <span class="theme-toggle-text d-none d-sm-inline">Light</span>
+        </button>
+    </div>
+
+    <main class="auth-shell">
+        <div class="auth-bg-backdrop"></div>
+        <div class="auth-bg-overlay"></div>
+        <div class="auth-content">
+            @RenderBody()
+        </div>
+    </main>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/theme-toggle.js" asp-append-version="true"></script>
+    <script src="~/js/auth.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

@@ -1,126 +1,112 @@
 @model Garij.Application.DTOs.ServiceJobDto
 @using Garij.Domain.Enums
+@using Garij.Web.Helpers
 
 @{
     ViewData["Title"] = $"Job Details - {Model.BookingReference}";
-    var statusBadge = Model.Status switch
-    {
-        JobStatus.Requested => "bg-warning text-dark",
-        JobStatus.InspectionPending => "bg-info text-dark",
-        JobStatus.CustomerApprovalNeeded => "bg-secondary text-white",
-        JobStatus.InProgress => "bg-primary text-white",
-        JobStatus.Completed => "bg-success text-white",
-        JobStatus.Cancelled => "bg-danger text-white",
-        _ => "bg-secondary text-white"
-    };
 }
 
-<div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h1 class="h3 mb-1">
-                Booking Reference: <span class="font-monospace text-primary">@Model.BookingReference</span>
-            </h1>
-            <span class="badge @statusBadge px-3 py-2 fs-6">Status: @Model.Status</span>
-        </div>
-        <div class="btn-group">
-            <a asp-controller="Mechanic" asp-action="Assign" asp-route-serviceJobId="@Model.Id" class="btn btn-success">
-                <i class="bi bi-person-plus me-1"></i> Assign Mechanic
-            </a>
-            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-secondary">
-                <i class="bi bi-pencil me-1"></i> Edit Job
-            </a>
-            <a asp-action="Index" class="btn btn-outline-dark">Back to List</a>
+<div class="app-page-header">
+    <div>
+        <h1 class="app-page-title mb-2">
+            Booking Reference: <span class="font-monospace text-info">@Model.BookingReference</span>
+        </h1>
+        <span class="app-badge @StatusBadgeHelper.BadgeClass(Model.Status)">@Model.Status</span>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+        <a asp-controller="Parts" asp-action="LogUsage" asp-route-serviceJobId="@Model.Id" class="app-btn app-btn-primary">
+            <i class="bi bi-box-seam"></i> Log Parts
+        </a>
+        <a asp-controller="Mechanic" asp-action="Assign" asp-route-serviceJobId="@Model.Id" class="app-btn app-btn-success">
+            <i class="bi bi-person-plus"></i> Assign Mechanic
+        </a>
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="app-btn app-btn-outline">
+            <i class="bi bi-pencil"></i> Edit Job
+        </a>
+        <a asp-action="Index" class="app-btn app-btn-outline">Back to List</a>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="app-alert-success"><span><i class="bi bi-check-circle-fill me-2"></i>@TempData["SuccessMessage"]</span></div>
+}
+
+<div class="row g-4">
+    <!-- Main Job & Vehicle Info Card -->
+    <div class="col-lg-7">
+        <div class="app-card mb-4">
+            <h5 class="app-card-heading"><i class="bi bi-card-checklist me-2 text-info"></i>Job &amp; Vehicle Information</h5>
+            <dl class="row mb-0">
+                <dt class="col-sm-4 app-page-subtitle">Vehicle License Plate:</dt>
+                <dd class="col-sm-8 fw-bold text-white">@Model.VehiclePlateNumber</dd>
+
+                <dt class="col-sm-4 app-page-subtitle">Vehicle Details:</dt>
+                <dd class="col-sm-8 text-white">@Model.VehicleDescription</dd>
+
+                <dt class="col-sm-4 app-page-subtitle">Customer Name:</dt>
+                <dd class="col-sm-8 fw-semibold text-white">@Model.CustomerName</dd>
+
+                <dt class="col-sm-4 app-page-subtitle">Job Type:</dt>
+                <dd class="col-sm-8"><span class="app-badge app-badge-neutral">@Model.JobType</span></dd>
+
+                <dt class="col-sm-4 app-page-subtitle">Date Created:</dt>
+                <dd class="col-sm-8 text-white">@Model.CreatedAt.ToString("f")</dd>
+
+                @if (Model.CompletedAt.HasValue)
+                {
+                    <dt class="col-sm-4 app-page-subtitle">Date Completed:</dt>
+                    <dd class="col-sm-8 fw-bold" style="color:#4ade80;">@Model.CompletedAt.Value.ToString("f")</dd>
+                }
+
+                <dt class="col-sm-4 app-page-subtitle">Diagnostic Notes:</dt>
+                <dd class="col-sm-8 text-white text-break mb-0">
+                    @(string.IsNullOrWhiteSpace(Model.DiagnosticNotes) ? "No notes recorded yet." : Model.DiagnosticNotes)
+                </dd>
+            </dl>
         </div>
     </div>
 
-    @if (TempData["SuccessMessage"] != null)
-    {
-        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
-            <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    }
-
-    <div class="row g-4">
-        <!-- Main Job & Vehicle Info Card -->
-        <div class="col-lg-7">
-            <div class="card shadow-sm border-0 mb-4">
-                <div class="card-header bg-light py-3">
-                    <h5 class="card-title mb-0"><i class="bi bi-card-checklist me-2"></i>Job & Vehicle Information</h5>
-                </div>
-                <div class="card-body">
-                    <dl class="row mb-0">
-                        <dt class="col-sm-4 text-muted">Vehicle License Plate:</dt>
-                        <dd class="col-sm-8 fw-bold fs-6">@Model.VehiclePlateNumber</dd>
-
-                        <dt class="col-sm-4 text-muted">Vehicle Details:</dt>
-                        <dd class="col-sm-8">@Model.VehicleDescription</dd>
-
-                        <dt class="col-sm-4 text-muted">Customer Name:</dt>
-                        <dd class="col-sm-8 fw-semibold">@Model.CustomerName</dd>
-
-                        <dt class="col-sm-4 text-muted">Job Type:</dt>
-                        <dd class="col-sm-8"><span class="badge bg-light text-dark border">@Model.JobType</span></dd>
-
-                        <dt class="col-sm-4 text-muted">Date Created:</dt>
-                        <dd class="col-sm-8">@Model.CreatedAt.ToString("f")</dd>
-
-                        @if (Model.CompletedAt.HasValue)
-                        {
-                            <dt class="col-sm-4 text-muted">Date Completed:</dt>
-                            <dd class="col-sm-8 text-success fw-bold">@Model.CompletedAt.Value.ToString("f")</dd>
-                        }
-
-                        <dt class="col-sm-4 text-muted">Diagnostic Notes:</dt>
-                        <dd class="col-sm-8 text-break">
-                            @(string.IsNullOrWhiteSpace(Model.DiagnosticNotes) ? "No notes recorded yet." : Model.DiagnosticNotes)
-                        </dd>
-                    </dl>
-                </div>
+    <!-- Assigned Mechanics Card -->
+    <div class="col-lg-5">
+        <div class="app-card mb-4">
+            <div class="d-flex justify-content-between align-items-center app-card-heading">
+                <span><i class="bi bi-people me-2 text-info"></i>Assigned Mechanics</span>
+                <a asp-controller="Mechanic" asp-action="Assign" asp-route-serviceJobId="@Model.Id" class="app-btn app-btn-success app-btn-sm">+ Assign</a>
             </div>
-        </div>
-
-        <!-- Assigned Mechanics Card -->
-        <div class="col-lg-5">
-            <div class="card shadow-sm border-0 mb-4">
-                <div class="card-header bg-light d-flex justify-content-between align-items-center py-3">
-                    <h5 class="card-title mb-0"><i class="bi bi-people me-2"></i>Assigned Mechanics</h5>
-                    <a asp-controller="Mechanic" asp-action="Assign" asp-route-serviceJobId="@Model.Id" class="btn btn-sm btn-outline-success">
-                        + Assign
-                    </a>
-                </div>
-                <div class="card-body">
-                    @if (!Model.MechanicAssignments.Any())
+            @if (!Model.MechanicAssignments.Any())
+            {
+                <p class="app-page-subtitle text-center py-2 mb-0">No mechanics assigned to this job yet.</p>
+            }
+            else
+            {
+                <div class="d-flex flex-column gap-3">
+                    @foreach (var assignment in Model.MechanicAssignments)
                     {
-                        <p class="text-muted text-center py-3 mb-0">No mechanics assigned to this job yet.</p>
-                    }
-                    else
-                    {
-                        <div class="list-group list-group-flush">
-                            @foreach (var assignment in Model.MechanicAssignments)
-                            {
-                                <div class="list-group-item d-flex justify-content-between align-items-center px-0">
-                                    <div>
-                                        <div class="fw-bold">@assignment.MechanicName</div>
-                                        <span class="badge @(assignment.RoleInJob == RoleInJob.Lead ? "bg-primary" : "bg-info text-dark")">
-                                            @assignment.RoleInJob
-                                        </span>
-                                        <div class="small text-muted">Assigned: @assignment.AssignedAt.ToString("MMM dd, yyyy")</div>
-                                    </div>
-                                    <form asp-controller="Mechanic" asp-action="RemoveAssignment" method="post" onsubmit="return confirm('Remove mechanic assignment?');">
-                                        <input type="hidden" name="id" value="@assignment.Id" />
-                                        <input type="hidden" name="serviceJobId" value="@Model.Id" />
-                                        <button type="submit" class="btn btn-sm btn-outline-danger">
-                                            <i class="bi bi-trash"></i> Remove
-                                        </button>
-                                    </form>
-                                </div>
-                            }
+                        <div class="d-flex justify-content-between align-items-center pb-3" style="border-bottom: 1px solid var(--border-dark);">
+                            <div>
+                                <div class="fw-bold text-white">@assignment.MechanicName</div>
+                                <span class="app-badge @(assignment.RoleInJob == RoleInJob.Lead ? "app-badge-info" : "app-badge-neutral")">
+                                    @assignment.RoleInJob
+                                </span>
+                                <div class="small app-page-subtitle mt-1">Assigned: @assignment.AssignedAt.ToString("MMM dd, yyyy")</div>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <a asp-controller="Mechanic" asp-action="EditAssignment" asp-route-id="@assignment.Id" asp-route-serviceJobId="@Model.Id" class="app-btn app-btn-outline app-btn-sm">
+                                    <i class="bi bi-pencil"></i> Edit Role
+                                </a>
+                                <form asp-controller="Mechanic" asp-action="RemoveAssignment" method="post" onsubmit="return confirm('Remove mechanic assignment?');">
+                                    <input type="hidden" name="id" value="@assignment.Id" />
+                                    <input type="hidden" name="serviceJobId" value="@Model.Id" />
+                                    <button type="submit" class="app-btn app-btn-danger app-btn-sm">
+                                        <i class="bi bi-trash"></i> Remove
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                     }
                 </div>
-            </div>
+            }
         </div>
     </div>
 </div>

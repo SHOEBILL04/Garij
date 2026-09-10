@@ -3,36 +3,42 @@
     ViewData["Title"] = "Edit Customer";
 }
 
-<h1 class="h3 mb-3">Edit Customer</h1>
+<div class="app-page-header">
+    <div>
+        <h1 class="app-page-title">Edit Customer</h1>
+    </div>
+</div>
 
-<form asp-action="Edit" method="post" class="row g-3">
-    <input asp-for="Id" type="hidden" />
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <div class="col-md-6">
-        <label asp-for="FullName" class="form-label"></label>
-        <input asp-for="FullName" class="form-control" />
-        <span asp-validation-for="FullName" class="text-danger"></span>
-    </div>
-    <div class="col-md-6">
-        <label asp-for="PhoneNumber" class="form-label"></label>
-        <input asp-for="PhoneNumber" class="form-control" />
-        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
-    </div>
-    <div class="col-md-6">
-        <label asp-for="Email" class="form-label"></label>
-        <input asp-for="Email" class="form-control" />
-        <span asp-validation-for="Email" class="text-danger"></span>
-    </div>
-    <div class="col-12">
-        <label asp-for="Address" class="form-label"></label>
-        <textarea asp-for="Address" class="form-control" rows="3"></textarea>
-        <span asp-validation-for="Address" class="text-danger"></span>
-    </div>
-    <div class="col-12">
-        <button type="submit" class="btn btn-primary">Save Changes</button>
-        <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Cancel</a>
-    </div>
-</form>
+<div class="app-card" style="max-width: 720px;">
+    <form asp-action="Edit" method="post" class="row g-3">
+        <input asp-for="Id" type="hidden" />
+        <div asp-validation-summary="ModelOnly" class="app-alert-danger"></div>
+        <div class="col-md-6 app-form-group mb-0">
+            <label asp-for="FullName" class="app-form-label"></label>
+            <input asp-for="FullName" class="app-form-control" placeholder="e.g. John Doe" />
+            <span asp-validation-for="FullName" class="app-field-error"></span>
+        </div>
+        <div class="col-md-6 app-form-group mb-0">
+            <label asp-for="PhoneNumber" class="app-form-label"></label>
+            <input asp-for="PhoneNumber" class="app-form-control" placeholder="e.g. +1 555 0100" />
+            <span asp-validation-for="PhoneNumber" class="app-field-error"></span>
+        </div>
+        <div class="col-md-6 app-form-group mb-0">
+            <label asp-for="Email" class="app-form-label"></label>
+            <input asp-for="Email" class="app-form-control" placeholder="e.g. john@example.com" />
+            <span asp-validation-for="Email" class="app-field-error"></span>
+        </div>
+        <div class="col-12 app-form-group mb-0">
+            <label asp-for="Address" class="app-form-label"></label>
+            <textarea asp-for="Address" class="app-form-control" rows="3" placeholder="Street, city, postal code"></textarea>
+            <span asp-validation-for="Address" class="app-field-error"></span>
+        </div>
+        <div class="col-12 d-flex gap-2 mt-2">
+            <button type="submit" class="app-btn app-btn-primary">Save Changes</button>
+            <a asp-action="Details" asp-route-id="@Model.Id" class="app-btn app-btn-outline">Cancel</a>
+        </div>
+    </form>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

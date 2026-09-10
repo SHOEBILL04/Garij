@@ -1,5 +1,90 @@
+@model IEnumerable<Garij.Domain.Entities.User>
+@using Garij.Domain.Enums
 @{
-    ViewData["Title"] = "Manage Roles";
+    ViewData["Title"] = "Manage Staff Roles";
 }
 
-<h1>Manage Roles</h1>
+<div class="app-page-header d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+    <div>
+        <h1 class="app-page-title"><i class="bi bi-person-badge me-2 text-info"></i>Manage Staff Roles</h1>
+        <p class="app-page-subtitle">Assign or update operational roles (Administrator, Front Desk, or Certified Mechanic) for workshop staff.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="CreateUser" class="app-btn app-btn-primary">
+            <i class="bi bi-person-plus-fill me-1"></i> Create Staff Account
+        </a>
+        <a asp-action="ManageUsers" class="app-btn app-btn-outline">View All Users</a>
+        <a asp-action="Index" class="app-btn app-btn-outline">Back to Admin</a>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success bg-opacity-10 bg-success text-success border-success mb-4 p-3 rounded-3">
+        <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger bg-opacity-10 bg-danger text-danger border-danger mb-4 p-3 rounded-3">
+        <i class="bi bi-x-circle-fill me-2"></i> @TempData["ErrorMessage"]
+    </div>
+}
+
+<div class="app-card">
+    <div class="table-responsive">
+        <table class="table table-dark table-hover align-middle mb-0">
+            <thead>
+                <tr class="border-secondary border-opacity-25 text-secondary small text-uppercase">
+                    <th>Staff Member</th>
+                    <th>Email Address</th>
+                    <th>Current Role</th>
+                    <th style="min-width: 250px;">Change Assigned Role</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var user in Model)
+                {
+                    <tr>
+                        <td>
+                            <strong class="text-white">@user.FullName</strong>
+                        </td>
+                        <td class="font-monospace small text-light">@user.Email</td>
+                        <td>
+                            @switch (user.Role)
+                            {
+                                case UserRole.Admin:
+                                    <span class="badge bg-primary px-2 py-1"><i class="bi bi-shield-lock me-1"></i>Administrator</span>
+                                    break;
+                                case UserRole.FrontDesk:
+                                    <span class="badge bg-info text-dark px-2 py-1"><i class="bi bi-clipboard-check me-1"></i>Front Desk</span>
+                                    break;
+                                case UserRole.Mechanic:
+                                    <span class="badge bg-warning text-dark px-2 py-1"><i class="bi bi-wrench me-1"></i>Mechanic</span>
+                                    break;
+                                default:
+                                    <span class="badge bg-secondary">@user.Role</span>
+                                    break;
+                            }
+                        </td>
+                        <td>
+                            <form asp-action="ChangeRole" method="post" class="d-flex align-items-center gap-2">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="userId" value="@user.Id" />
+                                <select name="newRole" class="form-select form-select-sm bg-dark text-light border-secondary">
+                                    <option value="@UserRole.FrontDesk" selected="@(user.Role == UserRole.FrontDesk)">Front Desk</option>
+                                    <option value="@UserRole.Mechanic" selected="@(user.Role == UserRole.Mechanic)">Mechanic</option>
+                                    <option value="@UserRole.Admin" selected="@(user.Role == UserRole.Admin)">Administrator</option>
+                                </select>
+                                <button type="submit" class="app-btn app-btn-outline app-btn-sm text-nowrap">
+                                    <i class="bi bi-arrow-repeat me-1"></i> Update
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

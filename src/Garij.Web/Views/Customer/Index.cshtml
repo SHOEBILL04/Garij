@@ -3,45 +3,61 @@
     ViewData["Title"] = "Customers";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="h3 mb-0">Customers</h1>
-    <a asp-action="Create" class="btn btn-primary">Register Customer</a>
+<div class="app-page-header">
+    <div>
+        <h1 class="app-page-title">Customers</h1>
+        <p class="app-page-subtitle">Registered customers and their vehicles.</p>
+    </div>
+    <a asp-action="Create" class="app-btn app-btn-primary"><i class="bi bi-person-plus"></i> Register Customer</a>
 </div>
 
 @if (TempData["SuccessMessage"] is string message)
 {
-    <div class="alert alert-success">@message</div>
+    <div class="app-alert-success"><span><i class="bi bi-check-circle-fill me-2"></i>@message</span></div>
 }
 
-<div class="table-responsive">
-    <table class="table table-striped align-middle">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th class="text-end">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        @foreach (var customer in Model)
-        {
-            <tr>
-                <td>@customer.FullName</td>
-                <td>@customer.Email</td>
-                <td>@customer.PhoneNumber</td>
-                <td class="text-end">
-                    <a asp-action="Details" asp-route-id="@customer.Id" class="btn btn-sm btn-outline-primary">Details</a>
-                    <a asp-action="Edit" asp-route-id="@customer.Id" class="btn btn-sm btn-outline-secondary">Edit</a>
-                    <a asp-action="Delete" asp-route-id="@customer.Id" class="btn btn-sm btn-outline-danger">Delete</a>
-                </td>
-            </tr>
-        }
-        </tbody>
-    </table>
+<div class="app-table-wrap">
+    <div class="table-responsive">
+        <table class="app-table mb-0">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="4">
+                            <div class="app-empty-state">
+                                <i class="bi bi-people"></i>
+                                No customers have been registered yet.
+                            </div>
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var customer in Model)
+                    {
+                        <tr>
+                            <td class="text-white fw-semibold">@customer.FullName</td>
+                            <td>@customer.Email</td>
+                            <td>@customer.PhoneNumber</td>
+                            <td class="text-end">
+                                <div class="d-flex gap-2 justify-content-end flex-wrap">
+                                    <a asp-action="Details" asp-route-id="@customer.Id" class="app-btn app-btn-outline app-btn-sm">Details</a>
+                                    <a asp-action="Edit" asp-route-id="@customer.Id" class="app-btn app-btn-outline app-btn-sm">Edit</a>
+                                    <a asp-action="Delete" asp-route-id="@customer.Id" class="app-btn app-btn-danger app-btn-sm">Delete</a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
 </div>
-
-@if (!Model.Any())
-{
-    <div class="alert alert-info">No customers have been registered yet.</div>
-}

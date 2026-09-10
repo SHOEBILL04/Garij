@@ -1,0 +1,116 @@
+@model Garij.Application.DTOs.ProjectPurchaseDto
+@{
+    ViewData["Title"] = "Software License & Purchase Status";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+            <h2 class="text-white fw-bold mb-1">
+                <i class="bi bi-shield-check text-info me-2"></i>Software License &amp; Purchase
+            </h2>
+            <p class="text-secondary small mb-0">Manage your Garij lifetime license, purchase records, and digital certificates.</p>
+        </div>
+        <a asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
+        </a>
+    </div>
+
+    @if (Model == null || !Model.IsActive)
+    {
+        <div class="card bg-dark border-warning p-4 p-md-5 text-center shadow">
+            <i class="bi bi-exclamation-triangle text-warning display-4 mb-3"></i>
+            <h4 class="text-white fw-bold">No Active License Found</h4>
+            <p class="text-secondary mx-auto mb-4" style="max-width: 500px;">
+                Your current account does not have an associated lifetime license. Purchase a one-time license or activate a key to unlock full platform features.
+            </p>
+            <div>
+                <a asp-controller="Purchase" asp-action="Index" class="btn btn-info text-dark fw-bold px-4 py-2">
+                    <i class="bi bi-cart-check me-2"></i>Purchase Lifetime License
+                </a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            <!-- Col 1: License Certificate -->
+            <div class="col-lg-7">
+                <div class="card bg-dark border-secondary p-4 rounded-4 shadow-lg h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <span class="badge bg-success bg-opacity-25 text-success border border-success px-3 py-2 rounded-pill font-monospace fw-bold">
+                            <i class="bi bi-patch-check-fill me-1"></i> LIFETIME LICENSE: ACTIVE
+                        </span>
+                        <span class="text-secondary small font-monospace">@Model.Currency @Model.Amount.ToString("F2") (One-Time)</span>
+                    </div>
+
+                    <div class="mb-4">
+                        <span class="text-secondary small d-block mb-1">REGISTERED LICENSE KEY</span>
+                        <div class="p-3 rounded-3 bg-black border border-info border-opacity-50 text-info font-monospace fs-5 fw-bold letter-spacing-1">
+                            @Model.LicenseKey
+                        </div>
+                    </div>
+
+                    <div class="row g-3 text-secondary small">
+                        <div class="col-sm-6">
+                            <span class="text-white-50 d-block">License Holder</span>
+                            <strong class="text-light fs-6">@Model.BuyerName</strong>
+                        </div>
+                        <div class="col-sm-6">
+                            <span class="text-white-50 d-block">Registered Email</span>
+                            <strong class="text-light fs-6">@Model.BuyerEmail</strong>
+                        </div>
+                        <div class="col-sm-6">
+                            <span class="text-white-50 d-block">Workshop Center</span>
+                            <strong class="text-light">@(Model.WorkshopName ?? "Primary Workshop")</strong>
+                        </div>
+                        <div class="col-sm-6">
+                            <span class="text-white-50 d-block">Activated Date</span>
+                            <strong class="text-light">@Model.PurchasedAt.ToLocalTime().ToString("dd MMM yyyy, hh:mm tt")</strong>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-4 border-top border-secondary border-opacity-25 d-flex gap-2">
+                        <button type="button" onclick="window.print();" class="btn btn-outline-secondary btn-sm">
+                            <i class="bi bi-printer me-1"></i> Print Certificate
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Col 2: Invoicing & Receipt Summary -->
+            <div class="col-lg-5">
+                <div class="card bg-dark border-secondary p-4 rounded-4 shadow-lg h-100">
+                    <h5 class="text-white fw-bold mb-3 d-flex align-items-center gap-2">
+                        <i class="bi bi-receipt text-info"></i>
+                        <span>Payment Record</span>
+                    </h5>
+
+                    <ul class="list-unstyled text-secondary small d-flex flex-column gap-3 mb-4">
+                        <li class="d-flex justify-content-between pb-2 border-bottom border-secondary border-opacity-25">
+                            <span>Transaction Reference:</span>
+                            <span class="text-light font-monospace">@Model.TransactionReference</span>
+                        </li>
+                        <li class="d-flex justify-content-between pb-2 border-bottom border-secondary border-opacity-25">
+                            <span>Payment Method:</span>
+                            <span class="text-light fw-bold">@Model.PaymentMethod</span>
+                        </li>
+                        <li class="d-flex justify-content-between pb-2 border-bottom border-secondary border-opacity-25">
+                            <span>Payment Type:</span>
+                            <span class="text-info fw-bold">One-Time Buyout (No Recurring Fee)</span>
+                        </li>
+                        <li class="d-flex justify-content-between pb-2 border-bottom border-secondary border-opacity-25">
+                            <span>Amount Paid:</span>
+                            <span class="text-success fw-bold fs-6">$@Model.Amount.ToString("F2") @Model.Currency</span>
+                        </li>
+                    </ul>
+
+                    <div class="p-3 rounded-3 bg-black border border-secondary border-opacity-50 text-secondary small">
+                        <i class="bi bi-info-circle text-info me-1"></i>
+                        This license is perpetually active and covers all existing and future modules of Garij.
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

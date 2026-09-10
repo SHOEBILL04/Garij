@@ -1,5 +1,38 @@
+@model Garij.Application.DTOs.ServiceJobDto
+
 @{
     ViewData["Title"] = "Delete Service Job";
 }
 
-<h1>Delete Service Job</h1>
+<div class="app-page-header">
+    <div>
+        <h1 class="app-page-title">Delete Service Job</h1>
+    </div>
+</div>
+
+<div class="app-card" style="max-width: 640px;">
+    <div class="app-alert-danger">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        Delete job <strong class="font-monospace">@Model.BookingReference</strong> for @Model.VehiclePlateNumber (@Model.CustomerName)? This cannot be undone.
+    </div>
+
+    <dl class="row mb-0">
+        <dt class="col-sm-4 app-page-subtitle">Vehicle</dt>
+        <dd class="col-sm-8 text-white">@Model.VehiclePlateNumber - @Model.VehicleDescription</dd>
+
+        <dt class="col-sm-4 app-page-subtitle">Customer</dt>
+        <dd class="col-sm-8 text-white">@Model.CustomerName</dd>
+
+        <dt class="col-sm-4 app-page-subtitle">Job Type</dt>
+        <dd class="col-sm-8 text-white">@Model.JobType</dd>
+
+        <dt class="col-sm-4 app-page-subtitle">Status</dt>
+        <dd class="col-sm-8 text-white mb-0">@Model.Status</dd>
+    </dl>
+
+    <form asp-action="Delete" method="post" class="d-flex gap-2 mt-3">
+        <input type="hidden" asp-for="Id" />
+        <button type="submit" class="app-btn app-btn-danger">Delete</button>
+        <a asp-action="Details" asp-route-id="@Model.Id" class="app-btn app-btn-outline">Cancel</a>
+    </form>
+</div>

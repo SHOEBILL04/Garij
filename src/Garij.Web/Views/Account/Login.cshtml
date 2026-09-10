@@ -1,83 +1,57 @@
 @model Garij.Web.Models.LoginViewModel
 
 @{
-    ViewData["Title"] = "Staff Login";
+    Layout = "_AuthLayout";
+    ViewData["Title"] = "Sign In";
 }
 
-<div class="row justify-content-center mt-5">
-    <div class="col-md-6 col-lg-5">
-        <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
-            <div class="card-header bg-primary bg-gradient text-white p-4 text-center">
-                <h3 class="fw-bold mb-1"><i class="bi bi-shield-lock me-2"></i>Garij Staff Portal</h3>
-                <p class="mb-0 text-white-50 fs-6">Sign in to access your garage management dashboard</p>
-            </div>
-            <div class="card-body p-4">
-                <form asp-action="Login" method="post" id="loginForm">
-                    <input type="hidden" asp-for="ReturnUrl" />
-                    
-                    <div asp-validation-summary="ModelOnly" class="alert alert-danger rounded-3 mb-3" role="alert"></div>
-
-                    <div class="mb-3">
-                        <label asp-for="Email" class="form-label fw-semibold">Email Address</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light"><i class="bi bi-envelope"></i></span>
-                            <input asp-for="Email" class="form-control form-control-lg" placeholder="name@garij.com" id="emailInput" />
-                        </div>
-                        <span asp-validation-for="Email" class="text-danger small"></span>
-                    </div>
-
-                    <div class="mb-3">
-                        <label asp-for="Password" class="form-label fw-semibold">Password</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light"><i class="bi bi-key"></i></span>
-                            <input asp-for="Password" class="form-control form-control-lg" placeholder="••••••••" id="passwordInput" />
-                        </div>
-                        <span asp-validation-for="Password" class="text-danger small"></span>
-                    </div>
-
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <div class="form-check">
-                            <input asp-for="RememberMe" class="form-check-input" />
-                            <label asp-for="RememberMe" class="form-check-label text-secondary">Remember me</label>
-                        </div>
-                        <a asp-action="Register" class="text-primary text-decoration-none small fw-semibold">Need an account? Register</a>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold shadow-sm rounded-3">
-                        <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
-                    </button>
-                </form>
-
-                <hr class="my-4 text-muted" />
-
-                <div class="demo-accounts text-center">
-                    <span class="badge bg-secondary mb-2 px-3 py-2 text-uppercase fs-7">Quick Demo Access</span>
-                    <div class="d-grid gap-2">
-                        <button type="button" class="btn btn-outline-dark btn-sm rounded-3 text-start px-3 py-2 d-flex align-items-center justify-content-between" onclick="fillDemo('admin@garij.com', 'Admin@12345')">
-                            <span><i class="bi bi-shield-check text-danger me-2"></i><strong>System Admin</strong></span>
-                            <span class="badge bg-danger">Admin</span>
-                        </button>
-                        <button type="button" class="btn btn-outline-dark btn-sm rounded-3 text-start px-3 py-2 d-flex align-items-center justify-content-between" onclick="fillDemo('frontdesk@garij.com', 'Staff@12345')">
-                            <span><i class="bi bi-person-badge text-primary me-2"></i><strong>Front Desk Staff</strong></span>
-                            <span class="badge bg-primary">Front Desk</span>
-                        </button>
-                        <button type="button" class="btn btn-outline-dark btn-sm rounded-3 text-start px-3 py-2 d-flex align-items-center justify-content-between" onclick="fillDemo('mechanic@garij.com', 'Mechanic@12345')">
-                            <span><i class="bi bi-tools text-warning me-2"></i><strong>Lead Mechanic</strong></span>
-                            <span class="badge bg-warning text-dark">Mechanic</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
+<div class="auth-card">
+    <div class="auth-icon-badge">
+        <i class="bi bi-box-arrow-in-right"></i>
     </div>
+    <h1 class="auth-title">Sign in to Garij</h1>
+    <p class="auth-subtitle">Access your garage management dashboard</p>
+
+    <form asp-action="Login" method="post" id="loginForm">
+        <input type="hidden" asp-for="ReturnUrl" />
+
+        <div asp-validation-summary="ModelOnly" class="auth-alert" role="alert"></div>
+
+        <div class="auth-field">
+            <label asp-for="Email" class="visually-hidden">Email Address</label>
+            <div class="auth-input-group">
+                <i class="bi bi-envelope auth-input-icon"></i>
+                <input asp-for="Email" class="form-control auth-input" placeholder="name@garij.com" autocomplete="username" />
+            </div>
+            <span asp-validation-for="Email" class="auth-field-error"></span>
+        </div>
+
+        <div class="auth-field">
+            <label asp-for="Password" class="visually-hidden">Password</label>
+            <div class="auth-input-group has-toggle">
+                <i class="bi bi-lock auth-input-icon"></i>
+                <input asp-for="Password" class="form-control auth-input" placeholder="••••••••" autocomplete="current-password" />
+                <button type="button" class="auth-toggle-password" data-target="Password" aria-label="Show password">
+                    <i class="bi bi-eye-slash"></i>
+                </button>
+            </div>
+            <span asp-validation-for="Password" class="auth-field-error"></span>
+        </div>
+
+        <div class="auth-remember-row">
+            <div class="form-check">
+                <input asp-for="RememberMe" class="form-check-input auth-check-input" />
+                <label asp-for="RememberMe" class="form-check-label text-secondary">Remember me</label>
+            </div>
+            <a asp-action="Register" class="auth-link">Create Account</a>
+        </div>
+
+        <button type="submit" class="auth-submit-btn">
+            <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+        </button>
+    </form>
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-    <script>
-        function fillDemo(email, password) {
-            document.getElementById('emailInput').value = email;
-            document.getElementById('passwordInput').value = password;
-        }
-    </script>
 }

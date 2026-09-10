@@ -1,0 +1,332 @@
+@model Garij.Domain.Entities.User
+@using Garij.Domain.Enums
+
+@{
+    ViewData["Title"] = $"{Model.FullName} - Employee Details";
+    var isAdmin = User.IsInRole("Admin");
+    var isFrontDesk = User.IsInRole("FrontDesk");
+    var initial = string.IsNullOrWhiteSpace(Model.FullName) ? "?" : Model.FullName.Substring(0, 1).ToUpper();
+    var assignments = Model.MechanicAssignments.OrderByDescending(a => a.AssignedAt).ToList();
+    var activeAssignments = assignments.Where(a => a.ServiceJob != null && a.ServiceJob.Status != JobStatus.Completed && a.ServiceJob.Status != JobStatus.Cancelled).ToList();
+    var completedAssignments = assignments.Where(a => a.ServiceJob != null && a.ServiceJob.Status == JobStatus.Completed).ToList();
+}
+
+<div class="app-page-header d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+    <div>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-1 small">
+                <li class="breadcrumb-item"><a asp-action="Index" class="text-info text-decoration-none">Employees</a></li>
+                <li class="breadcrumb-item active text-secondary" aria-current="page">@Model.FullName</li>
+            </ol>
+        </nav>
+        <h1 class="app-page-title d-flex align-items-center gap-2">
+            <i class="bi bi-person-vcard text-info"></i> Employee Profile
+        </h1>
+        <p class="app-page-subtitle mb-0">Detailed view of staff credentials, operational permissions, and workshop assignments.</p>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+        <a asp-action="Index" class="app-btn app-btn-outline">
+            <i class="bi bi-arrow-left me-1"></i> Back to Employees
+        </a>
+        @if (isAdmin)
+        {
+            <a asp-controller="Admin" asp-action="ManageRoles" class="app-btn app-btn-outline">
+                <i class="bi bi-person-badge me-1"></i> Manage Role
+            </a>
+        }
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Left Column: Personal Profile & Contact Card -->
+    <div class="col-lg-4">
+        <div class="app-card p-4 text-center mb-4 position-relative">
+            <!-- Large Avatar Badge -->
+            <div class="rounded-circle d-inline-flex align-items-center justify-content-center fw-bold fs-2 mb-3 shadow"
+                 style="width: 88px; height: 88px; background: rgba(6, 182, 212, 0.15); border: 3px solid @(Model.Role == UserRole.Admin ? "#3b82f6" : (Model.Role == UserRole.FrontDesk ? "#06b6d4" : "#f59e0b")); color: @(Model.Role == UserRole.Admin ? "#60a5fa" : (Model.Role == UserRole.FrontDesk ? "#22d3ee" : "#fbbf24"));">
+                @initial
+            </div>
+
+            <h3 class="text-white fw-bold mb-1">@Model.FullName</h3>
+
+            <div class="mb-3">
+                @switch (Model.Role)
+                {
+                    case UserRole.Admin:
+                        <span class="badge bg-primary px-3 py-2 fs-6"><i class="bi bi-shield-lock me-1"></i>Administrator</span>
+                        break;
+                    case UserRole.FrontDesk:
+                        <span class="badge bg-info text-dark px-3 py-2 fs-6"><i class="bi bi-clipboard-check me-1"></i>Front Desk Receptionist</span>
+                        break;
+                    case UserRole.Mechanic:
+                        <span class="badge bg-warning text-dark px-3 py-2 fs-6"><i class="bi bi-wrench me-1"></i>Certified Lead Mechanic</span>
+                        break;
+                    default:
+                        <span class="badge bg-secondary px-3 py-2 fs-6">@Model.Role</span>
+                        break;
+                }
+            </div>
+
+            <p class="text-secondary small mb-4">
+                Active member of the Garij workshop operational roster.
+            </p>
+
+            <div class="border-top border-secondary border-opacity-25 pt-3 text-start">
+                <div class="mb-3">
+                    <span class="text-secondary small d-block mb-1">Email Address</span>
+                    <div class="d-flex align-items-center justify-content-between">
+                        <span class="text-light fw-semibold text-truncate me-2" title="@Model.Email">@Model.Email</span>
+                        <a href="mailto:@Model.Email" class="app-btn app-btn-outline app-btn-sm" title="Send Email">
+                            <i class="bi bi-envelope"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <span class="text-secondary small d-block mb-1">Phone Number</span>
+                    <div class="d-flex align-items-center justify-content-between">
+                        <span class="text-light fw-semibold">@(string.IsNullOrWhiteSpace(Model.PhoneNumber) ? "Not Provided" : Model.PhoneNumber)</span>
+                        @if (!string.IsNullOrWhiteSpace(Model.PhoneNumber))
+                        {
+                            <a href="tel:@Model.PhoneNumber" class="app-btn app-btn-outline app-btn-sm" title="Call Phone">
+                                <i class="bi bi-telephone"></i>
+                            </a>
+                        }
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <span class="text-secondary small d-block mb-1">Date Joined</span>
+                    <span class="text-light fw-semibold">@Model.CreatedAt.ToString("MMMM dd, yyyy")</span>
+                </div>
+
+                <div class="mb-0">
+                    <span class="text-secondary small d-block mb-1">Employee Reference ID</span>
+                    <span class="font-monospace text-info small">EMP-@Model.Id.ToString("D4")</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Role Overview Card -->
+        <div class="app-card p-4">
+            <h5 class="text-white fw-bold mb-3 d-flex align-items-center gap-2">
+                <i class="bi bi-shield-check text-info"></i> Role &amp; Responsibilities
+            </h5>
+            @if (Model.Role == UserRole.Admin)
+            {
+                <p class="text-secondary small mb-3">
+                    As an <strong>Administrator</strong>, this user has unrestricted access to configure workshop settings, manage staff accounts, oversee customer transactions, and review financial reports.
+                </p>
+                <ul class="text-secondary small ps-3 mb-0">
+                    <li>Workshop branding and garage name customization</li>
+                    <li>Employee creation and role modification</li>
+                    <li>Complete billing, payments, and financial analytics</li>
+                    <li>Direct access to all customer and vehicle records</li>
+                </ul>
+            }
+            else if (Model.Role == UserRole.FrontDesk)
+            {
+                <p class="text-secondary small mb-3">
+                    As a <strong>Front Desk</strong> team member, this user manages reception desk workflows, customer appointments, vehicle intake, and service dispatching.
+                </p>
+                <ul class="text-secondary small ps-3 mb-0">
+                    <li>Customer intake and profile registration</li>
+                    <li>Vehicle inventory and diagnostic check-in</li>
+                    <li>Creating and scheduling service jobs</li>
+                    <li>Dispatching status update notifications</li>
+                </ul>
+            }
+            else
+            {
+                <p class="text-secondary small mb-3">
+                    As a <strong>Certified Mechanic</strong>, this user operates on the shop floor, inspects vehicles, performs diagnostic repairs, and logs technical service updates.
+                </p>
+                <ul class="text-secondary small ps-3 mb-0">
+                    <li>Execution of assigned mechanical service jobs</li>
+                    <li>Diagnostic notes and maintenance status reporting</li>
+                    <li>Tracking used spare parts and labor hours</li>
+                    <li>Real-time Job Board synchronization</li>
+                </ul>
+            }
+        </div>
+    </div>
+
+    <!-- Right Column: Assignments / Workload or Operational Scope -->
+    <div class="col-lg-8">
+        @if (Model.Role == UserRole.Mechanic)
+        {
+            <!-- Mechanic Assignments Workload Stats -->
+            <div class="row g-3 mb-4">
+                <div class="col-4">
+                    <div class="app-card p-3 text-center border-warning">
+                        <div class="text-secondary small text-uppercase fw-semibold mb-1">Active Jobs</div>
+                        <div class="display-6 fw-bold text-warning">@activeAssignments.Count</div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="app-card p-3 text-center border-success">
+                        <div class="text-secondary small text-uppercase fw-semibold mb-1">Completed</div>
+                        <div class="display-6 fw-bold text-success">@completedAssignments.Count</div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="app-card p-3 text-center border-info">
+                        <div class="text-secondary small text-uppercase fw-semibold mb-1">Total Assigned</div>
+                        <div class="display-6 fw-bold text-info">@assignments.Count</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Assigned Service Jobs Table -->
+            <div class="app-card p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="text-white fw-bold mb-0 d-flex align-items-center gap-2">
+                        <i class="bi bi-wrench-adjustable text-warning"></i> Assigned Service Jobs
+                    </h5>
+                    <a asp-controller="ServiceJob" asp-action="Index" class="app-btn app-btn-outline app-btn-sm">
+                        <i class="bi bi-list-task me-1"></i> All Jobs
+                    </a>
+                </div>
+
+                @if (!assignments.Any())
+                {
+                    <div class="py-5 text-center text-secondary">
+                        <i class="bi bi-tools display-4 mb-2 d-block text-secondary opacity-50"></i>
+                        <p class="mb-2">No service jobs assigned to this mechanic yet.</p>
+                        <a asp-controller="ServiceJob" asp-action="Index" class="app-btn app-btn-primary app-btn-sm">
+                            Assign to a Job
+                        </a>
+                    </div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover align-middle mb-0">
+                            <thead>
+                                <tr class="border-secondary border-opacity-25 text-secondary small text-uppercase">
+                                    <th>Ref #</th>
+                                    <th>Vehicle</th>
+                                    <th>Customer</th>
+                                    <th>Role In Job</th>
+                                    <th>Status</th>
+                                    <th>Assigned Date</th>
+                                    <th class="text-end">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var assign in assignments)
+                                {
+                                    var job = assign.ServiceJob;
+                                    if (job == null) continue;
+
+                                    <tr>
+                                        <td>
+                                            <span class="font-monospace text-info fw-bold">@job.BookingReference</span>
+                                        </td>
+                                        <td>
+                                            <div class="text-white fw-semibold">
+                                                @(job.Vehicle != null ? $"{job.Vehicle.Year} {job.Vehicle.Make} {job.Vehicle.Model}" : "—")
+                                            </div>
+                                            <span class="badge bg-secondary font-monospace" style="font-size: 0.7rem;">
+                                                @(job.Vehicle != null ? job.Vehicle.LicensePlateNumber : "—")
+                                            </span>
+                                        </td>
+                                        <td class="small text-light">
+                                            @(job.Customer != null ? job.Customer.FullName : "—")
+                                        </td>
+                                        <td>
+                                            @if (assign.RoleInJob == RoleInJob.Lead)
+                                            {
+                                                <span class="badge bg-warning text-dark"><i class="bi bi-star-fill me-1"></i>Lead</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary">Assistant</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @switch (job.Status)
+                                            {
+                                                case JobStatus.Requested:
+                                                    <span class="badge bg-secondary">Requested</span>
+                                                    break;
+                                                case JobStatus.InspectionPending:
+                                                    <span class="badge bg-info text-dark">Inspection Pending</span>
+                                                    break;
+                                                case JobStatus.CustomerApprovalNeeded:
+                                                    <span class="badge bg-warning text-dark">Approval Needed</span>
+                                                    break;
+                                                case JobStatus.InProgress:
+                                                    <span class="badge bg-primary">In Progress</span>
+                                                    break;
+                                                case JobStatus.Completed:
+                                                    <span class="badge bg-success">Completed</span>
+                                                    break;
+                                                case JobStatus.Cancelled:
+                                                    <span class="badge bg-danger">Cancelled</span>
+                                                    break;
+                                                default:
+                                                    <span class="badge bg-secondary">@job.Status</span>
+                                                    break;
+                                            }
+                                        </td>
+                                        <td class="small text-secondary">
+                                            @assign.AssignedAt.ToString("MMM dd, yyyy")
+                                        </td>
+                                        <td class="text-end">
+                                            <a asp-controller="ServiceJob" asp-action="Details" asp-route-id="@job.Id" class="app-btn app-btn-outline app-btn-sm" title="View Job Details">
+                                                <i class="bi bi-arrow-right"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <!-- Admin / Front Desk Operational Overview -->
+            <div class="app-card p-4 mb-4">
+                <h5 class="text-white fw-bold mb-3 d-flex align-items-center gap-2">
+                    <i class="bi bi-speedometer2 text-info"></i> Workshop Operational Workspace
+                </h5>
+                <p class="text-secondary">
+                    This staff member operates within the customer management and administrative systems. They can register incoming clients, schedule service bookings, and dispatch status updates.
+                </p>
+
+                <div class="row g-3 mt-2">
+                    <div class="col-md-6">
+                        <div class="p-3 rounded h-100" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08);">
+                            <h6 class="text-white fw-bold mb-2"><i class="bi bi-people me-2 text-info"></i>Client Operations</h6>
+                            <p class="small text-secondary mb-3">Manage reception desk intake, customer profiles, and vehicle registrations.</p>
+                            <a asp-controller="Customer" asp-action="Index" class="app-btn app-btn-outline app-btn-sm">Open Customers</a>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 rounded h-100" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08);">
+                            <h6 class="text-white fw-bold mb-2"><i class="bi bi-card-checklist me-2 text-info"></i>Job Scheduling</h6>
+                            <p class="small text-secondary mb-3">Create service jobs, assign certified mechanics, and monitor progress.</p>
+                            <a asp-controller="ServiceJob" asp-action="Index" class="app-btn app-btn-outline app-btn-sm">Open Jobs</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="app-card p-4">
+                <h5 class="text-white fw-bold mb-3 d-flex align-items-center gap-2">
+                    <i class="bi bi-clock-history text-info"></i> Account Activity
+                </h5>
+                <div class="d-flex align-items-center gap-3 p-3 rounded" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05);">
+                    <i class="bi bi-check-circle-fill text-success fs-3"></i>
+                    <div>
+                        <div class="text-white fw-semibold">Account Status: Active</div>
+                        <div class="small text-secondary">Registered on @Model.CreatedAt.ToString("MMMM dd, yyyy 'at' hh:mm tt")</div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

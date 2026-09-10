@@ -1,0 +1,138 @@
+@using Garij.Application.DTOs
+@{
+    ViewData["Title"] = "Garage Branding & Settings";
+    var currentGarageName = ViewBag.GarageName as string ?? "Garij Master Workshop";
+    var license = ViewBag.License as ProjectPurchaseDto;
+}
+
+<div class="app-page-header d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+    <div>
+        <h1 class="app-page-title"><i class="bi bi-building-gear me-2 text-info"></i>Garage Branding &amp; Settings</h1>
+        <p class="app-page-subtitle">Name your garage and customize how your workshop identity appears across the platform.</p>
+    </div>
+    <a asp-action="Index" class="app-btn app-btn-outline">
+        <i class="bi bi-arrow-left me-1"></i> Back to Admin
+    </a>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success bg-opacity-10 bg-success text-success border-success mb-4 p-3 rounded-3">
+        <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger bg-opacity-10 bg-danger text-danger border-danger mb-4 p-3 rounded-3">
+        <i class="bi bi-x-circle-fill me-2"></i> @TempData["ErrorMessage"]
+    </div>
+}
+
+<div class="row g-4">
+    <!-- Col 1: Name Your Garage Form -->
+    <div class="col-lg-7">
+        <div class="app-card h-100">
+            <h4 class="text-white fw-bold mb-2">
+                <i class="bi bi-pen-fill text-info me-2"></i>Customize Your Garage Name
+            </h4>
+            <p class="text-secondary small mb-4">
+                This name represents your business. It will be shown prominently at the top of the navigation bar, on service orders, and across your workshop screens.
+            </p>
+
+            <form asp-action="UpdateGarageName" method="post">
+                @Html.AntiForgeryToken()
+
+                <div class="mb-4">
+                    <label for="workshopName" class="form-label text-light small fw-semibold">Garage / Workshop Name *</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-dark border-secondary text-info">
+                            <i class="bi bi-shop"></i>
+                        </span>
+                        <input type="text" 
+                               name="workshopName" 
+                               id="workshopName" 
+                               class="form-control bg-dark text-light border-secondary fs-5 fw-bold" 
+                               value="@currentGarageName" 
+                               placeholder="e.g. Apex Performance Auto" 
+                               maxlength="100" 
+                               required />
+                    </div>
+                    <small class="text-secondary d-block mt-2">
+                        Visible to all staff members (front desk receptionists, technicians, mechanics, and clients).
+                    </small>
+                </div>
+
+                <!-- Live Preview Card -->
+                <div class="p-3 rounded-3 bg-black border border-secondary border-opacity-50 mb-4">
+                    <span class="text-secondary small text-uppercase font-monospace d-block mb-2">
+                        <i class="bi bi-eye me-1"></i> Top Navigation Bar Preview
+                    </span>
+                    <div class="d-flex align-items-center gap-2 p-2 rounded-2" style="background: rgba(255,255,255,0.03);">
+                        <i class="bi bi-gear-wide-connected text-info fs-3"></i>
+                        <div class="d-flex flex-column">
+                            <span id="previewGarageName" class="brand-title fw-bold text-white text-uppercase" style="letter-spacing: 0.5px; font-size: 1.05rem;">
+                                @currentGarageName
+                            </span>
+                            <span class="font-monospace text-info small" style="font-size: 0.65rem; letter-spacing: 1px;">
+                                POWERED BY GARIJ
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2">
+                    <a asp-action="Index" class="app-btn app-btn-outline">Cancel</a>
+                    <button type="submit" class="app-btn app-btn-primary">
+                        <i class="bi bi-check-circle-fill me-1"></i> Save Garage Name
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Col 2: Workshop Ownership & License Info -->
+    <div class="col-lg-5">
+        <div class="app-card h-100">
+            <h5 class="text-white fw-bold mb-3">
+                <i class="bi bi-shield-check text-info me-2"></i>Garage Ownership &amp; License
+            </h5>
+
+            <div class="p-3 rounded-3 bg-black border border-secondary border-opacity-25 mb-3">
+                <span class="text-secondary small d-block">ACTIVE WORKSHOP NAME</span>
+                <strong class="text-info fs-5">@currentGarageName</strong>
+            </div>
+
+            @if (license != null)
+            {
+                <div class="p-3 rounded-3 bg-black border border-secondary border-opacity-25 mb-3 small">
+                    <span class="text-secondary d-block">REGISTERED OWNER</span>
+                    <strong class="text-white">@license.BuyerName</strong>
+                    <span class="text-secondary d-block mt-1">@license.BuyerEmail</span>
+                </div>
+
+                <div class="p-3 rounded-3 bg-black border border-secondary border-opacity-25 mb-4 font-monospace small">
+                    <span class="text-secondary d-block">LIFETIME LICENSE KEY</span>
+                    <span class="text-info fw-bold">@license.LicenseKey</span>
+                </div>
+            }
+
+            <a asp-controller="Purchase" asp-action="Status" class="app-btn app-btn-outline w-100 text-center">
+                <i class="bi bi-award me-1"></i> View Full License Certificate
+            </a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Live preview of garage name as admin types
+        const input = document.getElementById('workshopName');
+        const preview = document.getElementById('previewGarageName');
+        if (input && preview) {
+            input.addEventListener('input', function() {
+                preview.textContent = this.value.trim() || 'YOUR GARAGE NAME';
+            });
+        }
+    </script>
+}

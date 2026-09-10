@@ -2,23 +2,39 @@
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
 
-<ul class="navbar-nav">
 @if (SignInManager.IsSignedIn(User))
 {
-    <li class="nav-item">
-        <span class="nav-link text-dark">Hello @User.Identity?.Name!</span>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Logout">Logout</a>
-    </li>
+    <span class="d-inline-flex align-items-center gap-1 text-light small fw-semibold me-1 px-2 py-1 rounded-pill" style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-dark);" title="Logged in as @User.Identity?.Name">
+        <i class="bi bi-person-circle text-info fs-6"></i>
+        <span class="d-none d-md-inline">@User.Identity?.Name</span>
+    </span>
+
+    <!-- Theme Switcher Option at Side of Profile -->
+    <button type="button" class="theme-toggle-btn" data-theme-toggle title="Toggle Light / Dark Mode" aria-label="Toggle Light and Dark Mode">
+        <i class="bi bi-sun-fill theme-toggle-icon text-warning"></i>
+        <span class="theme-toggle-text d-none d-md-inline">Light</span>
+    </button>
+
+    <a class="btn-nav-glow-register" asp-area="" asp-controller="Account" asp-action="Logout" title="Sign out">
+        <i class="bi bi-box-arrow-right"></i>
+        <span class="d-none d-sm-inline">Logout</span>
+    </a>
 }
 else
 {
-    <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Register">Register</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Login">Login</a>
-    </li>
+    <!-- Theme Switcher Option at Side of Profile / Auth Buttons -->
+    <button type="button" class="theme-toggle-btn" data-theme-toggle title="Toggle Light / Dark Mode" aria-label="Toggle Light and Dark Mode">
+        <i class="bi bi-sun-fill theme-toggle-icon text-warning"></i>
+        <span class="theme-toggle-text d-none d-md-inline">Light</span>
+    </button>
+
+    <a class="btn-nav-glow-register" asp-area="" asp-controller="Account" asp-action="Register">
+        <i class="bi bi-person-plus"></i>
+        <span>Create Account</span>
+    </a>
+    <a class="btn-nav-glow-login" asp-area="" asp-controller="Account" asp-action="Login">
+        <i class="bi bi-box-arrow-in-right"></i>
+        <span>Login</span>
+    </a>
 }
-</ul>
+

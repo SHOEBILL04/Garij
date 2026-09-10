@@ -1,0 +1,127 @@
+@model Garij.Application.DTOs.ProjectPurchaseDto
+@{
+    Layout = "_LandingLayout";
+    ViewData["Title"] = "Purchase Successful — Garij Lifetime License";
+    var returnUrl = ViewBag.ReturnUrl as string;
+    var launchUrl = !string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl) ? returnUrl : Url.Action("Index", "Dashboard");
+}
+
+<div class="purchase-success-shell py-5">
+    <div class="container px-lg-5 py-4">
+        
+        <div class="mx-auto text-center reveal" style="max-width: 800px;">
+            
+            <!-- Animated Success Dial / Badge -->
+            <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-4 shadow" style="width: 90px; height: 90px; background: rgba(16, 185, 129, 0.15); border: 2px solid #10b981;">
+                <i class="bi bi-check-lg text-success display-4"></i>
+            </div>
+
+            <span class="d-block text-success fw-bold small text-uppercase letter-spacing-2 mb-2">Payment Confirmed • Lifetime License Activated</span>
+            <h1 class="text-white fw-extrabold display-5 mb-3">CONGRATULATIONS &amp; WELCOME!</h1>
+            <p class="text-secondary mx-auto mb-5" style="max-width: 600px;">
+                Your one-time payment has been processed successfully. Your lifetime license certificate has been generated and your account now has full, unrestricted access to Garij.
+            </p>
+
+            <!-- Digital License Certificate Box -->
+            <div class="p-4 p-md-5 rounded-4 border border-info border-opacity-40 text-start shadow-lg mb-4 position-relative" style="background: linear-gradient(135deg, #0e121a 0%, #131824 100%);">
+                
+                <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                    <div>
+                        <div class="text-info small fw-bold text-uppercase letter-spacing-2">
+                            <i class="bi bi-award-fill me-1"></i> Official Digital Certificate
+                        </div>
+                        <h4 class="text-white fw-bold mb-0">Garij Lifetime Software License</h4>
+                    </div>
+                    <span class="badge bg-success bg-opacity-25 text-success border border-success px-3 py-2 rounded-pill font-monospace fw-bold">
+                        <i class="bi bi-patch-check-fill me-1"></i> ACTIVE &bull; LIFETIME
+                    </span>
+                </div>
+
+                <!-- License Key Box -->
+                <div class="p-3 rounded-3 bg-dark border border-secondary border-opacity-50 d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
+                    <div>
+                        <span class="text-secondary small d-block mb-1">YOUR UNIQUE LICENSE KEY</span>
+                        <span id="licenseKeyText" class="font-monospace text-info fs-5 fw-bold letter-spacing-1">@Model.LicenseKey</span>
+                    </div>
+                    <button type="button" id="btnCopyKey" class="btn btn-outline-info btn-sm px-3 py-2 rounded-pill d-flex align-items-center gap-2" title="Copy License Key">
+                        <i class="bi bi-clipboard" id="copyIcon"></i>
+                        <span id="copyLabel">Copy Key</span>
+                    </button>
+                </div>
+
+                <!-- Meta Details Grid -->
+                <div class="row g-3 text-secondary small pt-2 border-top border-secondary border-opacity-25">
+                    <div class="col-sm-6 col-md-3">
+                        <span class="text-white-50 d-block">Licensed To</span>
+                        <strong class="text-light">@Model.BuyerName</strong>
+                    </div>
+                    <div class="col-sm-6 col-md-3">
+                        <span class="text-white-50 d-block">Registered Email</span>
+                        <strong class="text-light">@Model.BuyerEmail</strong>
+                    </div>
+                    <div class="col-sm-6 col-md-3">
+                        <span class="text-white-50 d-block">Workshop</span>
+                        <strong class="text-light">@(Model.WorkshopName ?? "Private Automotive Center")</strong>
+                    </div>
+                    <div class="col-sm-6 col-md-3">
+                        <span class="text-white-50 d-block">Activated Date</span>
+                        <strong class="text-light">@Model.PurchasedAt.ToLocalTime().ToString("dd MMM yyyy")</strong>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Itemized Receipt Summary -->
+            <div class="p-4 rounded-3 bg-dark bg-opacity-50 border border-secondary border-opacity-25 text-start mb-5">
+                <h6 class="text-white fw-bold mb-3 d-flex align-items-center justify-content-between">
+                    <span><i class="bi bi-receipt me-2 text-info"></i>Transaction Receipt</span>
+                    <span class="text-secondary small font-monospace">@Model.TransactionReference</span>
+                </h6>
+                <div class="d-flex justify-content-between py-2 border-bottom border-secondary border-opacity-25 text-light small">
+                    <span>Garij Vehicle Workshop Management System (Lifetime Access)</span>
+                    <strong class="text-info">$@Model.Amount.ToString("F2") @Model.Currency</strong>
+                </div>
+                <div class="d-flex justify-content-between pt-3 text-white small">
+                    <span class="fw-bold">Total Paid (One-Time)</span>
+                    <strong class="text-success fs-6">$@Model.Amount.ToString("F2") @Model.Currency</strong>
+                </div>
+            </div>
+
+            <!-- Primary CTAs -->
+            <div class="d-flex justify-content-center align-items-center gap-3 flex-wrap">
+                <a href="@launchUrl" class="btn btn-info btn-lg px-5 py-3 text-dark fw-bold text-uppercase letter-spacing-1 shadow">
+                    <i class="bi bi-speedometer2 me-2"></i>Enter Workshop Dashboard
+                </a>
+                <button type="button" onclick="window.print();" class="btn btn-outline-secondary btn-lg px-4 py-3 text-light">
+                    <i class="bi bi-printer me-2"></i>Print Certificate / Receipt
+                </button>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const btnCopyKey = document.getElementById('btnCopyKey');
+            const licenseKeyText = document.getElementById('licenseKeyText');
+            const copyIcon = document.getElementById('copyIcon');
+            const copyLabel = document.getElementById('copyLabel');
+
+            if (btnCopyKey && licenseKeyText) {
+                btnCopyKey.addEventListener('click', function () {
+                    navigator.clipboard.writeText(licenseKeyText.innerText.trim()).then(function () {
+                        copyIcon.className = "bi bi-check2 text-success";
+                        copyLabel.innerText = "Copied!";
+                        setTimeout(function () {
+                            copyIcon.className = "bi bi-clipboard";
+                            copyLabel.innerText = "Copy Key";
+                        }, 2500);
+                    });
+                });
+            }
+        });
+    </script>
+}

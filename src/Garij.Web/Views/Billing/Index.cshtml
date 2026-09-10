@@ -1,5 +1,80 @@
+@model IEnumerable<InvoiceDto>
+@using Garij.Domain.Enums
+@using Garij.Web.Helpers
+
 @{
     ViewData["Title"] = "Invoices";
 }
 
-<h1>Invoices</h1>
+<div class="app-page-header">
+    <div>
+        <h1 class="app-page-title"><i class="bi bi-receipt me-2 text-info"></i>Invoices</h1>
+        <p class="app-page-subtitle">Generate invoices for completed jobs and track payments.</p>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="app-alert-success"><span><i class="bi bi-check-circle-fill me-2"></i>@TempData["SuccessMessage"]</span></div>
+}
+
+<div class="app-card mb-4">
+    <h5 class="app-card-heading">Generate Invoice for a Service Job</h5>
+    <form asp-action="Create" method="get" class="row g-2 align-items-end">
+        <div class="col-auto app-form-group mb-0">
+            <label for="serviceJobId" class="app-form-label">Service Job ID</label>
+            <input type="number" min="1" name="serviceJobId" id="serviceJobId" class="app-form-control" placeholder="e.g. 1" required />
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="app-btn app-btn-primary"><i class="bi bi-arrow-right-circle"></i> Generate Invoice</button>
+        </div>
+    </form>
+</div>
+
+<div class="app-table-wrap">
+    <div class="table-responsive">
+        <table class="app-table mb-0">
+            <thead>
+                <tr>
+                    <th>Invoice #</th>
+                    <th>Issued</th>
+                    <th class="text-end">Subtotal</th>
+                    <th class="text-end">Tax</th>
+                    <th class="text-end">Total</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="7">
+                            <div class="app-empty-state">
+                                <i class="bi bi-receipt"></i>
+                                No invoices generated yet.
+                            </div>
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var invoice in Model)
+                    {
+                        <tr>
+                            <td class="text-white font-monospace">@invoice.InvoiceNumber</td>
+                            <td>@invoice.IssuedAt.ToString("MMM dd, yyyy")</td>
+                            <td class="text-end">@invoice.SubTotal.ToString("C")</td>
+                            <td class="text-end">@invoice.TaxAmount.ToString("C")</td>
+                            <td class="text-end fw-bold text-white">@invoice.TotalAmount.ToString("C")</td>
+                            <td><span class="app-badge @StatusBadgeHelper.BadgeClass(invoice.PaymentStatus)">@invoice.PaymentStatus</span></td>
+                            <td class="text-end">
+                                <a asp-action="Details" asp-route-id="@invoice.Id" class="app-btn app-btn-outline app-btn-sm">Details</a>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

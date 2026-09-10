@@ -11,12 +11,16 @@ public class ServiceJobRepository : Repository<ServiceJob>, IServiceJobRepositor
     {
     }
 
-    public async Task<ServiceJob?> GetByBookingReferenceAsync(string bookingReference) =>
-        await DbSet.Include(sj => sj.Vehicle)
+    public async Task<ServiceJob?> GetByBookingReferenceAsync(string bookingReference)
+    {
+        var normalizedBookingReference = bookingReference.Trim().ToUpperInvariant();
+
+        return await DbSet.Include(sj => sj.Vehicle)
             .Include(sj => sj.Customer)
             .Include(sj => sj.MechanicAssignments)
                 .ThenInclude(ma => ma.User)
-            .FirstOrDefaultAsync(sj => sj.BookingReference == bookingReference);
+            .FirstOrDefaultAsync(sj => sj.BookingReference.ToUpper() == normalizedBookingReference);
+    }
 
     public async Task<IEnumerable<ServiceJob>> GetServiceHistoryByVehicleAsync(int vehicleId) =>
         await DbSet.Include(sj => sj.Vehicle)
@@ -51,6 +55,17 @@ public class ServiceJobRepository : Repository<ServiceJob>, IServiceJobRepositor
             .Include(sj => sj.MechanicAssignments)
                 .ThenInclude(ma => ma.User)
             .Where(sj => sj.Status == status)
+            .OrderByDescending(sj => sj.CreatedAt)
+            .ToListAsync();
+
+    public async Task<IEnumerable<ServiceJob>> GetJobsByMechanicAsync(int mechanicUserId) =>
+        await DbSet.Include(sj => sj.Vehicle)
+            .Include(sj => sj.Customer)
+            .Include(sj => sj.MechanicAssignments)
+                .ThenInclude(ma => ma.User)
+            .Include(sj => sj.JobPartsUsed)
+                .ThenInclude(jpu => jpu.Part)
+            .Where(sj => sj.MechanicAssignments.Any(ma => ma.UserId == mechanicUserId))
             .OrderByDescending(sj => sj.CreatedAt)
             .ToListAsync();
 }

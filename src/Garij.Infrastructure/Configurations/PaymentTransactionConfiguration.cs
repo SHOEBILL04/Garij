@@ -12,5 +12,9 @@ public class PaymentTransactionConfiguration : IEntityTypeConfiguration<PaymentT
 
         builder.Property(pt => pt.Amount).HasColumnType("decimal(18,2)");
         builder.Property(pt => pt.TransactionReference).HasMaxLength(100);
+
+        // Refunds are modelled by Invoice.PaymentStatus, not by negative payment rows,
+        // so a payment row is always a positive amount of money received.
+        builder.ToTable(t => t.HasCheckConstraint("CK_PaymentTransaction_Amount", "\"Amount\" > 0"));
     }
 }

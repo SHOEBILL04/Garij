@@ -1,5 +1,3 @@
-using Garij.Application.DTOs;
-using Garij.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,37 +6,24 @@ namespace Garij.Web.Controllers;
 [AllowAnonymous]
 public class StatusLookupController : Controller
 {
-    private readonly ICustomerVehicleService _customerVehicleService;
-
-    public StatusLookupController(ICustomerVehicleService customerVehicleService)
-    {
-        _customerVehicleService = customerVehicleService;
-    }
-
     [HttpGet]
     public IActionResult Index()
     {
-        return View();
+        return Redirect("/#status-tracker");
     }
 
     [HttpGet]
-    public async Task<IActionResult> Result(string? plateNumber)
+    public IActionResult Result(string? query, string? plateNumber, string? bookingReference)
     {
-        if (string.IsNullOrWhiteSpace(plateNumber))
+        var lookupValue = FirstProvided(query, bookingReference, plateNumber);
+        if (string.IsNullOrWhiteSpace(lookupValue))
         {
-            return RedirectToAction(nameof(Index));
+            return Redirect("/#status-tracker");
         }
 
-        var vehicle = await _customerVehicleService.GetVehicleByLicensePlateAsync(plateNumber);
-        if (vehicle is null)
-        {
-            ViewBag.SearchPlate = plateNumber;
-            return View(new List<ServiceHistoryDto>());
-        }
-
-        ViewBag.Vehicle = vehicle;
-        ViewBag.SearchPlate = plateNumber;
-        var history = await _customerVehicleService.GetServiceHistoryByVehicleAsync(vehicle.Id);
-        return View(history);
+        return Redirect($"/?query={Uri.EscapeDataString(lookupValue)}#status-tracker");
     }
+
+    private static string FirstProvided(params string?[] values) =>
+        values.FirstOrDefault(value => !string.IsNullOrWhiteSpace(value))?.Trim() ?? string.Empty;
 }

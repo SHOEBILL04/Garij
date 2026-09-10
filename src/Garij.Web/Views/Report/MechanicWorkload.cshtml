@@ -1,5 +1,237 @@
+@model IEnumerable<Garij.Application.DTOs.MechanicWorkloadDto>
 @{
     ViewData["Title"] = "Mechanic Workload Report";
+
+    var list = Model.ToList();
+    var totalAssigned = list.Sum(m => m.TotalJobsAssigned);
+    var totalCompleted = list.Sum(m => m.CompletedJobCount);
+    var totalActive = list.Sum(m => m.ActiveJobCount);
+
+    var namesJson = System.Text.Json.JsonSerializer.Serialize(list.Select(m => m.FullName));
+    var activeJson = System.Text.Json.JsonSerializer.Serialize(list.Select(m => m.ActiveJobCount));
+    var completedJson = System.Text.Json.JsonSerializer.Serialize(list.Select(m => m.CompletedJobCount));
 }
 
-<h1>Mechanic Workload Report</h1>
+<style>
+    @@media print {
+        header, nav, footer, .no-print, .app-btn, .navbar, .brand-title, .theme-toggle {
+            display: none !important;
+        }
+        body {
+            background: #ffffff !important;
+            color: #000000 !important;
+            font-size: 12pt;
+        }
+        .app-card {
+            border: 1px solid #ccc !important;
+            background: #ffffff !important;
+            color: #000000 !important;
+            box-shadow: none !important;
+            break-inside: avoid;
+        }
+        .text-white, .text-light, .text-info, .text-secondary {
+            color: #000000 !important;
+        }
+        table {
+            width: 100% !important;
+            border-collapse: collapse !important;
+        }
+        table, th, td {
+            border: 1px solid #333 !important;
+            color: #000000 !important;
+            padding: 6px !important;
+        }
+        .print-header {
+            display: block !important;
+            margin-bottom: 20px;
+        }
+    }
+    .print-header {
+        display: none;
+    }
+</style>
+
+<div class="print-header">
+    <h2>Garij Workshop — Mechanic Workload Report</h2>
+    <p>Generated: @DateTime.UtcNow.ToString("g") UTC</p>
+</div>
+
+<div class="app-page-header no-print">
+    <div>
+        <h1 class="app-page-title">Mechanic Workload Report</h1>
+        <p class="app-page-subtitle">Job ticket allocation, lead technician assignments, and completed volume shares.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="Index" class="app-btn app-btn-outline">Back to Reports</a>
+    </div>
+</div>
+
+@await Html.PartialAsync("_DateRangeFilterPartial")
+
+<!-- Domain Note: Mandatory caption disclosing absence of labor hours -->
+<div class="alert alert-secondary py-2 px-3 mb-4 d-flex align-items-center gap-2 small border border-secondary border-opacity-25 bg-dark" role="alert">
+    <i class="bi bi-info-circle text-info fs-5 flex-shrink-0"></i>
+    <div>
+        <strong>System Notice:</strong> Workload is measured in <strong>job ticket volume</strong> (Active vs Completed assignments) because actual labour hours and job durations are not recorded by the system.
+    </div>
+</div>
+
+<!-- Summary KPI Cards -->
+<div class="row row-cols-1 row-cols-sm-3 g-3 mb-4">
+    <div class="col">
+        <div class="app-card h-100 p-3">
+            <span class="text-secondary small text-uppercase">Total Assigned Tickets</span>
+            <h3 class="text-white fw-bold font-monospace mt-1 mb-0">@totalAssigned</h3>
+            <span class="small text-muted">All active and finished job assignments</span>
+        </div>
+    </div>
+    <div class="col">
+        <div class="app-card h-100 p-3 border-success border-opacity-25">
+            <span class="text-success small text-uppercase fw-semibold">Completed Tickets</span>
+            <h3 class="text-success fw-bold font-monospace mt-1 mb-0">@totalCompleted</h3>
+            <span class="small text-muted">Finished service jobs</span>
+        </div>
+    </div>
+    <div class="col">
+        <div class="app-card h-100 p-3 border-info border-opacity-25">
+            <span class="text-info small text-uppercase fw-semibold">Active In-Bay Tickets</span>
+            <h3 class="text-info fw-bold font-monospace mt-1 mb-0">@totalActive</h3>
+            <span class="small text-muted">Currently undergoing inspection or repair</span>
+        </div>
+    </div>
+</div>
+
+<!-- Chart Section -->
+@if (list.Count > 0)
+{
+    <div class="app-card mb-4 no-print">
+        <h5 class="text-white fw-bold mb-3"><i class="bi bi-bar-chart-steps me-2 text-info"></i>Workload Distribution by Mechanic</h5>
+        <div style="max-height: 280px; position: relative;">
+            <canvas id="mechanicChart"></canvas>
+        </div>
+    </div>
+}
+
+<!-- Detailed Workload Table -->
+<div class="app-card">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="text-white fw-bold mb-0">Mechanic Performance &amp; Ticket Breakdown</h5>
+        <span class="badge bg-secondary bg-opacity-25 text-light">@list.Count Mechanic(s)</span>
+    </div>
+
+    @if (list.Count == 0)
+    {
+        <div class="app-empty-state py-5">
+            <i class="bi bi-person-x fs-1 text-secondary mb-2"></i>
+            <div class="fw-semibold">No mechanics found or no assignments in selected range.</div>
+            <div class="small text-secondary mt-1">Adjust dates above or assign mechanics to service jobs.</div>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-dark table-hover align-middle mb-0">
+                <thead>
+                    <tr class="text-secondary small text-uppercase border-secondary">
+                        <th>Mechanic</th>
+                        <th class="text-center text-info">Active (Lead)</th>
+                        <th class="text-center">Active (Assistant)</th>
+                        <th class="text-center text-success">Completed (Lead)</th>
+                        <th class="text-center">Completed (Assistant)</th>
+                        <th class="text-center fw-bold">Total Assigned</th>
+                        <th class="text-end text-info">Completed Share %</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var m in list)
+                    {
+                        <tr>
+                            <td class="fw-semibold text-white">
+                                <i class="bi bi-wrench me-2 text-secondary"></i>@m.FullName
+                            </td>
+                            <td class="text-center font-monospace text-info">@m.LeadActiveJobCount</td>
+                            <td class="text-center font-monospace text-secondary">@m.AssistingActiveJobCount</td>
+                            <td class="text-center font-monospace text-success fw-semibold">@m.LeadCompletedJobCount</td>
+                            <td class="text-center font-monospace text-secondary">@m.AssistingCompletedJobCount</td>
+                            <td class="text-center font-monospace fw-bold text-white">@m.TotalJobsAssigned</td>
+                            <td class="text-end font-monospace text-info fw-semibold">
+                                @m.CompletedSharePercentage.ToString("0.0")%
+                                <div class="progress mt-1" style="height: 4px; background: rgba(255,255,255,0.08);">
+                                    <div class="progress-bar bg-info" style="width: @m.CompletedSharePercentage%"></div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr class="fw-bold text-white border-top border-secondary">
+                        <td>TOTAL</td>
+                        <td class="text-center font-monospace text-info">@list.Sum(m => m.LeadActiveJobCount)</td>
+                        <td class="text-center font-monospace text-secondary">@list.Sum(m => m.AssistingActiveJobCount)</td>
+                        <td class="text-center font-monospace text-success">@list.Sum(m => m.LeadCompletedJobCount)</td>
+                        <td class="text-center font-monospace text-secondary">@list.Sum(m => m.AssistingCompletedJobCount)</td>
+                        <td class="text-center font-monospace">@totalAssigned</td>
+                        <td class="text-end font-monospace text-info">@(totalCompleted > 0 ? "100.0%" : "0.0%")</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const ctx = document.getElementById('mechanicChart');
+            if (!ctx) return;
+
+            const labels = @Html.Raw(namesJson);
+            const active = @Html.Raw(activeJson);
+            const completed = @Html.Raw(completedJson);
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Active Tickets',
+                            data: active,
+                            backgroundColor: 'rgba(6, 182, 212, 0.65)',
+                            borderColor: 'rgb(6, 182, 212)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Completed Tickets',
+                            data: completed,
+                            backgroundColor: 'rgba(34, 197, 94, 0.65)',
+                            borderColor: 'rgb(34, 197, 94)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { precision: 0, color: '#94a3b8' },
+                            grid: { color: 'rgba(255, 255, 255, 0.08)' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#94a3b8' }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: { color: '#f8fafc' }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+}

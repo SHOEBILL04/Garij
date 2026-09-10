@@ -1,0 +1,524 @@
+@model Garij.Application.DTOs.CreateProjectPurchaseDto
+@{
+    Layout = "_LandingLayout";
+    ViewData["Title"] = "Buy Garij — Lifetime License & One-Time Payment";
+    var price = ViewBag.Price ?? 499.00m;
+    var currency = ViewBag.Currency ?? "USD";
+    var returnUrl = ViewBag.ReturnUrl as string;
+    var requireLicense = (bool)(ViewBag.RequireLicense ?? false);
+}
+
+<div class="purchase-page-shell py-5">
+    <div class="container px-lg-5 py-4">
+        
+        <!-- Header Banner -->
+        <div class="text-center mb-5 reveal">
+            <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill mb-3" style="background: rgba(6, 182, 212, 0.15); border: 1px solid rgba(6, 182, 212, 0.4);">
+                <i class="bi bi-shield-check text-info"></i>
+                <span class="text-info fw-bold small letter-spacing-2 text-uppercase">One-Time Buyout • Zero Subscriptions</span>
+            </div>
+            <h1 class="text-white fw-extrabold display-5 mb-2">UNLOCK FULL GARIJ ACCESS</h1>
+            <p class="text-secondary mx-auto" style="max-width: 650px;">
+                Invest once and own your automotive workshop management system forever. Complete with mechanic job boards, parts inventory, transactional invoicing, and AI diagnostics.
+            </p>
+        </div>
+
+        @if (TempData["LicenseAlert"] != null || requireLicense)
+        {
+            <div class="alert alert-warning border-warning bg-opacity-10 bg-warning text-warning d-flex align-items-center gap-3 p-3 rounded-3 mb-4 mx-auto" style="max-width: 960px;">
+                <i class="bi bi-lock-fill fs-2 flex-shrink-0"></i>
+                <div>
+                    <strong>Workshop Dashboard Locked:</strong> @(TempData["LicenseAlert"] ?? "A lifetime license is required to access the workshop management system.")
+                    <div class="small mt-1 text-light">
+                        Public pages (<a asp-controller="Home" asp-action="Index" class="text-info fw-bold text-decoration-none">Home</a>, <a asp-controller="Home" asp-action="About" class="text-info fw-bold text-decoration-none">About</a>, <a asp-controller="Home" asp-action="Services" class="text-info fw-bold text-decoration-none">Services</a>, <a asp-controller="Home" asp-action="Testimonials" class="text-info fw-bold text-decoration-none">Testimonials</a>, <a asp-controller="Home" asp-action="Pricing" class="text-info fw-bold text-decoration-none">Pricing</a>) are completely free and open to explore. Complete your purchase or enter a demo key below to unlock the management tools.
+                    </div>
+                </div>
+            </div>
+        }
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger bg-opacity-10 bg-danger text-danger border-danger p-3 rounded-3 mb-4 mx-auto" style="max-width: 960px;">
+                <i class="bi bi-x-circle-fill me-2"></i> @TempData["ErrorMessage"]
+            </div>
+        }
+
+        <div class="row g-5 align-items-start justify-content-center">
+            
+            <!-- Left Column: Value Proposition & Feature Matrix -->
+            <div class="col-lg-5 reveal-left">
+                <div class="p-4 p-md-5 rounded-4 border border-secondary border-opacity-25 h-100 shadow-lg" style="background: linear-gradient(145deg, #11151f 0%, #0d1017 100%);">
+                    
+                    <div class="d-flex justify-content-between align-items-start mb-4">
+                        <div>
+                            <span class="text-secondary small fw-bold text-uppercase letter-spacing-2">Software Package</span>
+                            <h3 class="text-white fw-bold mb-0">Lifetime License</h3>
+                        </div>
+                        <span class="badge bg-info text-dark px-3 py-2 rounded-pill fw-bold">PRO EDITION</span>
+                    </div>
+
+                    <div class="d-flex align-items-baseline gap-2 mb-4 pb-4 border-bottom border-secondary border-opacity-25">
+                        <span class="text-info display-4 fw-extrabold">$@price</span>
+                        <span class="text-secondary font-monospace">@currency</span>
+                        <span class="badge bg-dark border border-secondary text-white-50 ms-auto">ONE-TIME</span>
+                    </div>
+
+                    <h5 class="text-white fw-bold small text-uppercase letter-spacing-2 mb-3">
+                        <i class="bi bi-stars text-info me-2"></i>What's Included:
+                    </h5>
+
+                    <ul class="list-unstyled text-light small d-flex flex-column gap-3 mb-4">
+                        <li class="d-flex align-items-center gap-3">
+                            <i class="bi bi-check-circle-fill text-info fs-5"></i>
+                            <span><strong>Unlimited Service Jobs</strong> &amp; Complete Repair History</span>
+                        </li>
+                        <li class="d-flex align-items-center gap-3">
+                            <i class="bi bi-check-circle-fill text-info fs-5"></i>
+                            <span><strong>Touch-Friendly Mechanic Job Board</strong> with validated state transitions</span>
+                        </li>
+                        <li class="d-flex align-items-center gap-3">
+                            <i class="bi bi-check-circle-fill text-info fs-5"></i>
+                            <span><strong>Parts &amp; Inventory Management</strong> with auto reorder threshold alerts</span>
+                        </li>
+                        <li class="d-flex align-items-center gap-3">
+                            <i class="bi bi-check-circle-fill text-info fs-5"></i>
+                            <span><strong>Transactional Invoicing</strong> with atomic labor + parts calculation</span>
+                        </li>
+                        <li class="d-flex align-items-center gap-3">
+                            <i class="bi bi-check-circle-fill text-info fs-5"></i>
+                            <span><strong>Gemini AI Intelligence Engine</strong> for predictive maintenance</span>
+                        </li>
+                        <li class="d-flex align-items-center gap-3">
+                            <i class="bi bi-check-circle-fill text-info fs-5"></i>
+                            <span><strong>Public Telemetry Status Lookup</strong> for your vehicle customers</span>
+                        </li>
+                        <li class="d-flex align-items-center gap-3">
+                            <i class="bi bi-check-circle-fill text-info fs-5"></i>
+                            <span><strong>Lifetime Updates</strong> &amp; Digital Certificate Delivery</span>
+                        </li>
+                    </ul>
+
+                    <div class="p-3 rounded-3 bg-dark bg-opacity-75 border border-info border-opacity-25 d-flex align-items-center gap-3">
+                        <i class="bi bi-shield-lock-fill text-info fs-3"></i>
+                        <div class="small text-secondary">
+                            <span class="text-light fw-bold">256-Bit SSL Encrypted</span><br />
+                            Immediate digital key activation upon completed checkout.
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Right Column: Checkout & Payment Form -->
+            <div class="col-lg-7 reveal-right">
+                <div class="p-4 p-md-5 rounded-4 border border-info border-opacity-25 shadow-lg position-relative overflow-hidden" style="background: rgba(18, 22, 31, 0.95); backdrop-filter: blur(12px);">
+                    
+                    <!-- Navigation Pills: Payment vs Activation -->
+                    <ul class="nav nav-pills mb-4 gap-2" id="purchaseTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active px-4 py-2 rounded-pill fw-semibold text-uppercase small" id="pay-tab" data-bs-toggle="pill" data-bs-target="#pay-pane" type="button" role="tab">
+                                <i class="bi bi-credit-card me-2"></i>One-Time Checkout
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link px-4 py-2 rounded-pill fw-semibold text-uppercase small" id="activate-tab" data-bs-toggle="pill" data-bs-target="#activate-pane" type="button" role="tab">
+                                <i class="bi bi-key me-2"></i>Activate Key
+                            </button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content" id="purchaseTabContent">
+                        
+                        <!-- TAB 1: Payment Checkout -->
+                        <div class="tab-pane fade show active" id="pay-pane" role="tabpanel">
+                            
+                            <form asp-action="Checkout" method="post" id="checkoutForm">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="returnUrl" value="@returnUrl" />
+                                <input type="hidden" asp-for="IsTestPayment" id="isTestPaymentInput" value="false" />
+
+                                <div asp-validation-summary="ModelOnly" class="alert alert-danger p-3 rounded-3 small mb-4"></div>
+
+                                <!-- Section 1: Buyer Information -->
+                                <h6 class="text-info fw-bold small text-uppercase letter-spacing-2 mb-3">
+                                    <i class="bi bi-person-badge me-2"></i>1. Buyer &amp; Workshop Details
+                                </h6>
+
+                                <div class="row g-3 mb-4">
+                                    <div class="col-md-6">
+                                        <label asp-for="BuyerName" class="form-label text-light small fw-semibold">Full Name / Contact Person *</label>
+                                        <input asp-for="BuyerName" class="form-control bg-dark text-light border-secondary" placeholder="e.g. Marcus Vance" required />
+                                        <span asp-validation-for="BuyerName" class="text-danger small"></span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label asp-for="BuyerEmail" class="form-label text-light small fw-semibold">Email Address *</label>
+                                        <input asp-for="BuyerEmail" type="email" class="form-control bg-dark text-light border-secondary" placeholder="marcus@apexmotors.com" required />
+                                        <span asp-validation-for="BuyerEmail" class="text-danger small"></span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label asp-for="WorkshopName" class="form-label text-light small fw-semibold">Workshop / Garage Name</label>
+                                        <input asp-for="WorkshopName" class="form-control bg-dark text-light border-secondary" placeholder="e.g. Apex Performance Tuning" />
+                                    </div>
+                                    @if (!User.Identity?.IsAuthenticated ?? true)
+                                    {
+                                        <div class="col-md-6">
+                                            <label asp-for="Password" class="form-label text-light small fw-semibold">Create Account Password</label>
+                                            <input asp-for="Password" type="password" class="form-control bg-dark text-light border-secondary" placeholder="Minimum 6 characters" />
+                                            <small class="text-white-50 d-block mt-1">Allows immediate login after purchase.</small>
+                                        </div>
+                                    }
+                                    <div class="col-md-6">
+                                        <label asp-for="AccountRole" class="form-label text-light small fw-semibold">Assign My Account Role</label>
+                                        <select asp-for="AccountRole" class="form-select bg-dark text-light border-secondary">
+                                            <option value="Admin" selected>Admin / Workshop Owner (Full Access)</option>
+                                            <option value="FrontDesk">Front Desk (Reception &amp; Billing)</option>
+                                            <option value="Mechanic">Certified Mechanic (Job Board &amp; Repairs)</option>
+                                        </select>
+                                        <small class="text-white-50 d-block mt-1">Role assigned to your user account upon purchase.</small>
+                                    </div>
+                                </div>
+
+                                <!-- Section 2: Payment Method -->
+                                <h6 class="text-info fw-bold small text-uppercase letter-spacing-2 mb-3">
+                                    <i class="bi bi-wallet2 me-2"></i>2. Select Payment Option
+                                </h6>
+
+                                <div class="row g-2 mb-4">
+                                    <div class="col-sm-4">
+                                        <label class="p-3 rounded-3 border border-secondary border-opacity-50 text-light w-100 d-flex flex-column align-items-center gap-2 cursor-pointer text-center bg-dark" style="cursor:pointer;">
+                                            <input type="radio" asp-for="PaymentMethod" value="CreditCard" class="form-check-input mt-0" checked />
+                                            <i class="bi bi-credit-card-2-front text-info fs-4"></i>
+                                            <span class="small fw-bold">Credit / Debit</span>
+                                        </label>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <label class="p-3 rounded-3 border border-secondary border-opacity-50 text-light w-100 d-flex flex-column align-items-center gap-2 cursor-pointer text-center bg-dark" style="cursor:pointer;">
+                                            <input type="radio" asp-for="PaymentMethod" value="PayPal" class="form-check-input mt-0" />
+                                            <i class="bi bi-paypal text-primary fs-4"></i>
+                                            <span class="small fw-bold">PayPal</span>
+                                        </label>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <label class="p-3 rounded-3 border border-secondary border-opacity-50 text-light w-100 d-flex flex-column align-items-center gap-2 cursor-pointer text-center bg-dark" style="cursor:pointer;">
+                                            <input type="radio" asp-for="PaymentMethod" value="BankTransfer" class="form-check-input mt-0" />
+                                            <i class="bi bi-bank text-warning fs-4"></i>
+                                            <span class="small fw-bold">Bank Wire</span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Section 3: Card Fields -->
+                                <div id="cardFieldsArea" class="p-3 rounded-3 bg-dark bg-opacity-50 border border-secondary border-opacity-25 mb-4">
+                                    <div class="row g-3">
+                                        <div class="col-12">
+                                            <label asp-for="CardholderName" class="form-label text-light small fw-semibold">Cardholder Name</label>
+                                            <input asp-for="CardholderName" class="form-control bg-dark text-light border-secondary" placeholder="Name as printed on card" />
+                                        </div>
+                                        <div class="col-12">
+                                            <label asp-for="CardNumber" class="form-label text-light small fw-semibold">Card Number</label>
+                                            <div class="input-group">
+                                                <input asp-for="CardNumber" class="form-control bg-dark text-light border-secondary font-monospace" placeholder="4242 &bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; 4242" maxlength="19" />
+                                                <span class="input-group-text bg-dark border-secondary text-info"><i class="bi bi-lock-fill"></i></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <label asp-for="ExpiryDate" class="form-label text-light small fw-semibold">Expiry Date</label>
+                                            <input asp-for="ExpiryDate" class="form-control bg-dark text-light border-secondary font-monospace" placeholder="MM/YY" maxlength="5" />
+                                        </div>
+                                        <div class="col-6">
+                                            <label asp-for="Cvv" class="form-label text-light small fw-semibold">CVV / CVC</label>
+                                            <input asp-for="Cvv" type="password" class="form-control bg-dark text-light border-secondary font-monospace" placeholder="123" maxlength="4" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Action Buttons -->
+                                <div class="d-grid gap-2">
+                                    <button type="submit" class="btn btn-info btn-lg fw-bold py-3 text-dark text-uppercase letter-spacing-1 shadow">
+                                        <i class="bi bi-lock-fill me-2"></i>Complete One-Time Payment ($@price @currency)
+                                    </button>
+
+                                    <!-- Instant Test Mode Button -->
+                                    <button type="button" id="btnTestCheckout" class="btn btn-outline-secondary py-2 small d-flex align-items-center justify-content-center gap-2">
+                                        <i class="bi bi-lightning-charge-fill text-warning"></i>
+                                        <span>Instant Test Checkout (1-Click Demo Approval)</span>
+                                    </button>
+                                </div>
+
+                                <div class="text-center text-secondary small mt-3">
+                                    <i class="bi bi-check2-all text-info me-1"></i>
+                                    Instant automated license key delivery upon payment completion.
+                                </div>
+                            </form>
+
+                        </div>
+
+                        <!-- TAB 2: Direct License Key Activation -->
+                        <div class="tab-pane fade" id="activate-pane" role="tabpanel">
+                            <form asp-action="Activate" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="returnUrl" value="@returnUrl" />
+
+                                <div class="text-center mb-3">
+                                    <i class="bi bi-key-fill text-info display-5"></i>
+                                    <h5 class="text-white fw-bold mt-2">Activate Existing Lifetime License</h5>
+                                    <p class="text-secondary small">
+                                        Received your license key via enterprise invoice, wire transfer, or authorized partner? Enter it below to unlock the system immediately.
+                                    </p>
+                                </div>
+
+                                <!-- Demo Key Helper Card -->
+                                <div class="p-3 mb-4 rounded-3 border border-info border-opacity-30 text-center" style="background: rgba(6, 182, 212, 0.08);">
+                                    <span class="text-secondary small d-block mb-1 text-uppercase fw-semibold">🔑 Demo Activation Key for Testing:</span>
+                                    <button type="button" id="btnFillDemoKey" class="btn btn-sm btn-outline-info font-monospace fw-bold px-3 py-1 my-1" title="Click to insert key">
+                                        <i class="bi bi-magic me-1"></i> GRJ-DEMO-2026-KEY
+                                    </button>
+                                    <small class="text-white-50 d-block">Click above to automatically paste this demo key.</small>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label for="licenseKey" class="form-label text-light small fw-semibold">License Key</label>
+                                    <input type="text"
+                                           name="licenseKey"
+                                           id="licenseKey"
+                                           class="form-control bg-dark text-light border-info font-monospace py-3 fs-5 text-center"
+                                           placeholder="GRJ-LIC-XXXX-XXXX-XXXX-XXXX"
+                                           required />
+                                </div>
+
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-info btn-lg fw-bold py-3 text-dark text-uppercase">
+                                        <i class="bi bi-check-circle-fill me-2"></i>Activate &amp; Unlock Garij
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ==================================================================
+             Additional Sections: About, Services, and Testimonials on Buy Page
+             ================================================================== -->
+        <hr class="my-5 border-secondary border-opacity-25" />
+
+        <!-- 1. ABOUT WORKSHOP & SYSTEM -->
+        <div id="purchase-about" class="mb-5 pt-4">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-6">
+                    <span class="text-info small fw-bold text-uppercase letter-spacing-2">About The Platform</span>
+                    <h2 class="text-white fw-bold display-6 mt-1 mb-3">BUILT FOR MODERN AUTOMOTIVE WORKSHOPS</h2>
+                    <p class="text-secondary">
+                        Garij brings together vehicle intake, certified mechanic assignments, real-time parts inventory tracking, and Google Gemini AI diagnostics in one unified, high-performance web platform.
+                    </p>
+                    <div class="row g-3 mt-2">
+                        <div class="col-sm-6">
+                            <div class="p-3 rounded-3 bg-dark bg-opacity-50 border border-secondary border-opacity-25">
+                                <i class="bi bi-award-fill text-info fs-4"></i>
+                                <h6 class="text-white fw-bold mt-2 mb-1">25 Years Reputation</h6>
+                                <p class="text-secondary small mb-0">Designed by master automotive technicians and engineers.</p>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="p-3 rounded-3 bg-dark bg-opacity-50 border border-secondary border-opacity-25">
+                                <i class="bi bi-shield-check text-info fs-4"></i>
+                                <h6 class="text-white fw-bold mt-2 mb-1">Full Data Integrity</h6>
+                                <p class="text-secondary small mb-0">Transactional rollback guarantees on all jobs and invoices.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 text-center">
+                    <img src="~/images/renovation-car.png" alt="Tuned Performance Sports Car" class="img-fluid rounded-4 shadow-lg dark-only" style="max-height: 280px; object-fit: contain;" />
+                    <!-- Minimal Feature Highlights for Light Mode (Zero Images) -->
+                    <div class="light-only p-4 rounded-4 text-start" style="background: #ffffff; border: 1.5px solid #e2e8f0; box-shadow: 0 10px 30px rgba(0,0,0,0.04);">
+                        <span class="badge rounded-pill px-3 py-1 mb-3 text-uppercase fw-bold" style="background: rgba(2, 132, 199, 0.1); color: #0284c7; border: 1px solid rgba(2, 132, 199, 0.25);">Full Enterprise Spectrum</span>
+                        <h4 class="fw-bold text-dark mb-3">Turnkey Workshop Platform</h4>
+                        <ul class="list-unstyled d-flex flex-column gap-2 mb-0">
+                            <li class="d-flex align-items-center gap-2 text-secondary small">
+                                <i class="bi bi-check-circle-fill text-info"></i>
+                                <span>Zero subscriptions &mdash; pay once, own forever</span>
+                            </li>
+                            <li class="d-flex align-items-center gap-2 text-secondary small">
+                                <i class="bi bi-check-circle-fill text-info"></i>
+                                <span>Unlimited team accounts for mechanics and front desk</span>
+                            </li>
+                            <li class="d-flex align-items-center gap-2 text-secondary small">
+                                <i class="bi bi-check-circle-fill text-info"></i>
+                                <span>Full source code and direct SQL audit trail</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. SPECIALIZED WORKSHOP SERVICES COVERED -->
+        <div id="purchase-services" class="mb-5 pt-4">
+            <div class="text-center mb-4">
+                <span class="text-info small fw-bold text-uppercase letter-spacing-2">Full System Spectrum</span>
+                <h3 class="text-white fw-bold display-6 mt-1">SPECIALIZED WORKSHOP MODULES</h3>
+                <p class="text-secondary mx-auto" style="max-width: 600px;">
+                    Everything your team needs to run a high-volume repair garage, renovation bay, or tuning shop with zero friction.
+                </p>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-4">
+                    <div class="p-4 rounded-3 bg-dark bg-opacity-50 border border-secondary border-opacity-25 h-100">
+                        <i class="bi bi-wrench-adjustable-circle text-info fs-2 mb-3 d-block"></i>
+                        <h5 class="text-white fw-bold">Mechanic Job Board</h5>
+                        <p class="text-secondary small mb-0">
+                            Mobile-optimized diagnostic cards with step-by-step state machine transitions from inspection to completion.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="p-4 rounded-3 bg-dark bg-opacity-50 border border-secondary border-opacity-25 h-100">
+                        <i class="bi bi-cpu text-info fs-2 mb-3 d-block"></i>
+                        <h5 class="text-white fw-bold">Gemini AI Diagnostics</h5>
+                        <p class="text-secondary small mb-0">
+                            Predictive maintenance suggestions and repair duration estimates grounded in vehicle symptom data.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="p-4 rounded-3 bg-dark bg-opacity-50 border border-secondary border-opacity-25 h-100">
+                        <i class="bi bi-box-seam text-info fs-2 mb-3 d-block"></i>
+                        <h5 class="text-white fw-bold">Parts &amp; Stock Control</h5>
+                        <p class="text-secondary small mb-0">
+                            Atomic stock deduction upon usage logging and automatic low-stock notifications for critical shop parts.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="p-4 rounded-3 bg-dark bg-opacity-50 border border-secondary border-opacity-25 h-100">
+                        <i class="bi bi-receipt-cutoff text-info fs-2 mb-3 d-block"></i>
+                        <h5 class="text-white fw-bold">Transactional Invoicing</h5>
+                        <p class="text-secondary small mb-0">
+                            Automated calculation summing labor line items and genuine parts used with atomic database rollback protections.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="p-4 rounded-3 bg-dark bg-opacity-50 border border-secondary border-opacity-25 h-100">
+                        <i class="bi bi-radar text-info fs-2 mb-3 d-block"></i>
+                        <h5 class="text-white fw-bold">Public Telemetry Portal</h5>
+                        <p class="text-secondary small mb-0">
+                            Allow vehicle owners to track their service progress in real-time using their license plate or booking code.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="p-4 rounded-3 bg-dark bg-opacity-50 border border-secondary border-opacity-25 h-100">
+                        <i class="bi bi-shield-lock text-info fs-2 mb-3 d-block"></i>
+                        <h5 class="text-white fw-bold">Role-Based Security</h5>
+                        <p class="text-secondary small mb-0">
+                            Pre-configured role policies for Admins, Receptionists, Front Desk Staff, and Certified Mechanics.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. TESTIMONIALS -->
+        <div id="purchase-testimonials" class="mb-5 pt-4">
+            <div class="text-center mb-4">
+                <span class="text-info small fw-bold text-uppercase letter-spacing-2">Client Reviews</span>
+                <h3 class="text-white fw-bold display-6 mt-1">WHAT WORKSHOP MANAGERS SAY</h3>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="p-4 rounded-3 bg-dark bg-opacity-50 border border-secondary border-opacity-25 h-100 d-flex flex-column justify-content-between">
+                        <p class="text-secondary small fst-italic mb-3">
+                            "Switching to Garij eliminated lost work orders and stock discrepancies. The one-time buyout saved our garage thousands compared to monthly SaaS subscriptions."
+                        </p>
+                        <div>
+                            <strong class="text-white d-block small">BILL ALVARADO</strong>
+                            <span class="text-info small">Workshop Manager</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-4 rounded-3 bg-dark bg-opacity-50 border border-secondary border-opacity-25 h-100 d-flex flex-column justify-content-between">
+                        <p class="text-secondary small fst-italic mb-3">
+                            "The mechanic job board on tablets is brilliant. Our mechanics advance jobs with a tap, log parts immediately, and invoices generate automatically."
+                        </p>
+                        <div>
+                            <strong class="text-white d-block small">ALBERTA WILSON</strong>
+                            <span class="text-info small">Automotive Fleet Owner</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-4 rounded-3 bg-dark bg-opacity-50 border border-secondary border-opacity-25 h-100 d-flex flex-column justify-content-between">
+                        <p class="text-secondary small fst-italic mb-3">
+                            "Customers love the live status lookup. They check their repair stage on their phone instead of calling the front desk every twenty minutes."
+                        </p>
+                        <div>
+                            <strong class="text-white d-block small">ZACHARY FERNANDEZ</strong>
+                            <span class="text-info small">Service Center Director</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Return to Landing Page Button -->
+        <div class="text-center pt-3 pb-2">
+            <a href="/#hero" class="btn btn-outline-info rounded-pill px-4 py-2 small">
+                <i class="bi bi-arrow-left me-2"></i>Return to Main Presentation
+            </a>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const btnTestCheckout = document.getElementById('btnTestCheckout');
+            const checkoutForm = document.getElementById('checkoutForm');
+            const isTestPaymentInput = document.getElementById('isTestPaymentInput');
+
+            if (btnTestCheckout && checkoutForm) {
+                btnTestCheckout.addEventListener('click', function () {
+                    // Populate dummy details if empty
+                    const buyerName = document.getElementById('BuyerName');
+                    const buyerEmail = document.getElementById('BuyerEmail');
+                    const cardNumber = document.getElementById('CardNumber');
+                    const expiryDate = document.getElementById('ExpiryDate');
+                    const cvv = document.getElementById('Cvv');
+                    const cardholderName = document.getElementById('CardholderName');
+
+                    if (buyerName && !buyerName.value) buyerName.value = "Demo Workshop Owner";
+                    if (buyerEmail && !buyerEmail.value) buyerEmail.value = "demo.owner@garij.com";
+                    if (cardholderName && !cardholderName.value) cardholderName.value = "Demo Workshop Owner";
+                    if (cardNumber && !cardNumber.value) cardNumber.value = "4242 4242 4242 4242";
+                    if (expiryDate && !expiryDate.value) expiryDate.value = "12/28";
+                    if (cvv && !cvv.value) cvv.value = "999";
+
+                    if (isTestPaymentInput) {
+                        isTestPaymentInput.value = "true";
+                    }
+
+                    checkoutForm.submit();
+                });
+            }
+
+            const btnFillDemoKey = document.getElementById('btnFillDemoKey');
+            const licenseKeyInput = document.getElementById('licenseKey');
+            if (btnFillDemoKey && licenseKeyInput) {
+                btnFillDemoKey.addEventListener('click', function () {
+                    licenseKeyInput.value = "GRJ-DEMO-2026-KEY";
+                    licenseKeyInput.focus();
+                });
+            }
+        });
+    </script>
+}

@@ -1,0 +1,46 @@
+@model Garij.Application.DTOs.MechanicAssignmentDto
+@using Garij.Domain.Enums
+@using Garij.Application.DTOs
+
+@{
+    ViewData["Title"] = "Edit Mechanic Role";
+    var job = ViewBag.ServiceJob as ServiceJobDto;
+}
+
+<div class="app-page-header">
+    <div>
+        <h1 class="app-page-title">Edit Mechanic Role</h1>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="app-card">
+            @if (job != null)
+            {
+                <div class="app-card mb-4" style="background: rgba(255,255,255,0.04);">
+                    <div class="fw-bold text-info mb-1">Booking Reference: @job.BookingReference</div>
+                    <div class="small text-white"><strong>Vehicle:</strong> @job.VehiclePlateNumber (@job.VehicleDescription)</div>
+                    <div class="small text-white"><strong>Mechanic:</strong> @Model.MechanicName</div>
+                </div>
+            }
+
+            <form asp-action="EditAssignment" method="post">
+                <input type="hidden" name="id" value="@Model.Id" />
+                <input type="hidden" name="serviceJobId" value="@Model.ServiceJobId" />
+                <div asp-validation-summary="ModelOnly" class="app-alert-danger" role="alert"></div>
+
+                <div class="app-form-group">
+                    <label asp-for="RoleInJob" class="app-form-label">Role in Job</label>
+                    <select asp-for="RoleInJob" asp-items="Html.GetEnumSelectList<RoleInJob>()" class="app-form-select">
+                    </select>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-3">
+                    <a asp-controller="ServiceJob" asp-action="Details" asp-route-id="@Model.ServiceJobId" class="app-btn app-btn-outline">Cancel</a>
+                    <button type="submit" class="app-btn app-btn-primary"><i class="bi bi-check-lg"></i> Save Role</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

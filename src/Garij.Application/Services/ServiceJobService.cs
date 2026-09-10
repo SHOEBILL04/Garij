@@ -13,17 +13,20 @@ public class ServiceJobService : IServiceJobService
     private readonly IVehicleRepository _vehicleRepository;
     private readonly IUserRepository _userRepository;
     private readonly IMechanicAssignmentRepository _mechanicAssignmentRepository;
+    private readonly INotificationService _notificationService;
 
     public ServiceJobService(
         IServiceJobRepository serviceJobRepository,
         IVehicleRepository vehicleRepository,
         IUserRepository userRepository,
-        IMechanicAssignmentRepository mechanicAssignmentRepository)
+        IMechanicAssignmentRepository mechanicAssignmentRepository,
+        INotificationService notificationService)
     {
         _serviceJobRepository = serviceJobRepository;
         _vehicleRepository = vehicleRepository;
         _userRepository = userRepository;
         _mechanicAssignmentRepository = mechanicAssignmentRepository;
+        _notificationService = notificationService;
     }
 
     public async Task<IEnumerable<ServiceJobDto>> GetAllServiceJobsAsync()
@@ -38,6 +41,44 @@ public class ServiceJobService : IServiceJobService
         return jobs.Select(MapToDto);
     }
 
+    public async Task<IEnumerable<ServiceJobDto>> GetFilteredServiceJobsAsync(JobStatus? status = null, int? mechanicId = null, string? sortBy = null, string? searchTerm = null)
+    {
+        var jobs = await _serviceJobRepository.GetAllWithDetailsAsync();
+
+        if (status.HasValue)
+        {
+            jobs = jobs.Where(j => j.Status == status.Value);
+        }
+
+        if (mechanicId.HasValue && mechanicId.Value > 0)
+        {
+            jobs = jobs.Where(j => j.MechanicAssignments != null && j.MechanicAssignments.Any(ma => ma.UserId == mechanicId.Value));
+        }
+
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            var term = searchTerm.Trim();
+            jobs = jobs.Where(j =>
+                j.BookingReference.Contains(term, StringComparison.OrdinalIgnoreCase) ||
+                (j.Vehicle != null && j.Vehicle.LicensePlateNumber.Contains(term, StringComparison.OrdinalIgnoreCase)) ||
+                (j.Customer != null && j.Customer.FullName.Contains(term, StringComparison.OrdinalIgnoreCase)) ||
+                (j.Vehicle != null && (j.Vehicle.Make.Contains(term, StringComparison.OrdinalIgnoreCase) || j.Vehicle.Model.Contains(term, StringComparison.OrdinalIgnoreCase))));
+        }
+
+        var dtos = jobs.Select(MapToDto);
+
+        dtos = sortBy?.ToLowerInvariant() switch
+        {
+            "date_asc" => dtos.OrderBy(j => j.CreatedAt),
+            "date_desc" => dtos.OrderByDescending(j => j.CreatedAt),
+            "status" => dtos.OrderBy(j => j.Status).ThenByDescending(j => j.CreatedAt),
+            "plate" => dtos.OrderBy(j => j.VehiclePlateNumber),
+            _ => dtos.OrderByDescending(j => j.CreatedAt)
+        };
+
+        return dtos.ToList();
+    }
+
     public async Task<ServiceJobDto?> GetServiceJobByIdAsync(int id)
     {
         var job = await _serviceJobRepository.GetByIdWithDetailsAsync(id);
@@ -46,7 +87,13 @@ public class ServiceJobService : IServiceJobService
 
     public async Task<ServiceJobDto?> GetServiceJobByBookingReferenceAsync(string bookingReference)
     {
-        var job = await _serviceJobRepository.GetByBookingReferenceAsync(bookingReference);
+        var normalizedBookingReference = bookingReference.Trim().ToUpperInvariant();
+        if (string.IsNullOrWhiteSpace(normalizedBookingReference))
+        {
+            return null;
+        }
+
+        var job = await _serviceJobRepository.GetByBookingReferenceAsync(normalizedBookingReference);
         return job is null ? null : MapToDto(job);
     }
 
@@ -92,12 +139,18 @@ public class ServiceJobService : IServiceJobService
         var entity = await _serviceJobRepository.GetByIdWithDetailsAsync(serviceJobDto.Id)
             ?? throw new NotFoundException(nameof(ServiceJob), serviceJobDto.Id);
 
+        if (entity.Status != serviceJobDto.Status)
+        {
+            ValidateStatusTransition(entity.Status, serviceJobDto.Status);
+        }
+
         entity.JobType = serviceJobDto.JobType;
         entity.Status = serviceJobDto.Status;
         entity.DiagnosticNotes = serviceJobDto.DiagnosticNotes?.Trim();
         if (serviceJobDto.Status == JobStatus.Completed && entity.CompletedAt is null)
         {
             entity.CompletedAt = DateTime.UtcNow;
+            await NotifyJobCompletedAsync(entity);
         }
 
         _serviceJobRepository.Update(entity);
@@ -111,10 +164,16 @@ public class ServiceJobService : IServiceJobService
         var entity = await _serviceJobRepository.GetByIdWithDetailsAsync(id)
             ?? throw new NotFoundException(nameof(ServiceJob), id);
 
+        if (entity.Status != status)
+        {
+            ValidateStatusTransition(entity.Status, status);
+        }
+
         entity.Status = status;
         if (status == JobStatus.Completed && entity.CompletedAt is null)
         {
             entity.CompletedAt = DateTime.UtcNow;
+            await NotifyJobCompletedAsync(entity);
         }
 
         _serviceJobRepository.Update(entity);
@@ -140,6 +199,23 @@ public class ServiceJobService : IServiceJobService
         var mechanic = await _userRepository.GetByIdAsync(userId)
             ?? throw new NotFoundException(nameof(User), userId);
 
+        if (mechanic.Role != UserRole.Mechanic)
+        {
+            throw new BusinessRuleException("BR-003", $"Only users with the Mechanic role can be assigned to service jobs. User '{mechanic.FullName}' has role '{mechanic.Role}'.");
+        }
+
+        var existingAssignments = await _mechanicAssignmentRepository.GetAssignmentsByJobIdAsync(serviceJobId);
+
+        if (existingAssignments.Any(a => a.UserId == userId))
+        {
+            throw new BusinessRuleException("BR-003", $"Mechanic '{mechanic.FullName}' is already assigned to this job.");
+        }
+
+        if (roleInJob == RoleInJob.Lead && existingAssignments.Any(a => a.RoleInJob == RoleInJob.Lead))
+        {
+            throw new BusinessRuleException("BR-003", "This job already has a Lead mechanic assigned. Exactly one Lead mechanic is allowed per job.");
+        }
+
         var assignment = new MechanicAssignment
         {
             ServiceJobId = serviceJobId,
@@ -157,6 +233,37 @@ public class ServiceJobService : IServiceJobService
             ServiceJobId = assignment.ServiceJobId,
             UserId = assignment.UserId,
             MechanicName = mechanic.FullName,
+            RoleInJob = assignment.RoleInJob,
+            AssignedAt = assignment.AssignedAt
+        };
+    }
+
+    public async Task<MechanicAssignmentDto> UpdateMechanicAssignmentRoleAsync(int assignmentId, RoleInJob roleInJob)
+    {
+        var assignment = await _mechanicAssignmentRepository.GetByIdAsync(assignmentId)
+            ?? throw new NotFoundException(nameof(MechanicAssignment), assignmentId);
+
+        if (roleInJob == RoleInJob.Lead && assignment.RoleInJob != RoleInJob.Lead)
+        {
+            var existingAssignments = await _mechanicAssignmentRepository.GetAssignmentsByJobIdAsync(assignment.ServiceJobId);
+            if (existingAssignments.Any(a => a.Id != assignmentId && a.RoleInJob == RoleInJob.Lead))
+            {
+                throw new BusinessRuleException("BR-003", "This job already has a Lead mechanic assigned. Exactly one Lead mechanic is allowed per job.");
+            }
+        }
+
+        assignment.RoleInJob = roleInJob;
+        _mechanicAssignmentRepository.Update(assignment);
+        await _mechanicAssignmentRepository.SaveChangesAsync();
+
+        var mechanic = await _userRepository.GetByIdAsync(assignment.UserId);
+
+        return new MechanicAssignmentDto
+        {
+            Id = assignment.Id,
+            ServiceJobId = assignment.ServiceJobId,
+            UserId = assignment.UserId,
+            MechanicName = mechanic?.FullName ?? "Unknown",
             RoleInJob = assignment.RoleInJob,
             AssignedAt = assignment.AssignedAt
         };
@@ -185,6 +292,71 @@ public class ServiceJobService : IServiceJobService
         });
     }
 
+    public async Task<IEnumerable<ServiceJobDto>> GetJobsByMechanicAsync(int mechanicUserId)
+    {
+        var jobs = await _serviceJobRepository.GetJobsByMechanicAsync(mechanicUserId);
+        return jobs.Select(MapToDto);
+    }
+
+    public async Task<ServiceJobDto> SaveDiagnosticNotesAsync(int serviceJobId, string notes)
+    {
+        var entity = await _serviceJobRepository.GetByIdWithDetailsAsync(serviceJobId)
+            ?? throw new NotFoundException(nameof(ServiceJob), serviceJobId);
+
+        entity.DiagnosticNotes = notes?.Trim();
+        _serviceJobRepository.Update(entity);
+        await _serviceJobRepository.SaveChangesAsync();
+
+        return MapToDto(entity);
+    }
+
+    /// <summary>
+    /// The order a job advances through. Stages may be skipped - a mechanic who
+    /// finishes the work outright can move a job straight to Completed without
+    /// stepping through inspection and approval - but a job never moves back to
+    /// an earlier stage. Cancelled sits outside this pipeline and is reachable
+    /// from any stage that is not already terminal.
+    /// </summary>
+    private static readonly JobStatus[] StatusPipeline =
+    [
+        JobStatus.Requested,
+        JobStatus.InspectionPending,
+        JobStatus.CustomerApprovalNeeded,
+        JobStatus.InProgress,
+        JobStatus.Completed
+    ];
+
+    private static void ValidateStatusTransition(JobStatus currentStatus, JobStatus newStatus)
+    {
+        if (currentStatus == newStatus)
+        {
+            return;
+        }
+
+        if (currentStatus == JobStatus.Completed)
+        {
+            throw new BusinessRuleException("BR-007", "Cannot change status of a job that is already Completed.");
+        }
+
+        if (currentStatus == JobStatus.Cancelled)
+        {
+            throw new BusinessRuleException("BR-007", "Cannot change status of a job that is Cancelled.");
+        }
+
+        if (newStatus == JobStatus.Cancelled)
+        {
+            return;
+        }
+
+        var currentStage = Array.IndexOf(StatusPipeline, currentStatus);
+        var newStage = Array.IndexOf(StatusPipeline, newStatus);
+
+        if (newStage <= currentStage)
+        {
+            throw new BusinessRuleException("BR-007", $"Invalid status transition from '{currentStatus}' to '{newStatus}'. A job moves forward through: Requested -> InspectionPending -> CustomerApprovalNeeded -> InProgress -> Completed. Stages may be skipped, but a job cannot move back to an earlier stage.");
+        }
+    }
+
     private async Task<string> GenerateUniqueBookingReferenceAsync()
     {
         var year = DateTime.UtcNow.Year;
@@ -202,6 +374,15 @@ public class ServiceJobService : IServiceJobService
         return candidate;
     }
 
+    private async Task NotifyJobCompletedAsync(ServiceJob entity)
+    {
+        await _notificationService.CreateNotificationAsync(new NotificationDto
+        {
+            ServiceJobId = entity.Id,
+            Message = $"Job {entity.BookingReference} has been completed and is ready for review."
+        });
+    }
+
     private static ServiceJobDto MapToDto(ServiceJob job) => new()
     {
         Id = job.Id,
@@ -216,7 +397,7 @@ public class ServiceJobService : IServiceJobService
         DiagnosticNotes = job.DiagnosticNotes,
         CreatedAt = job.CreatedAt,
         CompletedAt = job.CompletedAt,
-        MechanicAssignments = job.MechanicAssignments.Select(ma => new MechanicAssignmentDto
+        MechanicAssignments = (job.MechanicAssignments ?? Enumerable.Empty<MechanicAssignment>()).Select(ma => new MechanicAssignmentDto
         {
             Id = ma.Id,
             ServiceJobId = ma.ServiceJobId,

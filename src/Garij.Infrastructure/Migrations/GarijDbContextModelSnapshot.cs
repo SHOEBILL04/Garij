@@ -122,7 +122,14 @@ namespace Garij.Infrastructure.Migrations
                     b.HasIndex("ServiceJobId")
                         .IsUnique();
 
-                    b.ToTable("Invoices");
+                    b.ToTable("Invoices", t =>
+                        {
+                            t.HasCheckConstraint("CK_Invoice_SubTotal", "\"SubTotal\" >= 0");
+
+                            t.HasCheckConstraint("CK_Invoice_TaxAmount", "\"TaxAmount\" >= 0");
+
+                            t.HasCheckConstraint("CK_Invoice_TotalAmount", "\"TotalAmount\" >= 0");
+                        });
                 });
 
             modelBuilder.Entity("Garij.Domain.Entities.JobPartUsed", b =>
@@ -149,7 +156,12 @@ namespace Garij.Infrastructure.Migrations
 
                     b.HasIndex("ServiceJobId");
 
-                    b.ToTable("JobPartsUsed");
+                    b.ToTable("JobPartsUsed", t =>
+                        {
+                            t.HasCheckConstraint("CK_JobPartUsed_PriceAtUsage", "\"PriceAtUsage\" >= 0");
+
+                            t.HasCheckConstraint("CK_JobPartUsed_QuantityUsed", "\"QuantityUsed\" > 0");
+                        });
                 });
 
             modelBuilder.Entity("Garij.Domain.Entities.JobServiceDetail", b =>
@@ -176,7 +188,12 @@ namespace Garij.Infrastructure.Migrations
 
                     b.HasIndex("ServiceJobId");
 
-                    b.ToTable("JobServiceDetails");
+                    b.ToTable("JobServiceDetails", t =>
+                        {
+                            t.HasCheckConstraint("CK_JobServiceDetail_PriceAtBooking", "\"PriceAtBooking\" >= 0");
+
+                            t.HasCheckConstraint("CK_JobServiceDetail_Quantity", "\"Quantity\" > 0");
+                        });
                 });
 
             modelBuilder.Entity("Garij.Domain.Entities.MechanicAssignment", b =>
@@ -258,6 +275,10 @@ namespace Garij.Infrastructure.Migrations
                     b.Property<int>("ReorderLevel")
                         .HasColumnType("INTEGER");
 
+                    b.Property<Guid>("RowVersion")
+                        .IsConcurrencyToken()
+                        .HasColumnType("TEXT");
+
                     b.Property<decimal>("UnitPrice")
                         .HasColumnType("decimal(18,2)");
 
@@ -266,6 +287,10 @@ namespace Garij.Infrastructure.Migrations
                     b.ToTable("Parts", t =>
                         {
                             t.HasCheckConstraint("CK_Part_QuantityInStock", "\"QuantityInStock\" >= 0");
+
+                            t.HasCheckConstraint("CK_Part_ReorderLevel", "\"ReorderLevel\" >= 0");
+
+                            t.HasCheckConstraint("CK_Part_UnitPrice", "\"UnitPrice\" >= 0");
                         });
                 });
 
@@ -296,7 +321,82 @@ namespace Garij.Infrastructure.Migrations
 
                     b.HasIndex("InvoiceId");
 
-                    b.ToTable("PaymentTransactions");
+                    b.ToTable("PaymentTransactions", t =>
+                        {
+                            t.HasCheckConstraint("CK_PaymentTransaction_Amount", "\"Amount\" > 0");
+                        });
+                });
+
+            modelBuilder.Entity("Garij.Domain.Entities.ProjectPurchase", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("BuyerEmail")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("BuyerName")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("IdentityUserId")
+                        .HasMaxLength(450)
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("LicenseKey")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PaymentMethod")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("PurchasedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("TransactionReference")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("WorkshopName")
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BuyerEmail");
+
+                    b.HasIndex("IdentityUserId");
+
+                    b.HasIndex("LicenseKey")
+                        .IsUnique();
+
+                    b.ToTable("ProjectPurchases");
                 });
 
             modelBuilder.Entity("Garij.Domain.Entities.ServiceCatalog", b =>
@@ -323,7 +423,12 @@ namespace Garij.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ServiceCatalogs");
+                    b.ToTable("ServiceCatalogs", t =>
+                        {
+                            t.HasCheckConstraint("CK_ServiceCatalog_BasePrice", "\"BasePrice\" >= 0");
+
+                            t.HasCheckConstraint("CK_ServiceCatalog_EstimatedDurationMinutes", "\"EstimatedDurationMinutes\" > 0");
+                        });
                 });
 
             modelBuilder.Entity("Garij.Domain.Entities.ServiceJob", b =>
@@ -453,7 +558,10 @@ namespace Garij.Infrastructure.Migrations
                     b.HasIndex("LicensePlateNumber")
                         .IsUnique();
 
-                    b.ToTable("Vehicles");
+                    b.ToTable("Vehicles", t =>
+                        {
+                            t.HasCheckConstraint("CK_Vehicle_Year", "\"Year\" BETWEEN 1900 AND 2100");
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

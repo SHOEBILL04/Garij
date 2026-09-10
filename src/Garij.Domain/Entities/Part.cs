@@ -14,5 +14,14 @@ public class Part
 
     public int ReorderLevel { get; set; }
 
+    /// <summary>
+    /// Optimistic concurrency token, re-stamped on every stock mutation. Without it two
+    /// mechanics logging parts at the same moment both read the same QuantityInStock and
+    /// the second write silently overwrites the first (lost update).
+    /// A Guid is used rather than a SQL Server rowversion because the project runs on
+    /// SQLite in development and SQL Server in production, and rowversion is not portable.
+    /// </summary>
+    public Guid RowVersion { get; set; } = Guid.NewGuid();
+
     public ICollection<JobPartUsed> JobPartsUsed { get; set; } = new List<JobPartUsed>();
 }

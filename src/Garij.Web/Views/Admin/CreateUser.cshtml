@@ -1,0 +1,74 @@
+@model Garij.Web.Models.CreateStaffUserViewModel
+@using Garij.Domain.Enums
+@{
+    ViewData["Title"] = "Create Staff Account";
+}
+
+<div class="app-page-header d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+    <div>
+        <h1 class="app-page-title"><i class="bi bi-person-plus-fill me-2 text-info"></i>Create Staff Account</h1>
+        <p class="app-page-subtitle">Add a receptionist, mechanic, or additional workshop administrator.</p>
+    </div>
+    <a asp-action="ManageUsers" class="app-btn app-btn-outline">Back to Staff List</a>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="app-card">
+            <form asp-action="CreateUser" method="post">
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger p-3 rounded-3 small mb-4"></div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label asp-for="FullName" class="form-label text-light small fw-semibold">Full Name *</label>
+                        <input asp-for="FullName" class="form-control bg-dark text-light border-secondary" placeholder="e.g. David Vance" required />
+                        <span asp-validation-for="FullName" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Email" class="form-label text-light small fw-semibold">Email Address (Login Username) *</label>
+                        <input asp-for="Email" type="email" class="form-control bg-dark text-light border-secondary" placeholder="david.vance@garij.com" required />
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="PhoneNumber" class="form-label text-light small fw-semibold">Phone Number *</label>
+                        <input asp-for="PhoneNumber" class="form-control bg-dark text-light border-secondary" placeholder="+880 1711-234567" required />
+                        <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Role" class="form-label text-light small fw-semibold">Account Role *</label>
+                        <select asp-for="Role" class="form-select bg-dark text-light border-secondary">
+                            <option value="@UserRole.FrontDesk">Front Desk (Reception, Bookings, &amp; Invoicing)</option>
+                            <option value="@UserRole.Mechanic">Certified Mechanic (Job Board &amp; Diagnostics)</option>
+                            <option value="@UserRole.Admin">Administrator (Full System Oversight &amp; User Management)</option>
+                        </select>
+                        <span asp-validation-for="Role" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Password" class="form-label text-light small fw-semibold">Account Password *</label>
+                        <input asp-for="Password" type="password" class="form-control bg-dark text-light border-secondary font-monospace" placeholder="Minimum 6 characters" required />
+                        <span asp-validation-for="Password" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="ConfirmPassword" class="form-label text-light small fw-semibold">Confirm Password *</label>
+                        <input asp-for="ConfirmPassword" type="password" class="form-control bg-dark text-light border-secondary font-monospace" placeholder="Repeat password" required />
+                        <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top border-secondary border-opacity-25">
+                    <a asp-action="ManageUsers" class="app-btn app-btn-outline">Cancel</a>
+                    <button type="submit" class="app-btn app-btn-primary">
+                        <i class="bi bi-check-circle-fill me-1"></i> Create Staff Account
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

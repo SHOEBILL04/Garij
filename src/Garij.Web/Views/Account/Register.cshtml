@@ -1,67 +1,84 @@
 @model Garij.Web.Models.RegisterViewModel
 
 @{
-    ViewData["Title"] = "Staff Registration";
+    Layout = "_AuthLayout";
+    ViewData["Title"] = "Create Account";
 }
 
-<div class="row justify-content-center mt-4">
-    <div class="col-md-7 col-lg-6">
-        <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
-            <div class="card-header bg-dark bg-gradient text-white p-4 text-center">
-                <h3 class="fw-bold mb-1"><i class="bi bi-person-plus me-2"></i>Staff Registration</h3>
-                <p class="mb-0 text-white-50 fs-6">Create a new staff member account for Garij</p>
+<div class="auth-card auth-card-wide">
+    <div class="auth-icon-badge">
+        <i class="bi bi-person-plus"></i>
+    </div>
+    <h1 class="auth-title">Create Account</h1>
+    <p class="auth-subtitle">Set up your workshop administrator account</p>
+
+    <form asp-action="Register" method="post">
+        <div asp-validation-summary="ModelOnly" class="auth-alert" role="alert"></div>
+
+        <div class="auth-field">
+            <label asp-for="FullName" class="visually-hidden">Full Name</label>
+            <div class="auth-input-group">
+                <i class="bi bi-person auth-input-icon"></i>
+                <input asp-for="FullName" class="form-control auth-input" placeholder="John Doe" />
             </div>
-            <div class="card-body p-4">
-                <form asp-action="Register" method="post">
-                    <div asp-validation-summary="ModelOnly" class="alert alert-danger rounded-3 mb-3" role="alert"></div>
+            <span asp-validation-for="FullName" class="auth-field-error"></span>
+        </div>
 
-                    <div class="mb-3">
-                        <label asp-for="FullName" class="form-label fw-semibold">Full Name</label>
-                        <input asp-for="FullName" class="form-control form-control-lg" placeholder="John Doe" />
-                        <span asp-validation-for="FullName" class="text-danger small"></span>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="Email" class="form-label fw-semibold">Email Address</label>
-                            <input asp-for="Email" class="form-control form-control-lg" placeholder="john@garij.com" />
-                            <span asp-validation-for="Email" class="text-danger small"></span>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="PhoneNumber" class="form-label fw-semibold">Phone Number</label>
-                            <input asp-for="PhoneNumber" class="form-control form-control-lg" placeholder="+1234567890" />
-                            <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
-                        </div>
-                    </div>
-
-                    <p class="text-muted small mb-3">
-                        New accounts are registered with Front Desk access. An administrator
-                        can promote your account to Admin or Mechanic afterward.
-                    </p>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="Password" class="form-label fw-semibold">Password</label>
-                            <input asp-for="Password" class="form-control form-control-lg" placeholder="••••••••" />
-                            <span asp-validation-for="Password" class="text-danger small"></span>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="ConfirmPassword" class="form-label fw-semibold">Confirm Password</label>
-                            <input asp-for="ConfirmPassword" class="form-control form-control-lg" placeholder="••••••••" />
-                            <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
-                        </div>
-                    </div>
-
-                    <button type="submit" class="btn btn-success btn-lg w-100 fw-bold shadow-sm rounded-3 mt-3">
-                        <i class="bi bi-check-circle me-2"></i>Register Account
-                    </button>
-                </form>
-
-                <div class="text-center mt-3">
-                    <a asp-action="Login" class="text-secondary text-decoration-none small">Already have an account? Sign In</a>
+        <div class="auth-input-row">
+            <div class="auth-field">
+                <label asp-for="Email" class="visually-hidden">Email Address</label>
+                <div class="auth-input-group">
+                    <i class="bi bi-envelope auth-input-icon"></i>
+                    <input asp-for="Email" class="form-control auth-input" placeholder="john@garij.com" />
                 </div>
+                <span asp-validation-for="Email" class="auth-field-error"></span>
+            </div>
+            <div class="auth-field">
+                <label asp-for="PhoneNumber" class="visually-hidden">Phone Number</label>
+                <div class="auth-input-group">
+                    <i class="bi bi-telephone auth-input-icon"></i>
+                    <input asp-for="PhoneNumber" class="form-control auth-input" placeholder="+1234567890" />
+                </div>
+                <span asp-validation-for="PhoneNumber" class="auth-field-error"></span>
             </div>
         </div>
+
+        <p class="auth-note">
+            <i class="bi bi-shield-check me-1"></i>Create your administrator account to manage your workshop and assign employee roles.
+        </p>
+
+        <div class="auth-input-row">
+            <div class="auth-field">
+                <label asp-for="Password" class="visually-hidden">Password</label>
+                <div class="auth-input-group has-toggle">
+                    <i class="bi bi-lock auth-input-icon"></i>
+                    <input asp-for="Password" class="form-control auth-input" placeholder="••••••••" autocomplete="new-password" />
+                    <button type="button" class="auth-toggle-password" data-target="Password" aria-label="Show password">
+                        <i class="bi bi-eye-slash"></i>
+                    </button>
+                </div>
+                <span asp-validation-for="Password" class="auth-field-error"></span>
+            </div>
+            <div class="auth-field">
+                <label asp-for="ConfirmPassword" class="visually-hidden">Confirm Password</label>
+                <div class="auth-input-group has-toggle">
+                    <i class="bi bi-lock-fill auth-input-icon"></i>
+                    <input asp-for="ConfirmPassword" class="form-control auth-input" placeholder="••••••••" autocomplete="new-password" />
+                    <button type="button" class="auth-toggle-password" data-target="ConfirmPassword" aria-label="Show password">
+                        <i class="bi bi-eye-slash"></i>
+                    </button>
+                </div>
+                <span asp-validation-for="ConfirmPassword" class="auth-field-error"></span>
+            </div>
+        </div>
+
+        <button type="submit" class="auth-submit-btn mt-2">
+            <i class="bi bi-check-circle me-2"></i>Create Account
+        </button>
+    </form>
+
+    <div class="auth-footer-link">
+        <a asp-action="Login" class="auth-link">Already have an account? Sign In</a>
     </div>
 </div>
 

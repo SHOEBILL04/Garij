@@ -3,52 +3,58 @@
     ViewData["Title"] = "Add Vehicle";
 }
 
-<h1 class="h3 mb-3">Add Vehicle</h1>
+<div class="app-page-header">
+    <div>
+        <h1 class="app-page-title">Add Vehicle</h1>
+    </div>
+</div>
 
-<form asp-action="Create" method="post" class="row g-3">
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <div class="col-md-6">
-        <label asp-for="CustomerId" class="form-label"></label>
-        <select asp-for="CustomerId" asp-items="ViewBag.Customers" class="form-select">
-            <option value="">Select customer</option>
-        </select>
-        <span asp-validation-for="CustomerId" class="text-danger"></span>
-    </div>
-    <div class="col-md-6">
-        <label asp-for="LicensePlateNumber" class="form-label"></label>
-        <input asp-for="LicensePlateNumber" class="form-control" placeholder="BR-002" />
-        <span asp-validation-for="LicensePlateNumber" class="text-danger"></span>
-    </div>
-    <div class="col-md-4">
-        <label asp-for="Make" class="form-label"></label>
-        <input asp-for="Make" class="form-control" />
-        <span asp-validation-for="Make" class="text-danger"></span>
-    </div>
-    <div class="col-md-4">
-        <label asp-for="Model" class="form-label"></label>
-        <input asp-for="Model" class="form-control" />
-        <span asp-validation-for="Model" class="text-danger"></span>
-    </div>
-    <div class="col-md-4">
-        <label asp-for="Year" class="form-label"></label>
-        <input asp-for="Year" class="form-control" />
-        <span asp-validation-for="Year" class="text-danger"></span>
-    </div>
-    <div class="col-md-6">
-        <label asp-for="Vin" class="form-label"></label>
-        <input asp-for="Vin" class="form-control" />
-        <span asp-validation-for="Vin" class="text-danger"></span>
-    </div>
-    <div class="col-md-6">
-        <label asp-for="Color" class="form-label"></label>
-        <input asp-for="Color" class="form-control" />
-        <span asp-validation-for="Color" class="text-danger"></span>
-    </div>
-    <div class="col-12">
-        <button type="submit" class="btn btn-primary">Save Vehicle</button>
-        <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
-    </div>
-</form>
+<div class="app-card" style="max-width: 860px;">
+    <form asp-action="Create" method="post" class="row g-3">
+        <div asp-validation-summary="ModelOnly" class="app-alert-danger"></div>
+        <div class="col-md-6 app-form-group mb-0">
+            <label asp-for="CustomerId" class="app-form-label"></label>
+            <select asp-for="CustomerId" asp-items="ViewBag.Customers" class="app-form-select">
+                <option value="">Select customer</option>
+            </select>
+            <span asp-validation-for="CustomerId" class="app-field-error"></span>
+        </div>
+        <div class="col-md-6 app-form-group mb-0">
+            <label asp-for="LicensePlateNumber" class="app-form-label"></label>
+            <input asp-for="LicensePlateNumber" class="app-form-control" placeholder="BR-002" />
+            <span asp-validation-for="LicensePlateNumber" class="app-field-error"></span>
+        </div>
+        <div class="col-md-4 app-form-group mb-0">
+            <label asp-for="Make" class="app-form-label"></label>
+            <input asp-for="Make" class="app-form-control" placeholder="e.g. Toyota" />
+            <span asp-validation-for="Make" class="app-field-error"></span>
+        </div>
+        <div class="col-md-4 app-form-group mb-0">
+            <label asp-for="Model" class="app-form-label"></label>
+            <input asp-for="Model" class="app-form-control" placeholder="e.g. Corolla" />
+            <span asp-validation-for="Model" class="app-field-error"></span>
+        </div>
+        <div class="col-md-4 app-form-group mb-0">
+            <label asp-for="Year" class="app-form-label"></label>
+            <input asp-for="Year" class="app-form-control" placeholder="e.g. 2022" />
+            <span asp-validation-for="Year" class="app-field-error"></span>
+        </div>
+        <div class="col-md-6 app-form-group mb-0">
+            <label asp-for="Vin" class="app-form-label"></label>
+            <input asp-for="Vin" class="app-form-control" placeholder="17-character vehicle identification number" />
+            <span asp-validation-for="Vin" class="app-field-error"></span>
+        </div>
+        <div class="col-md-6 app-form-group mb-0">
+            <label asp-for="Color" class="app-form-label"></label>
+            <input asp-for="Color" class="app-form-control" placeholder="e.g. White" />
+            <span asp-validation-for="Color" class="app-field-error"></span>
+        </div>
+        <div class="col-12 d-flex gap-2 mt-2">
+            <button type="submit" class="app-btn app-btn-primary">Save Vehicle</button>
+            <a asp-action="Index" class="app-btn app-btn-outline">Cancel</a>
+        </div>
+    </form>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

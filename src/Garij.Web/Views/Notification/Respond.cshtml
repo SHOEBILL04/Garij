@@ -1,5 +1,49 @@
+@using Garij.Application.DTOs
+@using Garij.Domain.Enums
+@using Garij.Web.Helpers
+@model NotificationDto
+
 @{
     ViewData["Title"] = "Respond to Notification";
 }
 
-<h1>Respond to Notification</h1>
+<div class="app-page-header">
+    <div>
+        <h1 class="app-page-title">Respond to Notification</h1>
+    </div>
+</div>
+
+<div class="app-card" style="max-width: 640px;">
+    <dl class="row mb-0">
+        <dt class="col-sm-3 app-page-subtitle">Service Job</dt>
+        <dd class="col-sm-9 text-white">#@Model.ServiceJobId</dd>
+
+        <dt class="col-sm-3 app-page-subtitle">Message</dt>
+        <dd class="col-sm-9 text-white">@Model.Message</dd>
+
+        <dt class="col-sm-3 app-page-subtitle">Status</dt>
+        <dd class="col-sm-9"><span class="app-badge @StatusBadgeHelper.BadgeClass(Model.Status)">@Model.Status</span></dd>
+
+        <dt class="col-sm-3 app-page-subtitle">Created At</dt>
+        <dd class="col-sm-9 text-white">@Model.CreatedAt.ToString("g")</dd>
+
+        <dt class="col-sm-3 app-page-subtitle">Responded At</dt>
+        <dd class="col-sm-9 text-white mb-0">@(Model.RespondedAt?.ToString("g") ?? "-")</dd>
+    </dl>
+
+    @if (Model.Status == NotificationStatus.Pending)
+    {
+        <div class="d-flex gap-2 mt-3">
+            <form asp-action="Respond" asp-route-id="@Model.Id" method="post">
+                <input type="hidden" name="status" value="@NotificationStatus.Approved" />
+                <button type="submit" class="app-btn app-btn-success">Approve</button>
+            </form>
+            <form asp-action="Respond" asp-route-id="@Model.Id" method="post">
+                <input type="hidden" name="status" value="@NotificationStatus.Rejected" />
+                <button type="submit" class="app-btn app-btn-danger">Reject</button>
+            </form>
+        </div>
+    }
+
+    <a asp-action="Index" class="app-btn app-btn-outline mt-3 d-inline-flex">Back to Queue</a>
+</div>

@@ -1,31 +1,1043 @@
+/* ==========================================================================
+   Garij Global Stylesheet
+   Fonts: Montserrat (Regular 400, Italic 400i, SemiBold 600, Bold 700/800)
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+@font-face {
+    font-family: 'Montserrat';
+    src: local('Montserrat Regular'), url('../fonts/Montserrat-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Montserrat';
+    src: local('Montserrat Italic'), url('../fonts/Montserrat-Italic.ttf') format('truetype');
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Montserrat';
+    src: local('Montserrat SemiBold'), url('../fonts/Montserrat-SemiBold.ttf') format('truetype');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Montserrat';
+    src: local('Montserrat Bold'), url('../fonts/Montserrat-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+:root {
+    --bs-body-font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
 html {
-  font-size: 14px;
+    font-size: 14px;
+    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    position: relative;
+    min-height: 100%;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
+    html {
+        font-size: 16px;
+    }
 }
 
 body {
-  margin-bottom: 60px;
+    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    margin-bottom: 60px;
+}
+
+h1, h2, h3, h4, h5, h6, .navbar-brand {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
 .form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
+    color: var(--bs-secondary-color);
+    text-align: end;
 }
 
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
+    text-align: start;
+}
+
+/* ==========================================================================
+   Internal App Theme (Dashboard, Customers, Vehicles, Service Jobs, Parts,
+   Billing, Notifications, Reports, Admin, Mechanic)
+   Same dark automotive theme as landing.css / auth.css - reuses their CSS
+   variables and font faces, so there is one source of truth for tokens.
+   Depends on landing.css being loaded first (for :root variables).
+   ========================================================================== */
+
+body.app-body {
+    background-color: var(--bg-dark-hero);
+    color: var(--text-light);
+    min-height: 100vh;
+}
+
+.app-main {
+    padding: 2.5rem 0 4rem;
+}
+
+.app-page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.app-page-title {
+    font-size: 1.9rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    color: #ffffff;
+    margin: 0;
+}
+
+.app-page-subtitle {
+    color: var(--text-muted);
+    font-size: 0.92rem;
+    margin-top: 0.35rem;
+    margin-bottom: 0;
+}
+
+/* Cards */
+.app-card {
+    background: var(--bg-dark-card);
+    border: 1px solid var(--border-dark);
+    border-radius: 16px;
+    padding: 1.75rem;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+}
+
+    .app-card + .app-card {
+        margin-top: 1.5rem;
+    }
+
+.app-card-heading {
+    font-size: 0.95rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    color: #ffffff;
+    margin-bottom: 1rem;
+    padding-bottom: 0.85rem;
+    border-bottom: 1px solid var(--border-dark);
+}
+
+.app-card-body-flush {
+    margin: -1.75rem;
+    margin-top: 0;
+}
+
+/* Buttons (pill, glowing - same interaction language as landing/auth) */
+.app-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 0.6rem 1.5rem;
+    font-family: var(--font-primary);
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    border-radius: 9999px;
+    border: 1.5px solid transparent;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.app-btn-primary {
+    color: #ffffff;
+    background: var(--accent-blue-btn);
+    box-shadow: 0 0 15px rgba(0, 114, 245, 0.45);
+}
+
+    .app-btn-primary:hover {
+        background: var(--neon-cyan);
+        color: #06080b;
+        box-shadow: 0 0 22px var(--neon-cyan);
+        transform: translateY(-2px);
+    }
+
+.app-btn-outline {
+    color: #e2e8f0;
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+    .app-btn-outline:hover {
+        background: rgba(255, 255, 255, 0.15);
+        border-color: #ffffff;
+        color: #ffffff;
+        transform: translateY(-2px);
+    }
+
+.app-btn-danger {
+    color: #fca5a5;
+    background: rgba(239, 68, 68, 0.12);
+    border-color: rgba(239, 68, 68, 0.4);
+}
+
+    .app-btn-danger:hover {
+        background: #ef4444;
+        color: #ffffff;
+        box-shadow: 0 0 18px rgba(239, 68, 68, 0.6);
+        transform: translateY(-2px);
+    }
+
+.app-btn-success {
+    color: #86efac;
+    background: rgba(34, 197, 94, 0.12);
+    border-color: rgba(34, 197, 94, 0.4);
+}
+
+    .app-btn-success:hover {
+        background: #22c55e;
+        color: #06080b;
+        box-shadow: 0 0 18px rgba(34, 197, 94, 0.6);
+        transform: translateY(-2px);
+    }
+
+.app-btn-sm {
+    padding: 0.4rem 1rem;
+    font-size: 0.76rem;
+}
+
+.app-form-select-sm {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.8rem;
+}
+
+/* Tables */
+.app-table-wrap {
+    background: var(--bg-dark-card);
+    border: 1px solid var(--border-dark);
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.app-table {
+    width: 100%;
+    margin: 0;
+    color: var(--text-light);
+    border-collapse: collapse;
+}
+
+    .app-table th {
+        background: rgba(255, 255, 255, 0.03);
+        color: var(--text-muted);
+        font-size: 0.74rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid var(--border-dark);
+        text-align: left;
+    }
+
+    .app-table td {
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid var(--border-dark);
+        vertical-align: middle;
+        font-size: 0.9rem;
+    }
+
+    .app-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .app-table tbody tr:hover {
+        background: rgba(0, 168, 255, 0.05);
+    }
+
+    .app-table tbody tr.row-warning {
+        background: rgba(245, 158, 11, 0.08);
+    }
+
+/* Forms */
+.app-form-group {
+    margin-bottom: 1.25rem;
+}
+
+.app-form-label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+}
+
+.app-form-control,
+.app-form-select,
+textarea.app-form-control {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1.5px solid rgba(255, 255, 255, 0.16);
+    border-radius: 12px;
+    color: #ffffff;
+    font-family: var(--font-primary);
+    font-size: 0.92rem;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+}
+
+    .app-form-control:focus,
+    .app-form-select:focus {
+        border-color: var(--neon-cyan);
+        box-shadow: 0 0 0 3px rgba(0, 210, 255, 0.15), 0 0 20px rgba(0, 210, 255, 0.25);
+        background: rgba(255, 255, 255, 0.1);
+        outline: none;
+        color: #ffffff;
+    }
+
+    .app-form-control::placeholder {
+        color: #64748b;
+    }
+
+    /* Browsers render the <select> popup list with its own background regardless of the
+   select's (semi-transparent) background-color, but still inherit its text color -
+   without this, option text renders white-on-white and is unreadable when opened. */
+    .app-form-select option {
+        background-color: #151a23;
+        color: #ffffff;
+    }
+
+.app-field-error {
+    display: block;
+    margin-top: 0.35rem;
+    font-size: 0.78rem;
+    color: #fca5a5;
+}
+
+.app-alert-danger {
+    background: rgba(239, 68, 68, 0.12);
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    color: #fca5a5;
+    border-radius: 12px;
+    padding: 0.85rem 1.1rem;
+    margin-bottom: 1.25rem;
+    font-size: 0.85rem;
+}
+
+    .app-alert-danger ul {
+        margin: 0;
+        padding-left: 1.1rem;
+    }
+
+.app-alert-success {
+    background: rgba(34, 197, 94, 0.12);
+    border: 1px solid rgba(34, 197, 94, 0.4);
+    color: #86efac;
+    border-radius: 12px;
+    padding: 0.85rem 1.1rem;
+    margin-bottom: 1.25rem;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+/* Filter pills (status filters, date-range toggles, etc.) */
+.app-filter-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.45rem 1.1rem;
+    border-radius: 9999px;
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    text-decoration: none;
+    border: 1.5px solid rgba(255, 255, 255, 0.16);
+    color: var(--text-muted);
+    background: rgba(255, 255, 255, 0.04);
+    transition: all 0.25s ease;
+    cursor: pointer;
+}
+
+    .app-filter-pill:hover {
+        color: #ffffff;
+        border-color: rgba(255, 255, 255, 0.4);
+    }
+
+    .app-filter-pill.active {
+        color: #ffffff;
+        background: var(--accent-blue-btn);
+        border-color: var(--accent-blue-btn);
+        box-shadow: 0 0 15px rgba(0, 114, 245, 0.45);
+    }
+
+/* Small text/icon chip inside table cells (mechanic tags, etc.) */
+.app-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.25rem 0.65rem;
+    border-radius: 9999px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #cbd5e1;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin: 0.15rem 0.25rem 0.15rem 0;
+}
+
+/* Status badges - color-coded, shared by ServiceJob/Notification/Invoice statuses */
+.app-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.3rem 0.8rem;
+    border-radius: 9999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    border: 1px solid transparent;
+    white-space: nowrap;
+}
+
+.app-badge-neutral {
+    color: #cbd5e1;
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.app-badge-info {
+    color: #38bdf8;
+    background: rgba(56, 189, 248, 0.12);
+    border-color: rgba(56, 189, 248, 0.35);
+}
+
+.app-badge-success {
+    color: #4ade80;
+    background: rgba(34, 197, 94, 0.12);
+    border-color: rgba(34, 197, 94, 0.35);
+}
+
+.app-badge-warning {
+    color: #fbbf24;
+    background: rgba(245, 158, 11, 0.12);
+    border-color: rgba(245, 158, 11, 0.35);
+}
+
+.app-badge-danger {
+    color: #f87171;
+    background: rgba(239, 68, 68, 0.12);
+    border-color: rgba(239, 68, 68, 0.35);
+}
+
+/* Notification bell (navbar trigger) */
+.app-bell-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 9999px;
+    color: #cbd5e1;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1.5px solid rgba(255, 255, 255, 0.16);
+    font-size: 1.05rem;
+    text-decoration: none;
+    transition: all 0.25s ease;
+}
+
+    .app-bell-btn:hover {
+        color: #ffffff;
+        border-color: var(--neon-cyan);
+        box-shadow: 0 0 15px rgba(0, 210, 255, 0.35);
+    }
+
+.app-bell-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    border-radius: 9999px;
+    background: #ef4444;
+    color: #ffffff;
+    font-size: 0.65rem;
+    font-weight: 800;
+    line-height: 18px;
+    text-align: center;
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.7);
+}
+
+/* Empty state */
+.app-empty-state {
+    text-align: center;
+    padding: 3.5rem 1.5rem;
+    color: var(--text-muted);
+}
+
+    .app-empty-state i {
+        font-size: 2.4rem;
+        color: rgba(255, 255, 255, 0.15);
+        margin-bottom: 1rem;
+        display: block;
+    }
+
+/* Consistent fallbacks for the remaining scaffolded views. These rules let
+   Bootstrap controls participate in the app design system during migration. */
+.app-body .form-control,
+.app-body .form-select {
+    min-height: 44px;
+    border-radius: 12px;
+    border-color: rgba(255, 255, 255, 0.16);
+    background-color: rgba(255, 255, 255, 0.06);
+    color: var(--text-light);
+}
+
+    .app-body .form-control:focus,
+    .app-body .form-select:focus {
+        border-color: var(--neon-cyan);
+        box-shadow: 0 0 0 3px rgba(0, 210, 255, 0.15);
+    }
+
+.app-body .table:not(.app-table) {
+    --bs-table-bg: transparent;
+    --bs-table-color: var(--text-light);
+    --bs-table-border-color: var(--border-dark);
+    margin-bottom: 0;
+}
+
+    .app-body .table:not(.app-table) th {
+        color: var(--text-muted);
+        font-size: 0.74rem;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+    }
+
+    .app-body .table:not(.app-table) > :not(caption) > * > * {
+        padding: 1rem 1.25rem;
+        vertical-align: middle;
+    }
+
+.app-button-spinner {
+    width: 0.95rem;
+    height: 0.95rem;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: app-spin 0.7s linear infinite;
+}
+
+.app-btn.is-loading,
+.app-body button.is-loading {
+    cursor: wait;
+    opacity: 0.82;
+}
+
+@keyframes app-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (max-width: 767px) {
+    .app-table-wrap {
+        overflow-x: auto;
+    }
+
+    .app-card {
+        padding: 1.25rem;
+    }
+
+    .app-page-header .app-btn {
+        flex: 1 1 auto;
+    }
+
+    .app-body .table:not(.app-table) > :not(caption) > * > * {
+        padding: 0.8rem;
+    }
+}
+
+/* ==========================================================================
+   LIGHT MODE STYLING FOR INTERNAL APPLICATION PAGES
+   (Dashboard, Customers, Vehicles, Jobs, Mechanics, Parts, Billing, Admin)
+   ========================================================================== */
+[data-theme="light"] body.app-body {
+    background-color: #edf2f7 !important;
+    color: #1e293b !important;
+}
+
+[data-theme="light"] .app-page-title {
+    color: #0f172a !important;
+}
+
+[data-theme="light"] .app-page-subtitle {
+    color: #475569 !important;
+}
+
+[data-theme="light"] .app-card {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    box-shadow: 0 2px 4px rgba(15, 23, 42, 0.04), 0 12px 28px -4px rgba(15, 23, 42, 0.09) !important;
+}
+
+    [data-theme="light"] .app-card:hover {
+        border-color: #94a3b8 !important;
+    }
+
+[data-theme="light"] .app-card-heading {
+    color: #0f172a !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+}
+
+[data-theme="light"] .app-table-wrap {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    box-shadow: 0 4px 18px rgba(15, 23, 42, 0.06) !important;
+}
+
+[data-theme="light"] .app-table,
+[data-theme="light"] .table,
+[data-theme="light"] .table-dark {
+    --bs-table-bg: #ffffff !important;
+    --bs-table-color: #1e293b !important;
+    --bs-table-striped-bg: #f8fafc !important;
+    --bs-table-hover-bg: #f1f5f9 !important;
+    --bs-table-border-color: #e2e8f0 !important;
+    background-color: #ffffff !important;
+    color: #1e293b !important;
+}
+
+    [data-theme="light"] .app-table th,
+    [data-theme="light"] .table th,
+    [data-theme="light"] .table-dark th {
+        background-color: #f1f5f9 !important;
+        color: #334155 !important;
+        border-bottom: 2px solid #cbd5e1 !important;
+    }
+
+    [data-theme="light"] .app-table td,
+    [data-theme="light"] .table td,
+    [data-theme="light"] .table-dark td {
+        background-color: #ffffff !important;
+        border-bottom: 1px solid #e2e8f0 !important;
+        color: #334155 !important;
+    }
+
+    [data-theme="light"] .app-table tbody tr:hover td,
+    [data-theme="light"] .table tbody tr:hover td,
+    [data-theme="light"] .table-dark tbody tr:hover td {
+        background-color: #f8fafc !important;
+    }
+
+[data-theme="light"] .app-card .text-white,
+[data-theme="light"] .text-white:not(.btn):not(.badge):not(.dropdown-item) {
+    color: #0f172a !important;
+}
+
+[data-theme="light"] .text-light {
+    color: #334155 !important;
+}
+
+[data-theme="light"] .border-secondary,
+[data-theme="light"] .border-secondary.border-opacity-25,
+[data-theme="light"] .border-secondary.border-opacity-50 {
+    border-color: #cbd5e1 !important;
+}
+
+[data-theme="light"] .app-card [style*="rgba(255, 255, 255"] {
+    background-color: #f8fafc !important;
+    border-color: #cbd5e1 !important;
+    color: #334155 !important;
+}
+
+[data-theme="light"] .app-btn-outline {
+    background: #ffffff !important;
+    border-color: #cbd5e1 !important;
+    color: #0f172a !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+}
+
+    [data-theme="light"] .app-btn-outline:hover {
+        background: #f1f5f9 !important;
+        border-color: #0284c7 !important;
+        color: #0284c7 !important;
+    }
+
+[data-theme="light"] .app-bell-btn {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #0f172a !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04) !important;
+}
+
+    [data-theme="light"] .app-bell-btn:hover {
+        background: #f1f5f9 !important;
+        border-color: #0284c7 !important;
+        color: #0284c7 !important;
+    }
+
+[data-theme="light"] .dropdown-menu {
+    background-color: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12) !important;
+}
+
+[data-theme="light"] .dropdown-item {
+    color: #334155 !important;
+}
+
+    [data-theme="light"] .dropdown-item:hover {
+        background-color: #f1f5f9 !important;
+        color: #0284c7 !important;
+    }
+
+[data-theme="light"] .dropdown-divider {
+    border-top: 1px solid #e2e8f0 !important;
+}
+
+[data-theme="light"] .app-stat-card {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06) !important;
+}
+
+[data-theme="light"] .app-stat-value {
+    color: #0f172a !important;
+}
+
+[data-theme="light"] .app-stat-label {
+    color: #64748b !important;
+}
+
+[data-theme="light"] .app-stat-icon {
+    background: rgba(2, 132, 199, 0.1) !important;
+    color: #0284c7 !important;
+    border: 1px solid rgba(2, 132, 199, 0.25) !important;
+}
+
+[data-theme="light"] .app-empty-state i {
+    color: rgba(2, 132, 199, 0.35) !important;
+}
+
+/* Light Mode Form Controls & High-Contrast Placeholders */
+[data-theme="light"] .app-form-control,
+[data-theme="light"] .form-control {
+    background-color: #ffffff !important;
+    border-color: #cbd5e1 !important;
+    color: #0f172a !important;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02) !important;
+}
+
+    [data-theme="light"] .app-form-control:focus,
+    [data-theme="light"] .form-control:focus {
+        background-color: #ffffff !important;
+        border-color: #0284c7 !important;
+        box-shadow: 0 0 0 0.2rem rgba(2, 132, 199, 0.15) !important;
+    }
+
+    [data-theme="light"] input::placeholder,
+    [data-theme="light"] textarea::placeholder,
+    [data-theme="light"] .form-control::placeholder,
+    [data-theme="light"] .app-form-control::placeholder,
+    [data-theme="light"] ::placeholder {
+        color: #475569 !important;
+        opacity: 1 !important;
+        -webkit-text-fill-color: #475569 !important;
+    }
+
+
+
+/* ==========================================================================
+   LIGHT MODE - PART 2: SURFACES, CONTROLS AND ACCENTS THAT STAYED DARK
+   The block above re-skins the app shell (body, cards, tables, stat tiles).
+   These rules cover what it missed: the dark Bootstrap utility surfaces, the
+   <select> controls, and the translucent badge/chip/button tints that were
+   picked for a dark background and either stay black or wash out on white.
+   ========================================================================== */
+
+/* --- Dark utility panels (bg-dark / bg-black) -----------------------------
+   Used for the licence blocks, navbar preview and info panels. Left alone
+   they render as solid black boxes whose text is re-coloured dark by the
+   overrides above, so the content inside disappears. */
+[data-theme="light"] .bg-dark,
+[data-theme="light"] .bg-black {
+    background-color: #f1f5f9 !important;
+    border-color: #cbd5e1 !important;
+}
+
+/* Fields keep a plain white background even when the markup asks for bg-dark.
+   Element-qualified so it outranks the .bg-dark rule above. */
+[data-theme="light"] input.form-control,
+[data-theme="light"] textarea.form-control,
+[data-theme="light"] select.form-select,
+[data-theme="light"] input.app-form-control,
+[data-theme="light"] textarea.app-form-control,
+[data-theme="light"] select.app-form-select {
+    background-color: #ffffff !important;
+    border-color: #cbd5e1 !important;
+    color: #0f172a !important;
+}
+
+/* --- Select controls -----------------------------------------------------
+   .app-form-select never had a light rule, so it kept white text on a nearly
+   white translucent background - the control was invisible on the card. The
+   option list kept its hard-coded near-black popup background too. */
+[data-theme="light"] .app-form-select,
+[data-theme="light"] .form-select {
+    background-color: #ffffff !important;
+    border-color: #cbd5e1 !important;
+    color: #0f172a !important;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02) !important;
+}
+
+    [data-theme="light"] .app-form-select:focus,
+    [data-theme="light"] .form-select:focus {
+        border-color: #0284c7 !important;
+        box-shadow: 0 0 0 0.2rem rgba(2, 132, 199, 0.15) !important;
+    }
+
+    [data-theme="light"] .app-form-select option,
+    [data-theme="light"] .form-select option {
+        background-color: #ffffff;
+        color: #0f172a;
+    }
+
+[data-theme="light"] .input-group-text {
+    background-color: #f1f5f9 !important;
+    border-color: #cbd5e1 !important;
+    color: #334155 !important;
+}
+
+/* --- Navbar status-lookup pill -------------------------------------------
+   Shares the landing navbar component, which has no light rule: a dark slate
+   pill sitting on the white app navbar on every page. */
+[data-theme="light"] .btn-nav-glow-lookup {
+    background: #ffffff !important;
+    border: 1.5px solid #cbd5e1 !important;
+    color: #0f172a !important;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.06) !important;
+}
+
+    [data-theme="light"] .btn-nav-glow-lookup:hover {
+        background: rgba(2, 132, 199, 0.08) !important;
+        border-color: #0284c7 !important;
+        color: #0284c7 !important;
+        box-shadow: 0 4px 12px rgba(2, 132, 199, 0.15) !important;
+    }
+
+    [data-theme="light"] .btn-nav-glow-lookup i {
+        color: #0284c7 !important;
+    }
+
+[data-theme="light"] .btn-outline-info {
+    --bs-btn-color: #0369a1;
+    --bs-btn-border-color: #0284c7;
+    --bs-btn-hover-color: #ffffff;
+    --bs-btn-hover-bg: #0284c7;
+    --bs-btn-hover-border-color: #0284c7;
+}
+
+/* --- Status badges, chips and tinted buttons ------------------------------
+   All of these are a pale accent on a 12%-alpha wash: readable on the dark
+   theme, near-invisible once the surface underneath turns white. Each gets a
+   darker ink and a solid tint instead. */
+[data-theme="light"] .app-badge-neutral {
+    color: #334155 !important;
+    background: #e2e8f0 !important;
+    border-color: #cbd5e1 !important;
+}
+
+[data-theme="light"] .app-badge-info {
+    color: #0369a1 !important;
+    background: #e0f2fe !important;
+    border-color: #7dd3fc !important;
+}
+
+[data-theme="light"] .app-badge-success {
+    color: #15803d !important;
+    background: #dcfce7 !important;
+    border-color: #86efac !important;
+}
+
+[data-theme="light"] .app-badge-warning {
+    color: #b45309 !important;
+    background: #fef3c7 !important;
+    border-color: #fcd34d !important;
+}
+
+[data-theme="light"] .app-badge-danger {
+    color: #b91c1c !important;
+    background: #fee2e2 !important;
+    border-color: #fca5a5 !important;
+}
+
+[data-theme="light"] .app-chip {
+    color: #334155 !important;
+    background: #f1f5f9 !important;
+    border-color: #cbd5e1 !important;
+}
+
+[data-theme="light"] .badge.bg-secondary {
+    background-color: #e2e8f0 !important;
+    color: #1e293b !important;
+}
+
+[data-theme="light"] .app-btn-danger {
+    color: #b91c1c !important;
+    background: #fef2f2 !important;
+    border-color: #fca5a5 !important;
+}
+
+    [data-theme="light"] .app-btn-danger:hover {
+        color: #ffffff !important;
+        background: #dc2626 !important;
+        border-color: #dc2626 !important;
+        box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3) !important;
+    }
+
+[data-theme="light"] .app-btn-success {
+    color: #15803d !important;
+    background: #f0fdf4 !important;
+    border-color: #86efac !important;
+}
+
+    [data-theme="light"] .app-btn-success:hover {
+        color: #ffffff !important;
+        background: #16a34a !important;
+        border-color: #16a34a !important;
+        box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3) !important;
+    }
+
+[data-theme="light"] .app-alert-danger {
+    color: #b91c1c !important;
+    background: #fef2f2 !important;
+    border-color: #fca5a5 !important;
+}
+
+[data-theme="light"] .app-alert-success {
+    color: #15803d !important;
+    background: #f0fdf4 !important;
+    border-color: #86efac !important;
+}
+
+[data-theme="light"] .app-field-error {
+    color: #b91c1c !important;
+}
+
+[data-theme="light"] .app-filter-pill {
+    color: #475569 !important;
+    background: #ffffff !important;
+    border-color: #cbd5e1 !important;
+}
+
+    [data-theme="light"] .app-filter-pill:hover {
+        color: #0284c7 !important;
+        background: #f1f5f9 !important;
+        border-color: #0284c7 !important;
+    }
+
+    [data-theme="light"] .app-filter-pill.active {
+        color: #ffffff !important;
+        background: #0284c7 !important;
+        border-color: #0284c7 !important;
+    }
+
+[data-theme="light"] .app-table tbody tr.row-warning td {
+    background-color: #fffbeb !important;
+}
+
+[data-theme="light"] .app-empty-state {
+    color: #64748b !important;
+}
+
+/* --- Bootstrap accent text utilities -------------------------------------
+   The stock values are tuned for a dark background and drop under 3:1 on the
+   white cards (bi icons, totals, inline status text). */
+[data-theme="light"] .text-info {
+    color: #0369a1 !important;
+}
+
+[data-theme="light"] .text-success {
+    color: #15803d !important;
+}
+
+[data-theme="light"] .text-warning {
+    color: #b45309 !important;
+}
+
+[data-theme="light"] .text-danger {
+    color: #b91c1c !important;
+}
+
+[data-theme="light"] .text-primary {
+    color: #1d4ed8 !important;
+}
+
+[data-theme="light"] .text-secondary {
+    color: #475569 !important;
+}
+
+[data-theme="light"] .text-muted,
+[data-theme="light"] .text-white-50 {
+    color: #64748b !important;
+}
+
+/* --- Inline styles written for the dark theme -----------------------------
+   These colours live in style="" attributes inside the views, so they can
+   only be reached by matching the declaration text itself. */
+[data-theme="light"] .app-card [style*="rgba(255,255,255"],
+[data-theme="light"] .app-card [style*="rgba(255, 255, 255"] {
+    background-color: #f8fafc !important;
+    border-color: #cbd5e1 !important;
+    color: #334155 !important;
+}
+
+[data-theme="light"] [style*="color:#4ade80"],
+[data-theme="light"] [style*="color: #4ade80"] {
+    color: #15803d !important;
+}
+
+[data-theme="light"] [style*="color:#f87171"],
+[data-theme="light"] [style*="color: #f87171"] {
+    color: #b91c1c !important;
+}
+
+[data-theme="light"] [style*="color: #fbbf24"] {
+    color: #b45309 !important;
+}
+
+[data-theme="light"] [style*="color: #60a5fa"] {
+    color: #1d4ed8 !important;
+}
+
+[data-theme="light"] [style*="color: #22d3ee"] {
+    color: #0e7490 !important;
+}
+
+/* Purchase / licence panels paint their own dark gradient. */
+[data-theme="light"] [style*="linear-gradient(145deg, #11151f"],
+[data-theme="light"] [style*="linear-gradient(135deg, #0e121a"] {
+    background: #ffffff !important;
+    border-color: #cbd5e1 !important;
 }

@@ -1,5 +1,169 @@
+@model InvoiceDto
+@using Garij.Domain.Enums
+@using Garij.Web.Helpers
+
 @{
-    ViewData["Title"] = "Invoice Details";
+    ViewData["Title"] = $"Invoice {Model.InvoiceNumber}";
 }
 
-<h1>Invoice Details</h1>
+<div class="app-page-header">
+    <div>
+        <h1 class="app-page-title mb-2">Invoice <span class="font-monospace text-info">@Model.InvoiceNumber</span></h1>
+        <span class="app-badge @StatusBadgeHelper.BadgeClass(Model.PaymentStatus)">@Model.PaymentStatus</span>
+    </div>
+    <div class="d-flex gap-2">
+        @if (Model.OutstandingBalance > 0)
+        {
+            <a asp-action="RecordPayment" asp-route-invoiceId="@Model.Id" class="app-btn app-btn-primary">
+                <i class="bi bi-cash-coin"></i> Record Payment
+            </a>
+        }
+        <a asp-action="Index" class="app-btn app-btn-outline">Back to List</a>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="app-alert-success"><span><i class="bi bi-check-circle-fill me-2"></i>@TempData["SuccessMessage"]</span></div>
+}
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="app-card mb-4">
+            <h5 class="app-card-heading"><i class="bi bi-card-checklist me-2 text-info"></i>Job &amp; Customer</h5>
+            <dl class="row mb-0">
+                <dt class="col-sm-4 app-page-subtitle">Booking Reference:</dt>
+                <dd class="col-sm-8 text-white font-monospace">@Model.BookingReference</dd>
+
+                <dt class="col-sm-4 app-page-subtitle">Customer:</dt>
+                <dd class="col-sm-8 text-white">@Model.CustomerName</dd>
+
+                <dt class="col-sm-4 app-page-subtitle">Vehicle:</dt>
+                <dd class="col-sm-8 text-white">@Model.VehicleDescription</dd>
+
+                <dt class="col-sm-4 app-page-subtitle">Issued:</dt>
+                <dd class="col-sm-8 text-white mb-0">@Model.IssuedAt.ToString("f")</dd>
+            </dl>
+        </div>
+
+        <div class="app-card mb-4">
+            <h5 class="app-card-heading"><i class="bi bi-tools me-2 text-info"></i>Services</h5>
+            @if (!Model.ServiceLines.Any())
+            {
+                <p class="app-page-subtitle text-center py-2 mb-0">No services logged.</p>
+            }
+            else
+            {
+                <table class="app-table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Description</th>
+                            <th class="text-end">Qty</th>
+                            <th class="text-end">Unit Price</th>
+                            <th class="text-end">Line Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var line in Model.ServiceLines)
+                        {
+                            <tr>
+                                <td>@line.Description</td>
+                                <td class="text-end">@line.Quantity</td>
+                                <td class="text-end">@line.UnitPrice.ToString("C")</td>
+                                <td class="text-end">@line.LineTotal.ToString("C")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+
+        <div class="app-card mb-4">
+            <h5 class="app-card-heading"><i class="bi bi-gear me-2 text-info"></i>Parts</h5>
+            @if (!Model.PartLines.Any())
+            {
+                <p class="app-page-subtitle text-center py-2 mb-0">No parts logged.</p>
+            }
+            else
+            {
+                <table class="app-table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Description</th>
+                            <th class="text-end">Qty</th>
+                            <th class="text-end">Unit Price</th>
+                            <th class="text-end">Line Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var line in Model.PartLines)
+                        {
+                            <tr>
+                                <td>@line.Description</td>
+                                <td class="text-end">@line.Quantity</td>
+                                <td class="text-end">@line.UnitPrice.ToString("C")</td>
+                                <td class="text-end">@line.LineTotal.ToString("C")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+
+        <div class="app-card">
+            <h5 class="app-card-heading"><i class="bi bi-clock-history me-2 text-info"></i>Payment History</h5>
+            @if (!Model.Payments.Any())
+            {
+                <p class="app-page-subtitle text-center py-2 mb-0">No payments recorded yet.</p>
+            }
+            else
+            {
+                <table class="app-table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Method</th>
+                            <th>Reference</th>
+                            <th class="text-end">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var payment in Model.Payments)
+                        {
+                            <tr>
+                                <td>@payment.PaidAt.ToString("MMM dd, yyyy HH:mm")</td>
+                                <td><span class="app-badge app-badge-neutral">@payment.PaymentMethod</span></td>
+                                <td class="font-monospace small">@payment.TransactionReference</td>
+                                <td class="text-end">@payment.Amount.ToString("C")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="app-card">
+            <h5 class="app-card-heading"><i class="bi bi-calculator me-2 text-info"></i>Summary</h5>
+            <dl class="row mb-0">
+                <dt class="col-7 app-page-subtitle">Subtotal:</dt>
+                <dd class="col-5 text-end text-white">@Model.SubTotal.ToString("C")</dd>
+
+                <dt class="col-7 app-page-subtitle">Tax:</dt>
+                <dd class="col-5 text-end text-white">@Model.TaxAmount.ToString("C")</dd>
+
+                <dt class="col-7 fw-bold text-white">Total:</dt>
+                <dd class="col-5 text-end fw-bold text-white">@Model.TotalAmount.ToString("C")</dd>
+
+                <dt class="col-7 app-page-subtitle">Paid:</dt>
+                <dd class="col-5 text-end" style="color:#4ade80;">@Model.AmountPaid.ToString("C")</dd>
+
+                <dt class="col-7 fw-bold text-white">Outstanding:</dt>
+                <dd class="col-5 text-end fw-bold mb-0" style="color:@(Model.OutstandingBalance > 0 ? "#f87171" : "#4ade80");">
+                    @Model.OutstandingBalance.ToString("C")
+                </dd>
+            </dl>
+        </div>
+    </div>
+</div>

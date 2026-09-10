@@ -76,6 +76,64 @@ public static class DbSeeder
                 }
             }
 
+            // 2.1 Seed Default Workshop Lifetime Licenses for Seeded Demo Accounts
+            var defaultStaff = new[]
+            {
+                (Email: "admin@garij.com", Name: "System Administrator"),
+                (Email: "frontdesk@garij.com", Name: "Front Desk Staff"),
+                (Email: "mechanic@garij.com", Name: "Lead Mechanic")
+            };
+
+            foreach (var staff in defaultStaff)
+            {
+                var staffUser = await userManager.FindByEmailAsync(staff.Email);
+                if (staffUser != null && !await context.ProjectPurchases.AnyAsync(p => p.IdentityUserId == staffUser.Id || p.BuyerEmail == staff.Email))
+                {
+                    var slug = staff.Email.Split('@')[0].ToUpperInvariant();
+                    context.ProjectPurchases.Add(new ProjectPurchase
+                    {
+                        LicenseKey = $"GRJ-LIC-{slug}-LIFETIME-2026",
+                        IdentityUserId = staffUser.Id,
+                        BuyerName = staff.Name,
+                        BuyerEmail = staff.Email,
+                        WorkshopName = "Garij Master Workshop",
+                        Amount = 499.00m,
+                        Currency = "USD",
+                        PaymentMethod = "SystemSeeded",
+                        TransactionReference = $"TXN-SEEDED-{slug}-2026",
+                        PurchasedAt = DateTime.UtcNow,
+                        Status = LicenseStatus.Active,
+                        IsActive = true,
+                        Notes = "Default system seeded lifetime license for workshop team."
+                    });
+                    logger.LogInformation("Seeded Default Lifetime License for {Email}", staff.Email);
+                }
+            }
+
+            // 2.2 Seed a reusable Demo Activation Key for testing
+            if (!await context.ProjectPurchases.AnyAsync(p => p.LicenseKey == "GRJ-DEMO-2026-KEY"))
+            {
+                context.ProjectPurchases.Add(new ProjectPurchase
+                {
+                    LicenseKey = "GRJ-DEMO-2026-KEY",
+                    IdentityUserId = null,
+                    BuyerName = "Demo Workshop Owner",
+                    BuyerEmail = "demo@garij.com",
+                    WorkshopName = "Demo Auto Service",
+                    Amount = 499.00m,
+                    Currency = "USD",
+                    PaymentMethod = "DemoKey",
+                    TransactionReference = "TXN-DEMO-KEY-2026",
+                    PurchasedAt = DateTime.UtcNow,
+                    Status = LicenseStatus.Active,
+                    IsActive = true,
+                    Notes = "Pre-seeded demo activation key for evaluation and testing."
+                });
+                logger.LogInformation("Seeded Demo Activation Key: GRJ-DEMO-2026-KEY");
+            }
+
+            await context.SaveChangesAsync();
+
             // 3. Seed Service Catalog Items
             if (!await context.ServiceCatalogs.AnyAsync())
             {
@@ -123,6 +181,10 @@ public static class DbSeeder
                 await context.SaveChangesAsync();
                 logger.LogInformation("Seeded initial Stock Parts.");
             }
+
+            // 5. Seed the presentation dataset. Runs last because it draws on the service
+            // catalog and the parts seeded above.
+            await DemoDataSeeder.SeedAsync(context, userManager, logger);
         }
         catch (Exception ex)
         {

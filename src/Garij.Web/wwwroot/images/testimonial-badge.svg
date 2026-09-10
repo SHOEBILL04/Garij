@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 40" width="120" height="40" fill="none">
+  <!-- Small Winged Insignia -->
+  <g stroke="#00a8ff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Center Diamond -->
+    <polygon points="60,12 66,20 60,28 54,20" fill="#0284c7" stroke="#38bdf8" />
+    <!-- Left Wing -->
+    <path d="M52 18 C40 12, 25 14, 10 22 C25 21, 38 23, 50 24" />
+    <path d="M48 24 C35 22, 22 25, 14 30 C28 29, 38 28, 46 27" />
+    <!-- Right Wing -->
+    <path d="M68 18 C80 12, 95 14, 110 22 C95 21, 82 23, 70 24" />
+    <path d="M72 24 C85 22, 98 25, 106 30 C92 29, 82 28, 74 27" />
+  </g>
+</svg>

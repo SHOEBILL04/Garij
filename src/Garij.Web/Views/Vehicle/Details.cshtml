@@ -1,63 +1,79 @@
+@using Garij.Web.Helpers
 @model VehicleDto
 @{
     ViewData["Title"] = "Vehicle Details";
     var serviceHistory = ViewBag.ServiceHistory as IEnumerable<ServiceHistoryDto> ?? Enumerable.Empty<ServiceHistoryDto>();
 }
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="h3 mb-0">@Model.LicensePlateNumber</h1>
+<div class="app-page-header">
     <div>
-        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Edit</a>
-        <a asp-controller="ServiceJob" asp-action="Create" asp-route-vehicleId="@Model.Id" class="btn btn-primary">Create Job</a>
+        <h1 class="app-page-title font-monospace">@Model.LicensePlateNumber</h1>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="app-btn app-btn-outline">Edit</a>
+        <a asp-controller="ServiceJob" asp-action="Create" asp-route-vehicleId="@Model.Id" class="app-btn app-btn-primary"><i class="bi bi-plus-lg"></i> Create Job</a>
     </div>
 </div>
 
 @if (TempData["SuccessMessage"] is string message)
 {
-    <div class="alert alert-success">@message</div>
+    <div class="app-alert-success"><span><i class="bi bi-check-circle-fill me-2"></i>@message</span></div>
 }
 
-<dl class="row">
-    <dt class="col-sm-3">Customer</dt>
-    <dd class="col-sm-9">
-        <a asp-controller="Customer" asp-action="Details" asp-route-id="@Model.CustomerId">@Model.CustomerName</a>
-    </dd>
-    <dt class="col-sm-3">Vehicle</dt>
-    <dd class="col-sm-9">@Model.Year @Model.Make @Model.Model</dd>
-    <dt class="col-sm-3">Color</dt>
-    <dd class="col-sm-9">@Model.Color</dd>
-    <dt class="col-sm-3">VIN</dt>
-    <dd class="col-sm-9">@Model.Vin</dd>
-</dl>
-
-<h2 class="h5 mt-4">Service History</h2>
-<div class="table-responsive">
-    <table class="table table-striped align-middle">
-        <thead>
-            <tr>
-                <th>Booking</th>
-                <th>Type</th>
-                <th>Status</th>
-                <th>Created</th>
-                <th>Completed</th>
-            </tr>
-        </thead>
-        <tbody>
-        @foreach (var job in serviceHistory)
-        {
-            <tr>
-                <td>@job.BookingReference</td>
-                <td>@job.JobType</td>
-                <td><span class="badge bg-secondary">@job.Status</span></td>
-                <td>@job.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</td>
-                <td>@(job.CompletedAt?.ToLocalTime().ToString("dd MMM yyyy") ?? "Pending")</td>
-            </tr>
-        }
-        </tbody>
-    </table>
+<div class="app-card mb-4">
+    <dl class="row mb-0">
+        <dt class="col-sm-3 app-page-subtitle">Customer</dt>
+        <dd class="col-sm-9">
+            <a asp-controller="Customer" asp-action="Details" asp-route-id="@Model.CustomerId" class="text-info text-decoration-none">@Model.CustomerName</a>
+        </dd>
+        <dt class="col-sm-3 app-page-subtitle">Vehicle</dt>
+        <dd class="col-sm-9 text-white">@Model.Year @Model.Make @Model.Model</dd>
+        <dt class="col-sm-3 app-page-subtitle">Color</dt>
+        <dd class="col-sm-9 text-white">@Model.Color</dd>
+        <dt class="col-sm-3 app-page-subtitle">VIN</dt>
+        <dd class="col-sm-9 text-white mb-0">@Model.Vin</dd>
+    </dl>
 </div>
 
-@if (!serviceHistory.Any())
-{
-    <div class="alert alert-info">No service history has been recorded for this vehicle.</div>
-}
+<h2 class="app-page-title" style="font-size: 1.3rem;">Service History</h2>
+<div class="app-table-wrap">
+    <div class="table-responsive">
+        <table class="app-table mb-0">
+            <thead>
+                <tr>
+                    <th>Booking</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th>Completed</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!serviceHistory.Any())
+                {
+                    <tr>
+                        <td colspan="5">
+                            <div class="app-empty-state">
+                                <i class="bi bi-clock-history"></i>
+                                No service history has been recorded for this vehicle.
+                            </div>
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var job in serviceHistory)
+                    {
+                        <tr>
+                            <td class="text-white font-monospace">@job.BookingReference</td>
+                            <td>@job.JobType</td>
+                            <td><span class="app-badge @StatusBadgeHelper.BadgeClass(job.Status)">@job.Status</span></td>
+                            <td>@job.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</td>
+                            <td>@(job.CompletedAt?.ToLocalTime().ToString("dd MMM yyyy") ?? "Pending")</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

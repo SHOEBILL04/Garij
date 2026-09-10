@@ -17,6 +17,15 @@ public class InvoiceConfiguration : IEntityTypeConfiguration<Invoice>
 
         builder.HasIndex(i => i.ServiceJobId).IsUnique();
 
+        // Backstop for the transactional invoice calculation: a rolled-back or half-written
+        // invoice can never be persisted with negative money on it.
+        builder.ToTable(t =>
+        {
+            t.HasCheckConstraint("CK_Invoice_SubTotal", "\"SubTotal\" >= 0");
+            t.HasCheckConstraint("CK_Invoice_TaxAmount", "\"TaxAmount\" >= 0");
+            t.HasCheckConstraint("CK_Invoice_TotalAmount", "\"TotalAmount\" >= 0");
+        });
+
         builder.HasMany(i => i.PaymentTransactions)
             .WithOne(pt => pt.Invoice)
             .HasForeignKey(pt => pt.InvoiceId)
