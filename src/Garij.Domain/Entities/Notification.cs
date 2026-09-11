@@ -18,4 +18,6 @@ public class Notification
     public DateTime CreatedAt { get; set; }
 
     public DateTime? RespondedAt { get; set; }
+
+    public string? GarageId { get; set; }
 }

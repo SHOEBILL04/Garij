@@ -14,6 +14,8 @@ public class Part
 
     public int ReorderLevel { get; set; }
 
+    public string? GarageId { get; set; }
+
     /// <summary>
     /// Optimistic concurrency token, re-stamped on every stock mutation. Without it two
     /// mechanics logging parts at the same moment both read the same QuantityInStock and

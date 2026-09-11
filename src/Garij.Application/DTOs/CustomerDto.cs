@@ -24,4 +24,6 @@ public class CustomerDto
 
     [StringLength(500)]
     public string Address { get; set; } = string.Empty;
+
+    public string? GarageId { get; set; }
 }

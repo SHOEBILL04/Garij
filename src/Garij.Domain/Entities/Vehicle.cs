@@ -21,5 +21,7 @@ public class Vehicle
 
     public string Color { get; set; } = string.Empty;
 
+    public string? GarageId { get; set; }
+
     public ICollection<ServiceJob> ServiceJobs { get; set; } = new List<ServiceJob>();
 }

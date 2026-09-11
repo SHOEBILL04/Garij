@@ -15,6 +15,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(u => u.FullName).IsRequired().HasMaxLength(200);
         builder.Property(u => u.Email).IsRequired().HasMaxLength(256);
         builder.Property(u => u.PhoneNumber).HasMaxLength(20);
+        builder.Property(u => u.GarageId).HasMaxLength(100);
 
         builder.HasOne<IdentityUser>()
             .WithMany()
@@ -22,6 +23,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasIndex(u => u.IdentityUserId);
+        builder.HasIndex(u => u.GarageId);
 
         builder.HasMany(u => u.MechanicAssignments)
             .WithOne(ma => ma.User)

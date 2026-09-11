@@ -23,12 +23,14 @@ public class IntelligenceService : IIntelligenceService
     private readonly ILogger<IntelligenceService> _logger;
     private readonly IVehicleRepository _vehicleRepository;
     private readonly IServiceJobRepository _serviceJobRepository;
+    private readonly ICurrentGarageService? _currentGarageService;
 
     public IntelligenceService(
         GarijDbContext context,
         ILlmClient? llmClient = null,
         IOptions<GeminiSettings>? settings = null,
-        ILogger<IntelligenceService>? logger = null)
+        ILogger<IntelligenceService>? logger = null,
+        ICurrentGarageService? currentGarageService = null)
     {
         _context = context;
         _llmClient = llmClient;
@@ -36,6 +38,26 @@ public class IntelligenceService : IIntelligenceService
         _logger = logger ?? NullLogger<IntelligenceService>.Instance;
         _vehicleRepository = new VehicleRepository(context);
         _serviceJobRepository = new ServiceJobRepository(context);
+        _currentGarageService = currentGarageService;
+    }
+
+    private async Task<string> ResolveGarageIdAsync(string? explicitGarageId = null)
+    {
+        if (!string.IsNullOrWhiteSpace(explicitGarageId))
+        {
+            return explicitGarageId;
+        }
+
+        if (_currentGarageService != null)
+        {
+            var id = await _currentGarageService.GetCurrentGarageIdAsync();
+            if (!string.IsNullOrWhiteSpace(id))
+            {
+                return id;
+            }
+        }
+
+        return "default-garij-master";
     }
 
     public async Task<IEnumerable<VehicleDto>> PredictMaintenanceDueAsync()
@@ -46,8 +68,12 @@ public class IntelligenceService : IIntelligenceService
 
     public async Task<IEnumerable<VehicleMaintenancePredictionDto>> FlagVehiclesDueForServiceAsync()
     {
-        var vehicles = await _vehicleRepository.GetAllWithCustomersAsync();
-        var allJobs = await _serviceJobRepository.GetAllWithDetailsAsync();
+        var garageId = await ResolveGarageIdAsync();
+        var allVehicles = await _vehicleRepository.GetAllWithCustomersAsync();
+        var vehicles = allVehicles.Where(v => (v.GarageId ?? "default-garij-master") == garageId).ToList();
+
+        var allJobsRaw = await _serviceJobRepository.GetAllWithDetailsAsync();
+        var allJobs = allJobsRaw.Where(j => (j.GarageId ?? "default-garij-master") == garageId).ToList();
 
         var jobLookup = allJobs.GroupBy(j => j.VehicleId)
                                .ToDictionary(g => g.Key, g => g.ToList());

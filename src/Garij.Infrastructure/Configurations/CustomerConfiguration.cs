@@ -14,6 +14,8 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
         builder.Property(c => c.Email).IsRequired().HasMaxLength(256);
         builder.Property(c => c.PhoneNumber).IsRequired().HasMaxLength(20);
         builder.Property(c => c.Address).HasMaxLength(500);
+        builder.Property(c => c.GarageId).HasMaxLength(100);
+        builder.HasIndex(c => c.GarageId);
 
         builder.HasMany(c => c.Vehicles)
             .WithOne(v => v.Customer)

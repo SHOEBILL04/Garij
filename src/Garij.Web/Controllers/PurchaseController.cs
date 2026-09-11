@@ -88,6 +88,8 @@ public class PurchaseController : Controller
 
         var chosenRole = Enum.TryParse<UserRole>(model.AccountRole, true, out var r) ? r : UserRole.Admin;
 
+        string? garageId = null;
+
         // 1. If user is currently signed in
         if (User.Identity != null && User.Identity.IsAuthenticated)
         {
@@ -101,12 +103,22 @@ public class PurchaseController : Controller
                     if (!authRoles.Contains(chosenRole.ToString()))
                     {
                         await _userManager.AddToRoleAsync(authUser, chosenRole.ToString());
-                        var staffMember = _context.StaffUsers.FirstOrDefault(s => s.IdentityUserId == authUser.Id);
-                        if (staffMember != null)
+                        await _signInManager.RefreshSignInAsync(authUser);
+                    }
+                    var staffMember = _context.StaffUsers.FirstOrDefault(s => s.IdentityUserId == authUser.Id);
+                    if (staffMember != null)
+                    {
+                        staffMember.Role = chosenRole;
+                        if (string.IsNullOrEmpty(staffMember.GarageId))
                         {
-                            staffMember.Role = chosenRole;
-                            await _context.SaveChangesAsync();
+                            staffMember.GarageId = $"GRG-{authUser.Id[..8].ToUpperInvariant()}";
                         }
+                        garageId = staffMember.GarageId;
+                        await _context.SaveChangesAsync();
+                    }
+                    else
+                    {
+                        garageId = $"GRG-{authUser.Id[..8].ToUpperInvariant()}";
                     }
                 }
             }
@@ -125,12 +137,21 @@ public class PurchaseController : Controller
                 if (!existingRoles.Contains(chosenRole.ToString()))
                 {
                     await _userManager.AddToRoleAsync(existingUser, chosenRole.ToString());
-                    var staffMember = _context.StaffUsers.FirstOrDefault(s => s.IdentityUserId == existingUser.Id || s.Email == normalizedEmail);
-                    if (staffMember != null)
+                }
+                var staffMember = _context.StaffUsers.FirstOrDefault(s => s.IdentityUserId == existingUser.Id || s.Email == normalizedEmail);
+                if (staffMember != null)
+                {
+                    staffMember.Role = chosenRole;
+                    if (string.IsNullOrEmpty(staffMember.GarageId))
                     {
-                        staffMember.Role = chosenRole;
-                        await _context.SaveChangesAsync();
+                        staffMember.GarageId = $"GRG-{existingUser.Id[..8].ToUpperInvariant()}";
                     }
+                    garageId = staffMember.GarageId;
+                    await _context.SaveChangesAsync();
+                }
+                else
+                {
+                    garageId = $"GRG-{existingUser.Id[..8].ToUpperInvariant()}";
                 }
 
                 // Sign in if password is valid
@@ -155,12 +176,15 @@ public class PurchaseController : Controller
                 {
                     await _userManager.AddToRoleAsync(newUser, chosenRole.ToString());
 
+                    garageId = $"GRG-{newUser.Id[..8].ToUpperInvariant()}";
+
                     _context.StaffUsers.Add(new User
                     {
                         IdentityUserId = newUser.Id,
                         FullName = model.BuyerName,
                         Email = normalizedEmail,
                         Role = chosenRole,
+                        GarageId = garageId,
                         CreatedAt = DateTime.UtcNow
                     });
                     await _context.SaveChangesAsync();
@@ -171,6 +195,7 @@ public class PurchaseController : Controller
             }
         }
 
+        model.GarageId = garageId;
         var result = await _purchaseService.ProcessPurchaseAsync(model, currentUserId);
         if (result.Success && result.Purchase != null)
         {

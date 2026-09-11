@@ -14,36 +14,66 @@ public class ServiceJobService : IServiceJobService
     private readonly IUserRepository _userRepository;
     private readonly IMechanicAssignmentRepository _mechanicAssignmentRepository;
     private readonly INotificationService _notificationService;
+    private readonly ICurrentGarageService? _currentGarageService;
 
     public ServiceJobService(
         IServiceJobRepository serviceJobRepository,
         IVehicleRepository vehicleRepository,
         IUserRepository userRepository,
         IMechanicAssignmentRepository mechanicAssignmentRepository,
-        INotificationService notificationService)
+        INotificationService notificationService,
+        ICurrentGarageService? currentGarageService = null)
     {
         _serviceJobRepository = serviceJobRepository;
         _vehicleRepository = vehicleRepository;
         _userRepository = userRepository;
         _mechanicAssignmentRepository = mechanicAssignmentRepository;
         _notificationService = notificationService;
+        _currentGarageService = currentGarageService;
+    }
+
+    private async Task<string> ResolveGarageIdAsync(string? explicitGarageId = null)
+    {
+        if (!string.IsNullOrWhiteSpace(explicitGarageId))
+        {
+            return explicitGarageId;
+        }
+
+        if (_currentGarageService != null)
+        {
+            var id = await _currentGarageService.GetCurrentGarageIdAsync();
+            if (!string.IsNullOrWhiteSpace(id))
+            {
+                return id;
+            }
+        }
+
+        return "default-garij-master";
     }
 
     public async Task<IEnumerable<ServiceJobDto>> GetAllServiceJobsAsync()
     {
+        var garageId = await ResolveGarageIdAsync();
         var jobs = await _serviceJobRepository.GetAllWithDetailsAsync();
-        return jobs.Select(MapToDto);
+        return jobs
+            .Where(j => (j.GarageId ?? "default-garij-master") == garageId)
+            .Select(MapToDto);
     }
 
     public async Task<IEnumerable<ServiceJobDto>> GetServiceJobsByStatusAsync(JobStatus status)
     {
+        var garageId = await ResolveGarageIdAsync();
         var jobs = await _serviceJobRepository.GetJobsByStatusAsync(status);
-        return jobs.Select(MapToDto);
+        return jobs
+            .Where(j => (j.GarageId ?? "default-garij-master") == garageId)
+            .Select(MapToDto);
     }
 
     public async Task<IEnumerable<ServiceJobDto>> GetFilteredServiceJobsAsync(JobStatus? status = null, int? mechanicId = null, string? sortBy = null, string? searchTerm = null)
     {
+        var garageId = await ResolveGarageIdAsync();
         var jobs = await _serviceJobRepository.GetAllWithDetailsAsync();
+        jobs = jobs.Where(j => (j.GarageId ?? "default-garij-master") == garageId);
 
         if (status.HasValue)
         {
@@ -81,8 +111,14 @@ public class ServiceJobService : IServiceJobService
 
     public async Task<ServiceJobDto?> GetServiceJobByIdAsync(int id)
     {
+        var garageId = await ResolveGarageIdAsync();
         var job = await _serviceJobRepository.GetByIdWithDetailsAsync(id);
-        return job is null ? null : MapToDto(job);
+        if (job is null || (job.GarageId ?? "default-garij-master") != garageId)
+        {
+            return null;
+        }
+
+        return MapToDto(job);
     }
 
     public async Task<ServiceJobDto?> GetServiceJobByBookingReferenceAsync(string bookingReference)
@@ -99,8 +135,14 @@ public class ServiceJobService : IServiceJobService
 
     public async Task<ServiceJobDto> CreateServiceJobAsync(ServiceJobDto serviceJobDto)
     {
+        var garageId = await ResolveGarageIdAsync(serviceJobDto.GarageId);
         var vehicle = await _vehicleRepository.GetByIdWithCustomerAsync(serviceJobDto.VehicleId)
             ?? throw new NotFoundException(nameof(Vehicle), serviceJobDto.VehicleId);
+
+        if ((vehicle.GarageId ?? "default-garij-master") != garageId)
+        {
+            throw new NotFoundException(nameof(Vehicle), serviceJobDto.VehicleId);
+        }
 
         string bookingRef = serviceJobDto.BookingReference;
         if (string.IsNullOrWhiteSpace(bookingRef))
@@ -124,7 +166,8 @@ public class ServiceJobService : IServiceJobService
             JobType = serviceJobDto.JobType,
             Status = serviceJobDto.Status == 0 ? JobStatus.Requested : serviceJobDto.Status,
             DiagnosticNotes = serviceJobDto.DiagnosticNotes?.Trim(),
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            GarageId = garageId
         };
 
         await _serviceJobRepository.AddAsync(entity);
@@ -193,11 +236,22 @@ public class ServiceJobService : IServiceJobService
 
     public async Task<MechanicAssignmentDto> AssignMechanicAsync(int serviceJobId, int userId, RoleInJob roleInJob)
     {
+        var garageId = await ResolveGarageIdAsync();
         var job = await _serviceJobRepository.GetByIdAsync(serviceJobId)
             ?? throw new NotFoundException(nameof(ServiceJob), serviceJobId);
 
+        if ((job.GarageId ?? "default-garij-master") != garageId)
+        {
+            throw new NotFoundException(nameof(ServiceJob), serviceJobId);
+        }
+
         var mechanic = await _userRepository.GetByIdAsync(userId)
             ?? throw new NotFoundException(nameof(User), userId);
+
+        if ((mechanic.GarageId ?? "default-garij-master") != garageId)
+        {
+            throw new NotFoundException(nameof(User), userId);
+        }
 
         if (mechanic.Role != UserRole.Mechanic)
         {
@@ -397,6 +451,7 @@ public class ServiceJobService : IServiceJobService
         DiagnosticNotes = job.DiagnosticNotes,
         CreatedAt = job.CreatedAt,
         CompletedAt = job.CompletedAt,
+        GarageId = job.GarageId,
         MechanicAssignments = (job.MechanicAssignments ?? Enumerable.Empty<MechanicAssignment>()).Select(ma => new MechanicAssignmentDto
         {
             Id = ma.Id,

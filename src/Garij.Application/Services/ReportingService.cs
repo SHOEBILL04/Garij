@@ -10,14 +10,37 @@ namespace Garij.Application.Services;
 public class ReportingService : IReportingService
 {
     private readonly GarijDbContext _context;
+    private readonly ICurrentGarageService? _currentGarageService;
 
-    public ReportingService(GarijDbContext context)
+    public ReportingService(GarijDbContext context, ICurrentGarageService? currentGarageService = null)
     {
         _context = context;
+        _currentGarageService = currentGarageService;
+    }
+
+    private async Task<string> ResolveGarageIdAsync(string? explicitGarageId = null)
+    {
+        if (!string.IsNullOrWhiteSpace(explicitGarageId))
+        {
+            return explicitGarageId;
+        }
+
+        if (_currentGarageService != null)
+        {
+            var id = await _currentGarageService.GetCurrentGarageIdAsync();
+            if (!string.IsNullOrWhiteSpace(id))
+            {
+                return id;
+            }
+        }
+
+        return "default-garij-master";
     }
 
     public async Task<RevenueReportDto> GetRevenueReportAsync(DateTime periodStart, DateTime periodEnd)
     {
+        var garageId = await ResolveGarageIdAsync();
+
         // Normalize range to include full end day if midnight
         var rangeEnd = periodEnd.TimeOfDay == TimeSpan.Zero
             ? periodEnd.Date.AddDays(1).AddTicks(-1)
@@ -25,7 +48,8 @@ public class ReportingService : IReportingService
 
         // 1. Billed Revenue: Grouped by Invoice.IssuedAt month (excluding Refunded/Void invoices)
         var billedQuery = _context.Invoices.AsNoTracking()
-            .Where(i => i.IssuedAt >= periodStart && i.IssuedAt <= rangeEnd && i.PaymentStatus != PaymentStatus.Refunded);
+            .Where(i => (i.GarageId ?? "default-garij-master") == garageId &&
+                        i.IssuedAt >= periodStart && i.IssuedAt <= rangeEnd && i.PaymentStatus != PaymentStatus.Refunded);
 
 
         var billedList = await billedQuery
@@ -53,7 +77,8 @@ public class ReportingService : IReportingService
 
         // 2. Collected Revenue: Grouped by PaymentTransaction.PaidAt month
         var collectedQuery = _context.PaymentTransactions.AsNoTracking()
-            .Where(pt => pt.PaidAt >= periodStart && pt.PaidAt <= rangeEnd);
+            .Where(pt => (pt.Invoice.GarageId ?? "default-garij-master") == garageId &&
+                         pt.PaidAt >= periodStart && pt.PaidAt <= rangeEnd);
 
         var collectedList = await collectedQuery
             .GroupBy(pt => new { pt.PaidAt.Year, pt.PaidAt.Month })
@@ -84,7 +109,8 @@ public class ReportingService : IReportingService
 
         // 3. Refunded Invoices: Invoices issued in period with PaymentStatus.Refunded
         var refundedQuery = _context.Invoices.AsNoTracking()
-            .Where(i => i.IssuedAt >= periodStart && i.IssuedAt <= rangeEnd && i.PaymentStatus == PaymentStatus.Refunded);
+            .Where(i => (i.GarageId ?? "default-garij-master") == garageId &&
+                        i.IssuedAt >= periodStart && i.IssuedAt <= rangeEnd && i.PaymentStatus == PaymentStatus.Refunded);
 
         var refundedInvoiceCount = await refundedQuery.CountAsync();
         var refundedGrossAmount = await refundedQuery.SumAsync(i => (decimal?)i.TotalAmount) ?? 0m;
@@ -107,6 +133,7 @@ public class ReportingService : IReportingService
 
     public async Task<IEnumerable<PartsConsumptionReportDto>> GetPartsConsumptionReportAsync(DateTime periodStart, DateTime periodEnd)
     {
+        var garageId = await ResolveGarageIdAsync();
         var rangeEnd = periodEnd.TimeOfDay == TimeSpan.Zero
             ? periodEnd.Date.AddDays(1).AddTicks(-1)
             : periodEnd;
@@ -116,7 +143,8 @@ public class ReportingService : IReportingService
         var usages = await _context.JobPartsUsed.AsNoTracking()
             .Include(jpu => jpu.Part)
             .Include(jpu => jpu.ServiceJob)
-            .Where(jpu => (jpu.ServiceJob.CompletedAt ?? jpu.ServiceJob.CreatedAt) >= periodStart &&
+            .Where(jpu => (jpu.ServiceJob.GarageId ?? "default-garij-master") == garageId &&
+                          (jpu.ServiceJob.CompletedAt ?? jpu.ServiceJob.CreatedAt) >= periodStart &&
                           (jpu.ServiceJob.CompletedAt ?? jpu.ServiceJob.CreatedAt) <= rangeEnd)
             .ToListAsync();
 
@@ -148,17 +176,19 @@ public class ReportingService : IReportingService
 
     public async Task<IEnumerable<MechanicWorkloadDto>> GetMechanicWorkloadReportAsync(DateTime? periodStart = null, DateTime? periodEnd = null)
     {
+        var garageId = await ResolveGarageIdAsync();
         var rangeEnd = periodEnd.HasValue && periodEnd.Value.TimeOfDay == TimeSpan.Zero
             ? periodEnd.Value.Date.AddDays(1).AddTicks(-1)
             : periodEnd;
 
         var mechanics = await _context.StaffUsers.AsNoTracking()
-            .Where(u => u.Role == UserRole.Mechanic)
+            .Where(u => (u.GarageId ?? "default-garij-master") == garageId && u.Role == UserRole.Mechanic)
             .OrderBy(u => u.FullName)
             .ToListAsync();
 
         var assignmentsQuery = _context.MechanicAssignments.AsNoTracking()
             .Include(ma => ma.ServiceJob)
+            .Where(ma => (ma.ServiceJob.GarageId ?? "default-garij-master") == garageId)
             .AsQueryable();
 
         if (periodStart.HasValue)

@@ -23,5 +23,7 @@ public class Invoice
 
     public DateTime IssuedAt { get; set; }
 
+    public string? GarageId { get; set; }
+
     public ICollection<PaymentTransaction> PaymentTransactions { get; set; } = new List<PaymentTransaction>();
 }

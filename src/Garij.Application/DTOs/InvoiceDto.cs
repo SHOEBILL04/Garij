@@ -35,4 +35,6 @@ public class InvoiceDto
     public decimal AmountPaid { get; set; }
 
     public decimal OutstandingBalance { get; set; }
+
+    public string? GarageId { get; set; }
 }

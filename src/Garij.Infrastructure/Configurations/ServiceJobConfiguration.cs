@@ -14,6 +14,8 @@ public class ServiceJobConfiguration : IEntityTypeConfiguration<ServiceJob>
         builder.HasIndex(sj => sj.BookingReference).IsUnique();
 
         builder.Property(sj => sj.DiagnosticNotes).HasMaxLength(2000);
+        builder.Property(sj => sj.GarageId).HasMaxLength(100);
+        builder.HasIndex(sj => sj.GarageId);
 
         builder.HasOne(sj => sj.Customer)
             .WithMany(c => c.ServiceJobs)

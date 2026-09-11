@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Garij.Domain.Entities;
 using Garij.Domain.Enums;
 using Garij.Infrastructure.Persistence;
@@ -20,7 +21,13 @@ public class EmployeeController : Controller
     [HttpGet]
     public async Task<IActionResult> Index(string? search, UserRole? role)
     {
+        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var currentUserEmail = User.FindFirstValue(ClaimTypes.Email) ?? User.Identity?.Name;
+        var currentStaff = await _context.StaffUsers.FirstOrDefaultAsync(s => s.IdentityUserId == currentUserId || (currentUserEmail != null && s.Email == currentUserEmail));
+        var currentGarageId = currentStaff?.GarageId ?? "default-garij-master";
+
         var query = _context.StaffUsers
+            .Where(u => (u.GarageId ?? "default-garij-master") == currentGarageId)
             .Include(u => u.MechanicAssignments)
                 .ThenInclude(ma => ma.ServiceJob)
             .AsQueryable();
@@ -40,7 +47,9 @@ public class EmployeeController : Controller
 
         var employees = await query.OrderBy(u => u.FullName).ToListAsync();
 
-        var allUsers = await _context.StaffUsers.ToListAsync();
+        var allUsers = await _context.StaffUsers
+            .Where(u => (u.GarageId ?? "default-garij-master") == currentGarageId)
+            .ToListAsync();
         ViewBag.TotalCount = allUsers.Count;
         ViewBag.AdminCount = allUsers.Count(u => u.Role == UserRole.Admin);
         ViewBag.FrontDeskCount = allUsers.Count(u => u.Role == UserRole.FrontDesk);
@@ -55,6 +64,11 @@ public class EmployeeController : Controller
     [HttpGet]
     public async Task<IActionResult> Details(int id)
     {
+        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var currentUserEmail = User.FindFirstValue(ClaimTypes.Email) ?? User.Identity?.Name;
+        var currentStaff = await _context.StaffUsers.FirstOrDefaultAsync(s => s.IdentityUserId == currentUserId || (currentUserEmail != null && s.Email == currentUserEmail));
+        var currentGarageId = currentStaff?.GarageId ?? "default-garij-master";
+
         var employee = await _context.StaffUsers
             .Include(u => u.MechanicAssignments)
                 .ThenInclude(ma => ma.ServiceJob)
@@ -62,7 +76,7 @@ public class EmployeeController : Controller
             .Include(u => u.MechanicAssignments)
                 .ThenInclude(ma => ma.ServiceJob)
                     .ThenInclude(j => j.Customer)
-            .FirstOrDefaultAsync(u => u.Id == id);
+            .FirstOrDefaultAsync(u => u.Id == id && (u.GarageId ?? "default-garij-master") == currentGarageId);
 
         if (employee == null)
         {

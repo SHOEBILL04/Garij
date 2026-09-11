@@ -15,6 +15,8 @@ public class ProjectPurchaseDto
     public string BuyerEmail { get; set; } = string.Empty;
 
     public string? WorkshopName { get; set; }
+ 
+    public string? GarageId { get; set; }
 
     public decimal Amount { get; set; }
 

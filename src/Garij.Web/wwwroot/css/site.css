@@ -580,40 +580,48 @@ textarea.app-form-control {
 
 /* ==========================================================================
    LIGHT MODE STYLING FOR INTERNAL APPLICATION PAGES
-   (Dashboard, Customers, Vehicles, Jobs, Mechanics, Parts, Billing, Admin)
+   (Dashboard, Customers, Vehicles, Jobs, Mechanics, Parts, Billing, Admin, Reports)
+   Modern, minimal, clean white surfaces, deep slate typography, electric blue accents
    ========================================================================== */
 [data-theme="light"] body.app-body {
-    background-color: #edf2f7 !important;
+    background-color: #f8fafc !important;
     color: #1e293b !important;
 }
 
 [data-theme="light"] .app-page-title {
     color: #0f172a !important;
+    font-weight: 800 !important;
 }
 
 [data-theme="light"] .app-page-subtitle {
-    color: #475569 !important;
+    color: #64748b !important;
 }
 
-[data-theme="light"] .app-card {
+[data-theme="light"] .app-card,
+[data-theme="light"] .card {
     background: #ffffff !important;
-    border: 1px solid #cbd5e1 !important;
-    box-shadow: 0 2px 4px rgba(15, 23, 42, 0.04), 0 12px 28px -4px rgba(15, 23, 42, 0.09) !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 16px !important;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04), 0 8px 24px -4px rgba(15, 23, 42, 0.04) !important;
 }
 
-    [data-theme="light"] .app-card:hover {
-        border-color: #94a3b8 !important;
+    [data-theme="light"] .app-card:hover,
+    [data-theme="light"] .card:hover {
+        border-color: #cbd5e1 !important;
     }
 
 [data-theme="light"] .app-card-heading {
     color: #0f172a !important;
-    border-bottom: 1px solid #e2e8f0 !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+    font-weight: 700 !important;
 }
 
 [data-theme="light"] .app-table-wrap {
     background: #ffffff !important;
-    border: 1px solid #cbd5e1 !important;
-    box-shadow: 0 4px 18px rgba(15, 23, 42, 0.06) !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 14px !important;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03) !important;
+    overflow: hidden;
 }
 
 [data-theme="light"] .app-table,
@@ -622,8 +630,8 @@ textarea.app-form-control {
     --bs-table-bg: #ffffff !important;
     --bs-table-color: #1e293b !important;
     --bs-table-striped-bg: #f8fafc !important;
-    --bs-table-hover-bg: #f1f5f9 !important;
-    --bs-table-border-color: #e2e8f0 !important;
+    --bs-table-hover-bg: #f8fafc !important;
+    --bs-table-border-color: #f1f5f9 !important;
     background-color: #ffffff !important;
     color: #1e293b !important;
 }
@@ -631,16 +639,20 @@ textarea.app-form-control {
     [data-theme="light"] .app-table th,
     [data-theme="light"] .table th,
     [data-theme="light"] .table-dark th {
-        background-color: #f1f5f9 !important;
-        color: #334155 !important;
-        border-bottom: 2px solid #cbd5e1 !important;
+        background-color: #f8fafc !important;
+        color: #475569 !important;
+        border-bottom: 2px solid #e2e8f0 !important;
+        font-weight: 700;
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
 
     [data-theme="light"] .app-table td,
     [data-theme="light"] .table td,
     [data-theme="light"] .table-dark td {
         background-color: #ffffff !important;
-        border-bottom: 1px solid #e2e8f0 !important;
+        border-bottom: 1px solid #f1f5f9 !important;
         color: #334155 !important;
     }
 
@@ -651,7 +663,7 @@ textarea.app-form-control {
     }
 
 [data-theme="light"] .app-card .text-white,
-[data-theme="light"] .text-white:not(.btn):not(.badge):not(.dropdown-item) {
+[data-theme="light"] .text-white:not(.btn):not(.badge):not(.dropdown-item):not(.app-badge) {
     color: #0f172a !important;
 }
 
@@ -662,20 +674,22 @@ textarea.app-form-control {
 [data-theme="light"] .border-secondary,
 [data-theme="light"] .border-secondary.border-opacity-25,
 [data-theme="light"] .border-secondary.border-opacity-50 {
-    border-color: #cbd5e1 !important;
+    border-color: #e2e8f0 !important;
 }
 
-[data-theme="light"] .app-card [style*="rgba(255, 255, 255"] {
+[data-theme="light"] .app-card [style*="rgba(255, 255, 255"],
+[data-theme="light"] .app-card [style*="rgba(255,255,255"] {
     background-color: #f8fafc !important;
-    border-color: #cbd5e1 !important;
+    border-color: #e2e8f0 !important;
     color: #334155 !important;
 }
 
 [data-theme="light"] .app-btn-outline {
     background: #ffffff !important;
-    border-color: #cbd5e1 !important;
-    color: #0f172a !important;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+    border: 1.5px solid #cbd5e1 !important;
+    color: #334155 !important;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04) !important;
+    font-weight: 600 !important;
 }
 
     [data-theme="light"] .app-btn-outline:hover {
@@ -686,9 +700,9 @@ textarea.app-form-control {
 
 [data-theme="light"] .app-bell-btn {
     background: #ffffff !important;
-    border: 1px solid #cbd5e1 !important;
+    border: 1.5px solid #cbd5e1 !important;
     color: #0f172a !important;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04) !important;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04) !important;
 }
 
     [data-theme="light"] .app-bell-btn:hover {
@@ -699,12 +713,14 @@ textarea.app-form-control {
 
 [data-theme="light"] .dropdown-menu {
     background-color: #ffffff !important;
-    border: 1px solid #cbd5e1 !important;
-    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12) !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08) !important;
+    border-radius: 12px !important;
 }
 
 [data-theme="light"] .dropdown-item {
     color: #334155 !important;
+    border-radius: 8px !important;
 }
 
     [data-theme="light"] .dropdown-item:hover {
@@ -713,27 +729,31 @@ textarea.app-form-control {
     }
 
 [data-theme="light"] .dropdown-divider {
-    border-top: 1px solid #e2e8f0 !important;
+    border-top: 1px solid #f1f5f9 !important;
 }
 
 [data-theme="light"] .app-stat-card {
     background: #ffffff !important;
-    border: 1px solid #cbd5e1 !important;
-    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06) !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 14px !important;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04) !important;
 }
 
 [data-theme="light"] .app-stat-value {
     color: #0f172a !important;
+    font-weight: 800 !important;
 }
 
 [data-theme="light"] .app-stat-label {
     color: #64748b !important;
+    font-weight: 600 !important;
 }
 
 [data-theme="light"] .app-stat-icon {
-    background: rgba(2, 132, 199, 0.1) !important;
+    background: rgba(2, 132, 199, 0.08) !important;
     color: #0284c7 !important;
-    border: 1px solid rgba(2, 132, 199, 0.25) !important;
+    border: 1px solid rgba(2, 132, 199, 0.2) !important;
+    border-radius: 12px !important;
 }
 
 [data-theme="light"] .app-empty-state i {
@@ -744,16 +764,17 @@ textarea.app-form-control {
 [data-theme="light"] .app-form-control,
 [data-theme="light"] .form-control {
     background-color: #ffffff !important;
-    border-color: #cbd5e1 !important;
+    border: 1.5px solid #cbd5e1 !important;
     color: #0f172a !important;
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02) !important;
+    box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.02) !important;
+    border-radius: 10px !important;
 }
 
     [data-theme="light"] .app-form-control:focus,
     [data-theme="light"] .form-control:focus {
         background-color: #ffffff !important;
         border-color: #0284c7 !important;
-        box-shadow: 0 0 0 0.2rem rgba(2, 132, 199, 0.15) !important;
+        box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15) !important;
     }
 
     [data-theme="light"] input::placeholder,
@@ -761,33 +782,25 @@ textarea.app-form-control {
     [data-theme="light"] .form-control::placeholder,
     [data-theme="light"] .app-form-control::placeholder,
     [data-theme="light"] ::placeholder {
-        color: #475569 !important;
+        color: #94a3b8 !important;
         opacity: 1 !important;
-        -webkit-text-fill-color: #475569 !important;
+        -webkit-text-fill-color: #94a3b8 !important;
     }
 
-
-
-/* ==========================================================================
-   LIGHT MODE - PART 2: SURFACES, CONTROLS AND ACCENTS THAT STAYED DARK
-   The block above re-skins the app shell (body, cards, tables, stat tiles).
-   These rules cover what it missed: the dark Bootstrap utility surfaces, the
-   <select> controls, and the translucent badge/chip/button tints that were
-   picked for a dark background and either stay black or wash out on white.
-   ========================================================================== */
-
-/* --- Dark utility panels (bg-dark / bg-black) -----------------------------
-   Used for the licence blocks, navbar preview and info panels. Left alone
-   they render as solid black boxes whose text is re-coloured dark by the
-   overrides above, so the content inside disappears. */
+/* --- Dark utility panels (bg-dark / bg-black) ----------------------------- */
 [data-theme="light"] .bg-dark,
 [data-theme="light"] .bg-black {
-    background-color: #f1f5f9 !important;
-    border-color: #cbd5e1 !important;
+    background-color: #ffffff !important;
+    border-color: #e2e8f0 !important;
 }
 
-/* Fields keep a plain white background even when the markup asks for bg-dark.
-   Element-qualified so it outranks the .bg-dark rule above. */
+    [data-theme="light"] .bg-dark.bg-opacity-25,
+    [data-theme="light"] .bg-dark.bg-opacity-50,
+    [data-theme="light"] .bg-dark.bg-opacity-75 {
+        background-color: #f8fafc !important;
+        border-color: #e2e8f0 !important;
+    }
+
 [data-theme="light"] input.form-control,
 [data-theme="light"] textarea.form-control,
 [data-theme="light"] select.form-select,
@@ -795,26 +808,23 @@ textarea.app-form-control {
 [data-theme="light"] textarea.app-form-control,
 [data-theme="light"] select.app-form-select {
     background-color: #ffffff !important;
-    border-color: #cbd5e1 !important;
+    border: 1.5px solid #cbd5e1 !important;
     color: #0f172a !important;
 }
 
-/* --- Select controls -----------------------------------------------------
-   .app-form-select never had a light rule, so it kept white text on a nearly
-   white translucent background - the control was invisible on the card. The
-   option list kept its hard-coded near-black popup background too. */
 [data-theme="light"] .app-form-select,
 [data-theme="light"] .form-select {
     background-color: #ffffff !important;
-    border-color: #cbd5e1 !important;
+    border: 1.5px solid #cbd5e1 !important;
     color: #0f172a !important;
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02) !important;
+    box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.02) !important;
+    border-radius: 10px !important;
 }
 
     [data-theme="light"] .app-form-select:focus,
     [data-theme="light"] .form-select:focus {
         border-color: #0284c7 !important;
-        box-shadow: 0 0 0 0.2rem rgba(2, 132, 199, 0.15) !important;
+        box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15) !important;
     }
 
     [data-theme="light"] .app-form-select option,
@@ -824,26 +834,25 @@ textarea.app-form-control {
     }
 
 [data-theme="light"] .input-group-text {
-    background-color: #f1f5f9 !important;
-    border-color: #cbd5e1 !important;
-    color: #334155 !important;
+    background-color: #f8fafc !important;
+    border: 1.5px solid #cbd5e1 !important;
+    color: #475569 !important;
 }
 
-/* --- Navbar status-lookup pill -------------------------------------------
-   Shares the landing navbar component, which has no light rule: a dark slate
-   pill sitting on the white app navbar on every page. */
+/* --- Navbar status-lookup pill ------------------------------------------- */
 [data-theme="light"] .btn-nav-glow-lookup {
     background: #ffffff !important;
     border: 1.5px solid #cbd5e1 !important;
     color: #0f172a !important;
-    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.06) !important;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04) !important;
+    border-radius: 50px !important;
+    padding: 6px 14px !important;
 }
 
     [data-theme="light"] .btn-nav-glow-lookup:hover {
-        background: rgba(2, 132, 199, 0.08) !important;
+        background: #f1f5f9 !important;
         border-color: #0284c7 !important;
         color: #0284c7 !important;
-        box-shadow: 0 4px 12px rgba(2, 132, 199, 0.15) !important;
     }
 
     [data-theme="light"] .btn-nav-glow-lookup i {
@@ -851,25 +860,22 @@ textarea.app-form-control {
     }
 
 [data-theme="light"] .btn-outline-info {
-    --bs-btn-color: #0369a1;
+    --bs-btn-color: #0284c7;
     --bs-btn-border-color: #0284c7;
     --bs-btn-hover-color: #ffffff;
     --bs-btn-hover-bg: #0284c7;
     --bs-btn-hover-border-color: #0284c7;
 }
 
-/* --- Status badges, chips and tinted buttons ------------------------------
-   All of these are a pale accent on a 12%-alpha wash: readable on the dark
-   theme, near-invisible once the surface underneath turns white. Each gets a
-   darker ink and a solid tint instead. */
+/* --- Status badges, chips and tinted buttons ------------------------------ */
 [data-theme="light"] .app-badge-neutral {
     color: #334155 !important;
-    background: #e2e8f0 !important;
+    background: #f1f5f9 !important;
     border-color: #cbd5e1 !important;
 }
 
 [data-theme="light"] .app-badge-info {
-    color: #0369a1 !important;
+    color: #0284c7 !important;
     background: #e0f2fe !important;
     border-color: #7dd3fc !important;
 }
@@ -894,14 +900,28 @@ textarea.app-form-control {
 
 [data-theme="light"] .app-chip {
     color: #334155 !important;
-    background: #f1f5f9 !important;
-    border-color: #cbd5e1 !important;
+    background: #f8fafc !important;
+    border-color: #e2e8f0 !important;
 }
 
 [data-theme="light"] .badge.bg-secondary {
-    background-color: #e2e8f0 !important;
-    color: #1e293b !important;
+    background-color: #f1f5f9 !important;
+    color: #334155 !important;
+    border: 1px solid #cbd5e1 !important;
 }
+
+[data-theme="light"] button.badge.bg-secondary {
+    background-color: #f1f5f9 !important;
+    color: #334155 !important;
+    border: 1px solid #cbd5e1 !important;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+    [data-theme="light"] button.badge.bg-secondary:hover {
+        background-color: #e2e8f0 !important;
+        color: #0f172a !important;
+    }
 
 [data-theme="light"] .app-btn-danger {
     color: #b91c1c !important;
@@ -913,7 +933,7 @@ textarea.app-form-control {
         color: #ffffff !important;
         background: #dc2626 !important;
         border-color: #dc2626 !important;
-        box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3) !important;
+        box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25) !important;
     }
 
 [data-theme="light"] .app-btn-success {
@@ -926,7 +946,7 @@ textarea.app-form-control {
         color: #ffffff !important;
         background: #16a34a !important;
         border-color: #16a34a !important;
-        box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3) !important;
+        box-shadow: 0 4px 12px rgba(22, 163, 74, 0.25) !important;
     }
 
 [data-theme="light"] .app-alert-danger {
@@ -971,11 +991,9 @@ textarea.app-form-control {
     color: #64748b !important;
 }
 
-/* --- Bootstrap accent text utilities -------------------------------------
-   The stock values are tuned for a dark background and drop under 3:1 on the
-   white cards (bi icons, totals, inline status text). */
+/* --- Bootstrap accent text utilities ------------------------------------- */
 [data-theme="light"] .text-info {
-    color: #0369a1 !important;
+    color: #0284c7 !important;
 }
 
 [data-theme="light"] .text-success {
@@ -991,11 +1009,11 @@ textarea.app-form-control {
 }
 
 [data-theme="light"] .text-primary {
-    color: #1d4ed8 !important;
+    color: #0284c7 !important;
 }
 
 [data-theme="light"] .text-secondary {
-    color: #475569 !important;
+    color: #64748b !important;
 }
 
 [data-theme="light"] .text-muted,
@@ -1003,16 +1021,19 @@ textarea.app-form-control {
     color: #64748b !important;
 }
 
-/* --- Inline styles written for the dark theme -----------------------------
-   These colours live in style="" attributes inside the views, so they can
-   only be reached by matching the declaration text itself. */
-[data-theme="light"] .app-card [style*="rgba(255,255,255"],
-[data-theme="light"] .app-card [style*="rgba(255, 255, 255"] {
-    background-color: #f8fafc !important;
-    border-color: #cbd5e1 !important;
-    color: #334155 !important;
+/* User Pill & Profile in Navbar */
+[data-theme="light"] .app-user-pill,
+[data-theme="light"] [title^="Logged in as"] {
+    background: #f8fafc !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #0f172a !important;
 }
 
+    [data-theme="light"] [title^="Logged in as"] .text-light {
+        color: #0f172a !important;
+    }
+
+/* --- Inline styles written for the dark theme ----------------------------- */
 [data-theme="light"] [style*="color:#4ade80"],
 [data-theme="light"] [style*="color: #4ade80"] {
     color: #15803d !important;
@@ -1028,16 +1049,70 @@ textarea.app-form-control {
 }
 
 [data-theme="light"] [style*="color: #60a5fa"] {
-    color: #1d4ed8 !important;
+    color: #0284c7 !important;
 }
 
 [data-theme="light"] [style*="color: #22d3ee"] {
-    color: #0e7490 !important;
+    color: #0284c7 !important;
 }
 
-/* Purchase / licence panels paint their own dark gradient. */
+/* Purchase / licence panels */
 [data-theme="light"] [style*="linear-gradient(145deg, #11151f"],
 [data-theme="light"] [style*="linear-gradient(135deg, #0e121a"] {
     background: #ffffff !important;
-    border-color: #cbd5e1 !important;
+    border-color: #e2e8f0 !important;
 }
+
+/* --- Smart Intake Assistant Light Mode Adaptations ------------------------ */
+[data-theme="light"] #aiIntakeAssistantCard {
+    background-color: #ffffff !important;
+    border-color: rgba(2, 132, 199, 0.35) !important;
+    box-shadow: 0 4px 20px rgba(2, 132, 199, 0.08) !important;
+}
+
+[data-theme="light"] #aiComplaintInput {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    border: 1.5px solid #cbd5e1 !important;
+}
+
+    [data-theme="light"] #aiComplaintInput::placeholder {
+        color: #94a3b8 !important;
+        -webkit-text-fill-color: #94a3b8 !important;
+    }
+
+[data-theme="light"] #aiSummaryText {
+    color: #1e293b !important;
+}
+
+[data-theme="light"] #aiResultsContainer .rounded[style*="background-color: rgba(15, 23, 42"],
+[data-theme="light"] #aiResultsContainer .rounded[style*="background-color:rgba(15, 23, 42"] {
+    background-color: #f8fafc !important;
+    border-color: #e2e8f0 !important;
+}
+
+[data-theme="light"] #aiSuggestionsList .rounded.bg-dark {
+    background-color: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 1px 4px rgba(15, 23, 42, 0.04) !important;
+}
+
+[data-theme="light"] #aiSuggestionsList label {
+    color: #0f172a !important;
+}
+
+[data-theme="light"] #aiSuggestionsList [style*="color: #cbd5e1"],
+[data-theme="light"] #aiSuggestionsList [style*="color:#cbd5e1"] {
+    color: #64748b !important;
+}
+
+[data-theme="light"] #aiSuggestionsList [style*="color: #38bdf8"],
+[data-theme="light"] #aiSuggestionsList [style*="color:#38bdf8"] {
+    color: #0284c7 !important;
+}
+
+[data-theme="light"] #aiQuestionsList li,
+[data-theme="light"] #aiQuestionsList li span {
+    color: #334155 !important;
+}
+

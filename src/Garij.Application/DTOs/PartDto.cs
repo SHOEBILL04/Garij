@@ -26,4 +26,6 @@ public class PartDto
     [Range(0, int.MaxValue, ErrorMessage = "Reorder level cannot be negative.")]
     [Display(Name = "Reorder Level")]
     public int ReorderLevel { get; set; }
+
+    public string? GarageId { get; set; }
 }

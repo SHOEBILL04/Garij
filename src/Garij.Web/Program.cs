@@ -11,6 +11,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<Garij.Application.Interfaces.ICurrentGarageService, Garij.Web.Services.CurrentGarageService>();
 builder.Services.Configure<BillingSettings>(builder.Configuration.GetSection(BillingSettings.SectionName));
 builder.Services.Configure<LicenseSettings>(builder.Configuration.GetSection(LicenseSettings.SectionName));
 builder.Services.Configure<Garij.Infrastructure.ExternalServices.Gemini.GeminiSettings>(builder.Configuration.GetSection(Garij.Infrastructure.ExternalServices.Gemini.GeminiSettings.SectionName));

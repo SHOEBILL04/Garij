@@ -27,6 +27,8 @@ public class ServiceJob
 
     public DateTime? CompletedAt { get; set; }
 
+    public string? GarageId { get; set; }
+
     public ICollection<JobServiceDetail> JobServiceDetails { get; set; } = new List<JobServiceDetail>();
 
     /// <summary>Lead mechanic is tracked only via MechanicAssignment.RoleInJob, not a dedicated FK here.</summary>

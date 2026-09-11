@@ -14,6 +14,8 @@ public class InvoiceConfiguration : IEntityTypeConfiguration<Invoice>
         builder.Property(i => i.SubTotal).HasColumnType("decimal(18,2)");
         builder.Property(i => i.TaxAmount).HasColumnType("decimal(18,2)");
         builder.Property(i => i.TotalAmount).HasColumnType("decimal(18,2)");
+        builder.Property(i => i.GarageId).HasMaxLength(100);
+        builder.HasIndex(i => i.GarageId);
 
         builder.HasIndex(i => i.ServiceJobId).IsUnique();
 

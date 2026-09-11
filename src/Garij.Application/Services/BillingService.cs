@@ -19,6 +19,7 @@ public class BillingService : IBillingService
     private readonly IPaymentTransactionRepository _paymentTransactionRepository;
     private readonly IServiceJobRepository _serviceJobRepository;
     private readonly IServiceJobService _serviceJobService;
+    private readonly ICurrentGarageService? _currentGarageService;
     private readonly decimal _taxRatePercent;
 
     public BillingService(
@@ -27,14 +28,35 @@ public class BillingService : IBillingService
         IPaymentTransactionRepository paymentTransactionRepository,
         IServiceJobRepository serviceJobRepository,
         IServiceJobService serviceJobService,
-        IOptions<BillingSettings> billingSettings)
+        IOptions<BillingSettings> billingSettings,
+        ICurrentGarageService? currentGarageService = null)
     {
         _context = context;
         _invoiceRepository = invoiceRepository;
         _paymentTransactionRepository = paymentTransactionRepository;
         _serviceJobRepository = serviceJobRepository;
         _serviceJobService = serviceJobService;
+        _currentGarageService = currentGarageService;
         _taxRatePercent = billingSettings.Value.TaxRatePercent;
+    }
+
+    private async Task<string> ResolveGarageIdAsync(string? explicitGarageId = null)
+    {
+        if (!string.IsNullOrWhiteSpace(explicitGarageId))
+        {
+            return explicitGarageId;
+        }
+
+        if (_currentGarageService != null)
+        {
+            var id = await _currentGarageService.GetCurrentGarageIdAsync();
+            if (!string.IsNullOrWhiteSpace(id))
+            {
+                return id;
+            }
+        }
+
+        return "default-garij-master";
     }
 
     /// <summary>
@@ -113,8 +135,14 @@ public class BillingService : IBillingService
     /// </summary>
     public async Task<InvoiceDto> GenerateInvoiceAsync(int serviceJobId)
     {
+        var garageId = await ResolveGarageIdAsync();
         var job = await _serviceJobRepository.GetByIdWithDetailsAsync(serviceJobId)
             ?? throw new NotFoundException(nameof(ServiceJob), serviceJobId);
+
+        if ((job.GarageId ?? "default-garij-master") != garageId)
+        {
+            throw new NotFoundException(nameof(ServiceJob), serviceJobId);
+        }
 
         await EnsureNotAlreadyInvoicedAsync(serviceJobId);
         EnsureHasLineItems(job);
@@ -124,6 +152,7 @@ public class BillingService : IBillingService
 
         var invoice = new Invoice
         {
+            GarageId = garageId,
             ServiceJobId = serviceJobId,
             InvoiceNumber = invoiceNumber,
             SubTotal = subTotal,
@@ -154,14 +183,21 @@ public class BillingService : IBillingService
 
     public async Task<InvoiceDto?> GetInvoiceByIdAsync(int id)
     {
+        var garageId = await ResolveGarageIdAsync();
         var invoice = await _invoiceRepository.GetByIdWithPaymentsAsync(id);
-        return invoice is null ? null : await MapToDetailedDtoAsync(invoice);
+        if (invoice is null || (invoice.GarageId ?? "default-garij-master") != garageId)
+        {
+            return null;
+        }
+
+        return await MapToDetailedDtoAsync(invoice);
     }
 
     public async Task<InvoiceDto?> GetInvoiceByServiceJobAsync(int serviceJobId)
     {
+        var garageId = await ResolveGarageIdAsync();
         var invoice = await _invoiceRepository.GetByServiceJobIdAsync(serviceJobId);
-        if (invoice is null)
+        if (invoice is null || (invoice.GarageId ?? "default-garij-master") != garageId)
         {
             return null;
         }
@@ -172,8 +208,11 @@ public class BillingService : IBillingService
 
     public async Task<IEnumerable<InvoiceDto>> GetAllInvoicesAsync()
     {
+        var garageId = await ResolveGarageIdAsync();
         var invoices = await _invoiceRepository.GetAllAsync();
-        return invoices.Select(MapToSummaryDto);
+        return invoices
+            .Where(i => (i.GarageId ?? "default-garij-master") == garageId)
+            .Select(MapToSummaryDto);
     }
 
     /// <summary>
@@ -188,8 +227,14 @@ public class BillingService : IBillingService
             throw new BusinessRuleException("BR-012", "Payment amount must be greater than zero.");
         }
 
+        var garageId = await ResolveGarageIdAsync();
         var invoice = await _invoiceRepository.GetByIdWithPaymentsAsync(payment.InvoiceId)
             ?? throw new NotFoundException(nameof(Invoice), payment.InvoiceId);
+
+        if ((invoice.GarageId ?? "default-garij-master") != garageId)
+        {
+            throw new NotFoundException(nameof(Invoice), payment.InvoiceId);
+        }
 
         var amountPaidSoFar = invoice.PaymentTransactions.Sum(p => p.Amount);
         var outstanding = invoice.TotalAmount - amountPaidSoFar;
@@ -226,8 +271,14 @@ public class BillingService : IBillingService
 
     public async Task<IEnumerable<PaymentTransactionDto>> GetPaymentsByInvoiceAsync(int invoiceId)
     {
+        var garageId = await ResolveGarageIdAsync();
         var invoice = await _invoiceRepository.GetByIdWithPaymentsAsync(invoiceId)
             ?? throw new NotFoundException(nameof(Invoice), invoiceId);
+
+        if ((invoice.GarageId ?? "default-garij-master") != garageId)
+        {
+            throw new NotFoundException(nameof(Invoice), invoiceId);
+        }
 
         return invoice.PaymentTransactions.OrderBy(p => p.PaidAt).Select(MapPaymentToDto);
     }
@@ -262,6 +313,7 @@ public class BillingService : IBillingService
         return new InvoiceDto
         {
             Id = invoice.Id,
+            GarageId = invoice.GarageId,
             ServiceJobId = invoice.ServiceJobId,
             InvoiceNumber = invoice.InvoiceNumber,
             SubTotal = invoice.SubTotal,
@@ -284,6 +336,7 @@ public class BillingService : IBillingService
     private static InvoiceDto MapToSummaryDto(Invoice invoice) => new()
     {
         Id = invoice.Id,
+        GarageId = invoice.GarageId,
         ServiceJobId = invoice.ServiceJobId,
         InvoiceNumber = invoice.InvoiceNumber,
         SubTotal = invoice.SubTotal,

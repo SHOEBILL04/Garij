@@ -20,5 +20,11 @@ public class User
 
     public DateTime CreatedAt { get; set; }
 
+    /// <summary>
+    /// Unique identifier of the garage/workshop this staff member belongs to.
+    /// Ensures staff accounts are isolated to their specific garage.
+    /// </summary>
+    public string? GarageId { get; set; }
+
     public ICollection<MechanicAssignment> MechanicAssignments { get; set; } = new List<MechanicAssignment>();
 }

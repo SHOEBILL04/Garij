@@ -34,6 +34,8 @@ public class VehicleDto
     [Display(Name = "VIN")]
     public string Vin { get; set; } = string.Empty;
 
-    [StringLength(50)]
+    [StringLength(500)]
     public string Color { get; set; } = string.Empty;
+
+    public string? GarageId { get; set; }
 }

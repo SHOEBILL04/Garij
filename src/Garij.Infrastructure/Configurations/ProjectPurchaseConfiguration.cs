@@ -35,6 +35,11 @@ public class ProjectPurchaseConfiguration : IEntityTypeConfiguration<ProjectPurc
         builder.Property(p => p.WorkshopName)
             .HasMaxLength(200);
 
+        builder.Property(p => p.GarageId)
+            .HasMaxLength(100);
+
+        builder.HasIndex(p => p.GarageId);
+
         builder.Property(p => p.Amount)
             .HasColumnType("decimal(18,2)");
 

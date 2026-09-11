@@ -160,7 +160,8 @@ public static class DemoDataSeeder
                 Email = email,
                 PhoneNumber = phone,
                 Role = UserRole.Mechanic,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                GarageId = "default-garij-master"
             });
         }
 
@@ -189,7 +190,8 @@ public static class DemoDataSeeder
                 PhoneNumber = $"+88017{random.Next(10000000, 99999999)}",
                 Address = Areas[random.Next(Areas.Length)],
                 // Registered over the past two years so "customer since" reads plausibly.
-                CreatedAt = DateTime.UtcNow.AddDays(-random.Next(30, 730))
+                CreatedAt = DateTime.UtcNow.AddDays(-random.Next(30, 730)),
+                GarageId = "default-garij-master"
             });
         }
 
@@ -214,7 +216,8 @@ public static class DemoDataSeeder
                 Model = model,
                 Year = random.Next(2012, 2025),
                 Vin = $"BD{random.Next(100000, 999999)}{random.Next(1000, 9999)}",
-                Color = Colors[random.Next(Colors.Length)]
+                Color = Colors[random.Next(Colors.Length)],
+                GarageId = "default-garij-master"
             });
         }
 
@@ -257,7 +260,8 @@ public static class DemoDataSeeder
                 Status = status,
                 DiagnosticNotes = status == JobStatus.Requested ? null : DiagnosticNotes[random.Next(DiagnosticNotes.Length)],
                 CreatedAt = createdAt,
-                CompletedAt = status == JobStatus.Completed ? createdAt.AddDays(random.Next(1, 6)) : null
+                CompletedAt = status == JobStatus.Completed ? createdAt.AddDays(random.Next(1, 6)) : null,
+                GarageId = "default-garij-master"
             };
 
             AssignMechanics(job, mechanics, random, createdAt);
@@ -398,7 +402,8 @@ public static class DemoDataSeeder
             TaxAmount = taxAmount,
             TotalAmount = totalAmount,
             PaymentStatus = PaymentStatus.Pending,
-            IssuedAt = job.CompletedAt ?? job.CreatedAt
+            IssuedAt = job.CompletedAt ?? job.CreatedAt,
+            GarageId = "default-garij-master"
         };
 
         // Roughly 60% settled, 20% part-paid, 20% still outstanding, so the billing screens
@@ -451,7 +456,8 @@ public static class DemoDataSeeder
             Message = $"Job {job.BookingReference} has been completed and is ready for review.",
             Status = status,
             CreatedAt = createdAt,
-            RespondedAt = status == NotificationStatus.Pending ? null : createdAt.AddHours(random.Next(1, 24))
+            RespondedAt = status == NotificationStatus.Pending ? null : createdAt.AddHours(random.Next(1, 24)),
+            GarageId = "default-garij-master"
         });
     }
 

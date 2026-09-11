@@ -11,5 +11,7 @@ public class NotificationConfiguration : IEntityTypeConfiguration<Notification>
         builder.HasKey(n => n.Id);
 
         builder.Property(n => n.Message).IsRequired().HasMaxLength(1000);
+        builder.Property(n => n.GarageId).HasMaxLength(100);
+        builder.HasIndex(n => n.GarageId);
     }
 }

@@ -13,6 +13,8 @@ public class PartConfiguration : IEntityTypeConfiguration<Part>
         builder.Property(p => p.Name).IsRequired().HasMaxLength(200);
         builder.Property(p => p.PartNumber).IsRequired().HasMaxLength(50);
         builder.Property(p => p.UnitPrice).HasColumnType("decimal(18,2)");
+        builder.Property(p => p.GarageId).HasMaxLength(100);
+        builder.HasIndex(p => p.GarageId);
 
         // Included in the WHERE clause of every UPDATE, so a stale writer affects 0 rows
         // and EF Core raises DbUpdateConcurrencyException instead of losing the update.

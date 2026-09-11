@@ -44,7 +44,13 @@ public class AdminController : Controller
     [HttpGet]
     public async Task<IActionResult> ManageUsers()
     {
+        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var currentUserEmail = User.FindFirstValue(ClaimTypes.Email) ?? User.Identity?.Name;
+        var currentStaff = await _context.StaffUsers.FirstOrDefaultAsync(s => s.IdentityUserId == currentUserId || (currentUserEmail != null && s.Email == currentUserEmail));
+        var currentGarageId = currentStaff?.GarageId ?? "default-garij-master";
+
         var users = await _context.StaffUsers
+            .Where(u => (u.GarageId ?? "default-garij-master") == currentGarageId)
             .OrderBy(u => u.FullName)
             .ToListAsync();
 
@@ -103,6 +109,11 @@ public class AdminController : Controller
 
         await _userManager.AddToRoleAsync(identityUser, roleName);
 
+        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var currentUserEmail = User.FindFirstValue(ClaimTypes.Email) ?? User.Identity?.Name;
+        var currentStaff = await _context.StaffUsers.FirstOrDefaultAsync(s => s.IdentityUserId == currentUserId || (currentUserEmail != null && s.Email == currentUserEmail));
+        var currentGarageId = currentStaff?.GarageId ?? "default-garij-master";
+
         // Add to StaffUsers table
         _context.StaffUsers.Add(new User
         {
@@ -111,6 +122,7 @@ public class AdminController : Controller
             Email = normalizedEmail,
             PhoneNumber = model.PhoneNumber.Trim(),
             Role = model.Role,
+            GarageId = currentGarageId,
             CreatedAt = DateTime.UtcNow
         });
 
@@ -123,6 +135,7 @@ public class AdminController : Controller
             BuyerName = model.FullName.Trim(),
             BuyerEmail = normalizedEmail,
             WorkshopName = "Workshop Staff Member",
+            GarageId = currentGarageId,
             Amount = 0m,
             Currency = "USD",
             PaymentMethod = "AdminCreatedStaff",
@@ -142,7 +155,13 @@ public class AdminController : Controller
     [HttpGet]
     public async Task<IActionResult> ManageRoles()
     {
+        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var currentUserEmail = User.FindFirstValue(ClaimTypes.Email) ?? User.Identity?.Name;
+        var currentStaff = await _context.StaffUsers.FirstOrDefaultAsync(s => s.IdentityUserId == currentUserId || (currentUserEmail != null && s.Email == currentUserEmail));
+        var currentGarageId = currentStaff?.GarageId ?? "default-garij-master";
+
         var users = await _context.StaffUsers
+            .Where(u => (u.GarageId ?? "default-garij-master") == currentGarageId)
             .OrderBy(u => u.FullName)
             .ToListAsync();
 
@@ -153,10 +172,15 @@ public class AdminController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> ChangeRole(int userId, UserRole newRole)
     {
-        var staffUser = await _context.StaffUsers.FindAsync(userId);
+        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var currentUserEmail = User.FindFirstValue(ClaimTypes.Email) ?? User.Identity?.Name;
+        var currentStaff = await _context.StaffUsers.FirstOrDefaultAsync(s => s.IdentityUserId == currentUserId || (currentUserEmail != null && s.Email == currentUserEmail));
+        var currentGarageId = currentStaff?.GarageId ?? "default-garij-master";
+
+        var staffUser = await _context.StaffUsers.FirstOrDefaultAsync(s => s.Id == userId && (s.GarageId ?? "default-garij-master") == currentGarageId);
         if (staffUser == null)
         {
-            TempData["ErrorMessage"] = "Staff user not found.";
+            TempData["ErrorMessage"] = "Staff user not found in your garage.";
             return RedirectToAction(nameof(ManageRoles));
         }
 

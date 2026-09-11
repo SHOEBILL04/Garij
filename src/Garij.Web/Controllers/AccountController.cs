@@ -95,6 +95,9 @@ public class AccountController : Controller
 
             await _userManager.AddToRoleAsync(user, selfRegisteredRole.ToString());
 
+            // Create a unique garage identifier for the registering garage owner
+            var garageId = $"GRG-{user.Id[..8].ToUpperInvariant()}";
+
             _context.StaffUsers.Add(new User
             {
                 IdentityUserId = user.Id,
@@ -102,7 +105,8 @@ public class AccountController : Controller
                 Email = model.Email,
                 PhoneNumber = model.PhoneNumber,
                 Role = selfRegisteredRole,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                GarageId = garageId
             });
             await _context.SaveChangesAsync();
 

@@ -11,29 +11,63 @@ public class PartsInventoryService : IPartsInventoryService
 {
     private readonly IPartRepository _partRepository;
     private readonly IJobPartUsedRepository _jobPartUsedRepository;
+    private readonly ICurrentGarageService? _currentGarageService;
 
-    public PartsInventoryService(IPartRepository partRepository, IJobPartUsedRepository jobPartUsedRepository)
+    public PartsInventoryService(
+        IPartRepository partRepository,
+        IJobPartUsedRepository jobPartUsedRepository,
+        ICurrentGarageService? currentGarageService = null)
     {
         _partRepository = partRepository;
         _jobPartUsedRepository = jobPartUsedRepository;
+        _currentGarageService = currentGarageService;
+    }
+
+    private async Task<string> ResolveGarageIdAsync(string? explicitGarageId = null)
+    {
+        if (!string.IsNullOrWhiteSpace(explicitGarageId))
+        {
+            return explicitGarageId;
+        }
+
+        if (_currentGarageService != null)
+        {
+            var id = await _currentGarageService.GetCurrentGarageIdAsync();
+            if (!string.IsNullOrWhiteSpace(id))
+            {
+                return id;
+            }
+        }
+
+        return "default-garij-master";
     }
 
     public async Task<IEnumerable<PartDto>> GetAllPartsAsync()
     {
+        var garageId = await ResolveGarageIdAsync();
         var parts = await _partRepository.GetAllAsync();
-        return parts.Select(ToDto);
+        return parts
+            .Where(p => (p.GarageId ?? "default-garij-master") == garageId)
+            .Select(ToDto);
     }
 
     public async Task<PartDto?> GetPartByIdAsync(int id)
     {
+        var garageId = await ResolveGarageIdAsync();
         var part = await _partRepository.GetByIdAsync(id);
-        return part is null ? null : ToDto(part);
+        if (part is null || (part.GarageId ?? "default-garij-master") != garageId)
+        {
+            return null;
+        }
+
+        return ToDto(part);
     }
 
     public async Task<PartDto> AddPartAsync(PartDto part)
     {
+        var garageId = await ResolveGarageIdAsync(part.GarageId);
         var parts = await _partRepository.GetAllAsync();
-        if (parts.Any(p => p.PartNumber == part.PartNumber))
+        if (parts.Any(p => (p.GarageId ?? "default-garij-master") == garageId && p.PartNumber == part.PartNumber))
         {
             throw new ValidationException(nameof(PartDto.PartNumber), $"A part with part number '{part.PartNumber}' already exists.");
         }
@@ -44,7 +78,8 @@ public class PartsInventoryService : IPartsInventoryService
             PartNumber = part.PartNumber,
             UnitPrice = part.UnitPrice,
             QuantityInStock = part.QuantityInStock,
-            ReorderLevel = part.ReorderLevel
+            ReorderLevel = part.ReorderLevel,
+            GarageId = garageId
         };
 
         await _partRepository.AddAsync(entity);
@@ -55,8 +90,14 @@ public class PartsInventoryService : IPartsInventoryService
 
     public async Task<PartDto> UpdatePartAsync(PartDto part)
     {
+        var garageId = await ResolveGarageIdAsync(part.GarageId);
         var entity = await _partRepository.GetByIdAsync(part.Id)
             ?? throw new NotFoundException(nameof(Part), part.Id);
+
+        if ((entity.GarageId ?? "default-garij-master") != garageId)
+        {
+            throw new NotFoundException(nameof(Part), part.Id);
+        }
 
         entity.Name = part.Name;
         entity.PartNumber = part.PartNumber;
@@ -72,8 +113,14 @@ public class PartsInventoryService : IPartsInventoryService
 
     public async Task DeletePartAsync(int id)
     {
+        var garageId = await ResolveGarageIdAsync();
         var entity = await _partRepository.GetByIdAsync(id)
             ?? throw new NotFoundException(nameof(Part), id);
+
+        if ((entity.GarageId ?? "default-garij-master") != garageId)
+        {
+            throw new NotFoundException(nameof(Part), id);
+        }
 
         _partRepository.Remove(entity);
         await _partRepository.SaveChangesAsync();
@@ -81,8 +128,14 @@ public class PartsInventoryService : IPartsInventoryService
 
     public async Task AdjustStockAsync(int partId, int quantityDelta)
     {
+        var garageId = await ResolveGarageIdAsync();
         var entity = await _partRepository.GetByIdAsync(partId)
             ?? throw new NotFoundException(nameof(Part), partId);
+
+        if ((entity.GarageId ?? "default-garij-master") != garageId)
+        {
+            throw new NotFoundException(nameof(Part), partId);
+        }
 
         var newQuantity = entity.QuantityInStock + quantityDelta;
         if (newQuantity < 0)
@@ -98,8 +151,11 @@ public class PartsInventoryService : IPartsInventoryService
 
     public async Task<IEnumerable<PartDto>> GetLowStockPartsAsync()
     {
+        var garageId = await ResolveGarageIdAsync();
         var parts = await _partRepository.GetLowStockAsync();
-        return parts.Select(ToDto);
+        return parts
+            .Where(p => (p.GarageId ?? "default-garij-master") == garageId)
+            .Select(ToDto);
     }
 
     public async Task<JobPartUsedDto> RecordPartUsageAsync(JobPartUsedDto jobPartUsed)
@@ -111,8 +167,12 @@ public class PartsInventoryService : IPartsInventoryService
             throw new ValidationException(nameof(JobPartUsedDto.QuantityUsed), "Quantity used must be at least 1.");
         }
 
-        var part = await _partRepository.GetByIdAsync(jobPartUsed.PartId)
-            ?? throw new NotFoundException(nameof(Part), jobPartUsed.PartId);
+        var garageId = await ResolveGarageIdAsync();
+        var part = await _partRepository.GetByIdAsync(jobPartUsed.PartId);
+        if (part is null || (part.GarageId ?? "default-garij-master") != garageId)
+        {
+            throw new NotFoundException(nameof(Part), jobPartUsed.PartId);
+        }
 
         var newQuantity = part.QuantityInStock - jobPartUsed.QuantityUsed;
         if (newQuantity < 0)
@@ -166,6 +226,7 @@ public class PartsInventoryService : IPartsInventoryService
     private static PartDto ToDto(Part part) => new()
     {
         Id = part.Id,
+        GarageId = part.GarageId,
         Name = part.Name,
         PartNumber = part.PartNumber,
         UnitPrice = part.UnitPrice,

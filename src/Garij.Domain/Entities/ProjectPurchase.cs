@@ -24,6 +24,11 @@ public class ProjectPurchase
     public string BuyerEmail { get; set; } = string.Empty;
 
     public string? WorkshopName { get; set; }
+ 
+    /// <summary>
+    /// Garage identifier associated with this license grant.
+    /// </summary>
+    public string? GarageId { get; set; }
 
     public decimal Amount { get; set; }
 

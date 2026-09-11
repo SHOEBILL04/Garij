@@ -197,7 +197,18 @@
             const labels = @Html.Raw(labelsJson);
             const costs = @Html.Raw(costsJson);
 
-            new Chart(ctx, {
+            function getThemeConfig() {
+                const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+                return {
+                    textColor: isLight ? '#0f172a' : '#f8fafc',
+                    mutedColor: isLight ? '#475569' : '#94a3b8',
+                    gridColor: isLight ? 'rgba(15, 23, 42, 0.08)' : 'rgba(255, 255, 255, 0.08)'
+                };
+            }
+
+            let theme = getThemeConfig();
+
+            const chart = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: labels,
@@ -216,18 +227,26 @@
                     scales: {
                         x: {
                             beginAtZero: true,
-                            grid: { color: 'rgba(255, 255, 255, 0.08)' },
-                            ticks: { color: '#94a3b8' }
+                            grid: { color: theme.gridColor },
+                            ticks: { color: theme.mutedColor }
                         },
                         y: {
                             grid: { display: false },
-                            ticks: { color: '#f8fafc' }
+                            ticks: { color: theme.textColor }
                         }
                     },
                     plugins: {
                         legend: { display: false }
                     }
                 }
+            });
+
+            window.addEventListener('garij:themechanged', function () {
+                const newTheme = getThemeConfig();
+                chart.options.scales.x.grid.color = newTheme.gridColor;
+                chart.options.scales.x.ticks.color = newTheme.mutedColor;
+                chart.options.scales.y.ticks.color = newTheme.textColor;
+                chart.update();
             });
         });
     </script>

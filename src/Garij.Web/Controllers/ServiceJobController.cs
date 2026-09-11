@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Garij.Application.DTOs;
 using Garij.Application.Interfaces;
 using Garij.Domain.Entities;
@@ -40,8 +41,10 @@ public class ServiceJobController : Controller
     {
         var jobs = await _serviceJobService.GetFilteredServiceJobsAsync(status, mechanicId, sortBy, search);
 
+        var currentGarageId = GetCurrentGarageId();
+
         var mechanics = _context.StaffUsers
-            .Where(u => u.Role == UserRole.Mechanic)
+            .Where(u => u.Role == UserRole.Mechanic && (u.GarageId ?? "default-garij-master") == currentGarageId)
             .OrderBy(u => u.FullName)
             .Select(u => new { u.Id, u.FullName })
             .ToList();
@@ -180,14 +183,25 @@ public class ServiceJobController : Controller
         }
     }
 
+    private string GetCurrentGarageId()
+    {
+        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var currentUserEmail = User.FindFirstValue(ClaimTypes.Email) ?? User.Identity?.Name;
+        var currentStaff = _context.StaffUsers.FirstOrDefault(s => s.IdentityUserId == currentUserId || (currentUserEmail != null && s.Email == currentUserEmail));
+        return currentStaff?.GarageId ?? "default-garij-master";
+    }
+
     private async Task PopulateVehiclesDropDownList(object? selectedVehicle = null)
     {
+        var currentGarageId = GetCurrentGarageId();
         var vehicles = await _vehicleRepository.GetAllWithCustomersAsync();
-        var vehicleList = vehicles.Select(v => new
-        {
-            v.Id,
-            DisplayText = $"{v.LicensePlateNumber} - {v.Year} {v.Make} {v.Model} (Owner: {v.Customer?.FullName ?? "Unknown"})"
-        }).OrderBy(v => v.DisplayText);
+        var vehicleList = vehicles
+            .Where(v => (v.GarageId ?? "default-garij-master") == currentGarageId)
+            .Select(v => new
+            {
+                v.Id,
+                DisplayText = $"{v.LicensePlateNumber} - {v.Year} {v.Make} {v.Model} (Owner: {v.Customer?.FullName ?? "Unknown"})"
+            }).OrderBy(v => v.DisplayText);
 
         ViewBag.Vehicles = new SelectList(vehicleList, "Id", "DisplayText", selectedVehicle);
     }
@@ -246,6 +260,11 @@ public class ServiceJobController : Controller
 
         await _userManager.AddToRoleAsync(identityUser, roleName);
 
+        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var currentUserEmail = User.FindFirstValue(ClaimTypes.Email) ?? User.Identity?.Name;
+        var currentStaff = _context.StaffUsers.FirstOrDefault(s => s.IdentityUserId == currentUserId || (currentUserEmail != null && s.Email == currentUserEmail));
+        var currentGarageId = currentStaff?.GarageId ?? "default-garij-master";
+
         // Add to StaffUsers table
         _context.StaffUsers.Add(new User
         {
@@ -254,6 +273,7 @@ public class ServiceJobController : Controller
             Email = normalizedEmail,
             PhoneNumber = model.PhoneNumber.Trim(),
             Role = model.Role,
+            GarageId = currentGarageId,
             CreatedAt = DateTime.UtcNow
         });
 
@@ -266,6 +286,7 @@ public class ServiceJobController : Controller
             BuyerName = model.FullName.Trim(),
             BuyerEmail = normalizedEmail,
             WorkshopName = "Workshop Staff Member",
+            GarageId = currentGarageId,
             Amount = 0m,
             Currency = "USD",
             PaymentMethod = "GarageOwnerCreatedStaff",

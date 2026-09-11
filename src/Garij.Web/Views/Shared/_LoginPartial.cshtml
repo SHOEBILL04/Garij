@@ -4,7 +4,7 @@
 
 @if (SignInManager.IsSignedIn(User))
 {
-    <span class="d-inline-flex align-items-center gap-1 text-light small fw-semibold me-1 px-2 py-1 rounded-pill" style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-dark);" title="Logged in as @User.Identity?.Name">
+    <span class="d-inline-flex align-items-center gap-1 app-user-pill small fw-semibold me-1 px-2 py-1 rounded-pill" title="Logged in as @User.Identity?.Name">
         <i class="bi bi-person-circle text-info fs-6"></i>
         <span class="d-none d-md-inline">@User.Identity?.Name</span>
     </span>

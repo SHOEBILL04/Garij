@@ -25,9 +25,9 @@ public class MechanicController : Controller
     [HttpGet]
     public async Task<IActionResult> Index()
     {
-        var users = await _userRepository.GetAllAsync();
-        var mechanics = users.Where(u => u.Role == UserRole.Mechanic)
-                             .OrderBy(u => u.FullName);
+        var currentUser = await GetCurrentStaffUserAsync();
+        var currentGarageId = currentUser?.GarageId ?? "default-garij-master";
+        var mechanics = await _userRepository.GetMechanicsByGarageIdAsync(currentGarageId);
 
         return View(mechanics);
     }
@@ -199,19 +199,25 @@ public class MechanicController : Controller
     private async Task<Garij.Domain.Entities.User?> GetCurrentStaffUserAsync()
     {
         var email = User.Identity?.Name;
-        if (string.IsNullOrEmpty(email))
+        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(email) && string.IsNullOrEmpty(userId))
         {
             return null;
         }
 
         var users = await _userRepository.GetAllAsync();
-        return users.FirstOrDefault(u => u.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
+        return users.FirstOrDefault(u =>
+            (!string.IsNullOrEmpty(userId) && u.IdentityUserId == userId) ||
+            (!string.IsNullOrEmpty(email) && u.Email.Equals(email, StringComparison.OrdinalIgnoreCase)));
     }
 
     private async Task PopulateMechanicsDropDownList(object? selectedMechanic = null)
     {
-        var users = await _userRepository.GetAllAsync();
-        var mechanics = users.Where(u => u.Role == UserRole.Mechanic)
+        var currentUser = await GetCurrentStaffUserAsync();
+        var currentGarageId = currentUser?.GarageId ?? "default-garij-master";
+        var mechanicsList = await _userRepository.GetMechanicsByGarageIdAsync(currentGarageId);
+
+        var mechanics = mechanicsList
                              .Select(u => new
                              {
                                  u.Id,

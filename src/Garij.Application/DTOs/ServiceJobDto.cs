@@ -28,5 +28,7 @@ public class ServiceJobDto
 
     public DateTime? CompletedAt { get; set; }
 
+    public string? GarageId { get; set; }
+
     public List<MechanicAssignmentDto> MechanicAssignments { get; set; } = new();
 }
