@@ -8,6 +8,21 @@ using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Cloud / Container hosting support: dynamically bind to PORT if provided (e.g. Render, Railway, Koyeb, Cloud Run)
+var port = Environment.GetEnvironmentVariable("PORT");
+if (!string.IsNullOrEmpty(port))
+{
+    builder.WebHost.UseUrls($"http://*:{port}");
+}
+
+// Support reverse proxies (Render, Fly.io, Cloudflare) for HTTPS detection
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor | Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto;
+    options.KnownIPNetworks.Clear();
+    options.KnownProxies.Clear();
+});
+
 // Add services to the container.
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
@@ -45,6 +60,8 @@ builder.Services.AddControllersWithViews(options =>
 });
 
 var app = builder.Build();
+
+app.UseForwardedHeaders();
 
 // Catches unhandled exceptions and renders the shared error view in place, keeping the
 // status code it calculated. Registered first so it wraps the whole pipeline, and used in
