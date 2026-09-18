@@ -3,6 +3,9 @@ using Garij.Domain.Enums;
 using Garij.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -10,6 +13,66 @@ namespace Garij.Infrastructure.SeedData;
 
 public static class DbSeeder
 {
+    /// <summary>
+    /// The last migration whose schema a database created by the old EnsureCreated call already
+    /// has. Databases from before this project applied migrations carry no migrations history, so
+    /// they are recorded as having reached this point and only later migrations are run against
+    /// them. Nothing before this migration may be edited, or those databases will skip the change.
+    /// </summary>
+    private const string PreMigrationBaseline = "20260909143542_AddDataIntegrityCheckConstraints";
+
+    /// <summary>
+    /// Brings the database schema up to the model by applying migrations, creating the database
+    /// first if it is not there yet.
+    /// </summary>
+    /// <remarks>
+    /// This deliberately does not use EnsureCreated: that builds the schema once and then does
+    /// nothing at all on a database that already exists, so every model change after the first run
+    /// left the schema behind and the columns only failed when a query finally asked for them.
+    /// </remarks>
+    private static async Task ApplySchemaAsync(GarijDbContext context, ILogger logger)
+    {
+        var creator = context.GetService<IRelationalDatabaseCreator>();
+        var history = context.GetService<IHistoryRepository>();
+
+        // A database with tables but no migrations history was built by the old EnsureCreated call.
+        // Migrating it directly would try to create tables that are already there, so record the
+        // migrations its schema already satisfies and let only the later ones run.
+        if (await creator.ExistsAsync() && await creator.HasTablesAsync() && !await history.ExistsAsync())
+        {
+            var all = context.Database.GetMigrations().ToList();
+            var baselineIndex = all.IndexOf(PreMigrationBaseline);
+
+            if (baselineIndex < 0)
+            {
+                throw new InvalidOperationException(
+                    $"Migration '{PreMigrationBaseline}' is missing, so a database created before this " +
+                    "project used migrations cannot be brought forward. Restore that migration, or " +
+                    "recreate the database from scratch.");
+            }
+
+            await context.Database.ExecuteSqlRawAsync(history.GetCreateIfNotExistsScript());
+
+            foreach (var migrationId in all.Take(baselineIndex + 1))
+            {
+                await context.Database.ExecuteSqlRawAsync(
+                    history.GetInsertScript(new HistoryRow(migrationId, ProductInfo.GetVersion())));
+            }
+
+            logger.LogInformation(
+                "Recorded {Count} migration(s) as already applied for a database that predates migrations.",
+                baselineIndex + 1);
+        }
+
+        var pending = (await context.Database.GetPendingMigrationsAsync()).ToList();
+        if (pending.Count > 0)
+        {
+            logger.LogInformation("Applying {Count} pending migration(s): {Migrations}", pending.Count, string.Join(", ", pending));
+        }
+
+        await context.Database.MigrateAsync();
+    }
+
     public static async Task SeedAsync(IServiceProvider serviceProvider)
     {
         using var scope = serviceProvider.CreateScope();
@@ -20,7 +83,7 @@ public static class DbSeeder
 
         try
         {
-            await context.Database.EnsureCreatedAsync();
+            await ApplySchemaAsync(context, logger);
 
             // 1. Seed Roles
             string[] roles = Enum.GetNames<UserRole>();

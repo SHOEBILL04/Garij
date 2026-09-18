@@ -1,4 +1,4 @@
-using Garij.Application.DTOs;
+﻿using Garij.Application.DTOs;
 using Garij.Application.Interfaces;
 using Garij.Application.Services;
 using Garij.Domain.Entities;
@@ -198,6 +198,10 @@ public class ServiceJobServiceTests : IDisposable
 
         var job = await _serviceJobService.CreateServiceJobAsync(new ServiceJobDto { VehicleId = vehicle.Id, JobType = JobType.RoutineService });
 
+        // This test is about transition legality, not BR-008, so give the job a logged
+        // part to clear the completion pre-condition.
+        await LogPartAgainstJobAsync(job.Id, $"SKIP-P{(int)target}");
+
         // Act: jump straight from Requested to a later stage, skipping the ones between.
         var updated = await _serviceJobService.UpdateServiceJobStatusAsync(job.Id, target);
 
@@ -218,6 +222,7 @@ public class ServiceJobServiceTests : IDisposable
         await _context.SaveChangesAsync();
 
         var job = await _serviceJobService.CreateServiceJobAsync(new ServiceJobDto { VehicleId = vehicle.Id, JobType = JobType.RoutineService });
+        await LogPartAgainstJobAsync(job.Id, "STRAIGHT-P1");
 
         // Act
         var updated = await _serviceJobService.UpdateServiceJobStatusAsync(job.Id, JobStatus.Completed);
@@ -228,9 +233,9 @@ public class ServiceJobServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task UpdateServiceJobStatusAsync_SucceedsCompletion_WhenNoPartsLogged()
+    public async Task UpdateServiceJobStatusAsync_RejectsCompletion_WhenNothingLogged()
     {
-        // Arrange: a labor-only job (e.g. diagnostics/inspection) with nothing logged in JobPartsUsed.
+        // Arrange: a job with nothing in JobPartsUsed and nothing in JobServiceDetails.
         var customer = new Customer { FullName = "Test", Email = "noparts@test.com", PhoneNumber = "123", Address = "Test" };
         _context.Customers.Add(customer);
         await _context.SaveChangesAsync();
@@ -244,7 +249,42 @@ public class ServiceJobServiceTests : IDisposable
         await _serviceJobService.UpdateServiceJobStatusAsync(job.Id, JobStatus.CustomerApprovalNeeded);
         await _serviceJobService.UpdateServiceJobStatusAsync(job.Id, JobStatus.InProgress);
 
-        // Act: completing a job with zero parts logged must succeed (labor-only jobs are valid).
+        // Act & Assert: BR-008 refuses an empty completion.
+        var ex = await Assert.ThrowsAsync<BusinessRuleException>(() =>
+            _serviceJobService.UpdateServiceJobStatusAsync(job.Id, JobStatus.Completed));
+
+        Assert.Equal("BR-008", ex.RuleCode);
+
+        // The job is left untouched - still InProgress, still uncompleted.
+        var persisted = await _context.ServiceJobs.FindAsync(job.Id);
+        Assert.NotNull(persisted);
+        Assert.Equal(JobStatus.InProgress, persisted.Status);
+        Assert.Null(persisted.CompletedAt);
+    }
+
+    [Fact]
+    public async Task UpdateServiceJobStatusAsync_SucceedsCompletion_WhenOnlyLabourIsLogged()
+    {
+        // Arrange: a labour-only job (diagnostic/inspection) - no parts, one recorded service.
+        var customer = new Customer { FullName = "Test", Email = "labouronly@test.com", PhoneNumber = "123", Address = "Test" };
+        _context.Customers.Add(customer);
+        await _context.SaveChangesAsync();
+
+        var vehicle = new Vehicle { CustomerId = customer.Id, LicensePlateNumber = "DHA-6060", Make = "Nissan", Model = "Sunny", Year = 2018, Vin = "VIN606", Color = "Red" };
+        _context.Vehicles.Add(vehicle);
+        await _context.SaveChangesAsync();
+
+        var catalogService = new ServiceCatalog { Name = "Diagnostic Inspection", Description = "Full diagnostic", BasePrice = 80.00m, EstimatedDurationMinutes = 60 };
+        _context.ServiceCatalogs.Add(catalogService);
+        await _context.SaveChangesAsync();
+
+        var job = await _serviceJobService.CreateServiceJobAsync(new ServiceJobDto { VehicleId = vehicle.Id, JobType = JobType.Checkup });
+        await _serviceJobService.UpdateServiceJobStatusAsync(job.Id, JobStatus.InProgress);
+
+        _context.JobServiceDetails.Add(new JobServiceDetail { ServiceJobId = job.Id, ServiceCatalogId = catalogService.Id, Quantity = 1, PriceAtBooking = 80.00m });
+        await _context.SaveChangesAsync();
+
+        // Act: labour with no parts still represents real work, so BR-008 lets it through.
         var completedJob = await _serviceJobService.UpdateServiceJobStatusAsync(job.Id, JobStatus.Completed);
 
         // Assert
@@ -354,6 +394,77 @@ public class ServiceJobServiceTests : IDisposable
             _serviceJobService.AssignMechanicAsync(job.Id, frontDeskUser.Id, RoleInJob.Assistant));
         Assert.Equal("BR-003", exFd.RuleCode);
         Assert.Contains("Only users with the Mechanic role can be assigned", exFd.Message);
+    }
+
+    [Fact]
+    public async Task CreateServiceJobAsync_OpensJobAsRequested_WithNoCompletionDate()
+    {
+        // Arrange
+        var customer = new Customer { FullName = "Intake Customer", Email = "intake@test.com", PhoneNumber = "123", Address = "Test" };
+        _context.Customers.Add(customer);
+        await _context.SaveChangesAsync();
+
+        var vehicle = new Vehicle { CustomerId = customer.Id, LicensePlateNumber = "DHA-3030", Make = "Nissan", Model = "Note", Year = 2021, Vin = "VIN303", Color = "Grey" };
+        _context.Vehicles.Add(vehicle);
+        await _context.SaveChangesAsync();
+
+        // Act: the intake form only ever offers Requested.
+        var job = await _serviceJobService.CreateServiceJobAsync(new ServiceJobDto
+        {
+            VehicleId = vehicle.Id,
+            JobType = JobType.RoutineService,
+            Status = JobStatus.Requested
+        });
+
+        // Assert
+        Assert.Equal(JobStatus.Requested, job.Status);
+        Assert.Null(job.CompletedAt);
+
+        var persisted = await _context.ServiceJobs.FindAsync(job.Id);
+        Assert.NotNull(persisted);
+        Assert.Equal(JobStatus.Requested, persisted.Status);
+        Assert.Null(persisted.CompletedAt);
+    }
+
+    [Theory]
+    [InlineData(JobStatus.Completed)]
+    [InlineData(JobStatus.Cancelled)]
+    public async Task CreateServiceJobAsync_ThrowsBusinessRuleException_WhenInitialStatusIsTerminal(JobStatus terminalStatus)
+    {
+        // Arrange
+        var customer = new Customer { FullName = "Test", Email = $"terminal-{terminalStatus}@test.com", PhoneNumber = "123", Address = "Test" };
+        _context.Customers.Add(customer);
+        await _context.SaveChangesAsync();
+
+        var vehicle = new Vehicle { CustomerId = customer.Id, LicensePlateNumber = $"TERM-{(int)terminalStatus}", Make = "Toyota", Model = "Premio", Year = 2020, Vin = $"VINTERM{(int)terminalStatus}", Color = "White" };
+        _context.Vehicles.Add(vehicle);
+        await _context.SaveChangesAsync();
+
+        // Act & Assert: a forged post that bypasses the intake form is still refused.
+        var ex = await Assert.ThrowsAsync<BusinessRuleException>(() =>
+            _serviceJobService.CreateServiceJobAsync(new ServiceJobDto
+            {
+                VehicleId = vehicle.Id,
+                JobType = JobType.Repair,
+                Status = terminalStatus
+            }));
+
+        Assert.Equal("BR-007", ex.RuleCode);
+        Assert.Empty(_context.ServiceJobs.Where(j => j.VehicleId == vehicle.Id));
+    }
+
+    /// <summary>
+    /// Logs one part against a job so it clears BR-008's completion pre-condition.
+    /// Used by tests whose subject is transition legality rather than BR-008 itself.
+    /// </summary>
+    private async Task LogPartAgainstJobAsync(int serviceJobId, string partNumber)
+    {
+        var part = new Part { Name = "Engine Oil 5W-30", PartNumber = partNumber, UnitPrice = 12.50m, QuantityInStock = 100, ReorderLevel = 10 };
+        _context.Parts.Add(part);
+        await _context.SaveChangesAsync();
+
+        _context.JobPartsUsed.Add(new JobPartUsed { ServiceJobId = serviceJobId, PartId = part.Id, QuantityUsed = 1, PriceAtUsage = part.UnitPrice });
+        await _context.SaveChangesAsync();
     }
 
     public void Dispose()

@@ -124,17 +124,39 @@
                             <th>Date</th>
                             <th>Method</th>
                             <th>Reference</th>
+                            <th>Status</th>
                             <th class="text-end">Amount</th>
+                            <th class="text-end"></th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (var payment in Model.Payments)
                         {
-                            <tr>
+                            @* A refunded payment stays in the list, marked, rather than disappearing. *@
+                            <tr data-payment-id="@payment.Id" data-payment-status="@(payment.IsRefunded ? "refunded" : "received")">
                                 <td>@payment.PaidAt.ToString("MMM dd, yyyy HH:mm")</td>
                                 <td><span class="app-badge app-badge-neutral">@payment.PaymentMethod</span></td>
                                 <td class="font-monospace small">@payment.TransactionReference</td>
-                                <td class="text-end">@payment.Amount.ToString("C")</td>
+                                <td>
+                                    @if (payment.IsRefunded)
+                                    {
+                                        <span class="app-badge app-badge-danger" title="Refunded @payment.RefundedAt!.Value.ToString("MMM dd, yyyy HH:mm")">Refunded</span>
+                                        <div class="app-page-subtitle small">@payment.RefundedAt!.Value.ToString("MMM dd, yyyy")</div>
+                                    }
+                                    else
+                                    {
+                                        <span class="app-badge app-badge-success">Received</span>
+                                    }
+                                </td>
+                                <td class="text-end @(payment.IsRefunded ? "text-decoration-line-through app-page-subtitle" : "")">@payment.Amount.ToString("C")</td>
+                                <td class="text-end">
+                                    @if (!payment.IsRefunded)
+                                    {
+                                        <a asp-action="RefundPayment" asp-route-invoiceId="@Model.Id" asp-route-paymentId="@payment.Id" class="app-btn app-btn-outline app-btn-sm">
+                                            <i class="bi bi-arrow-counterclockwise"></i> Refund
+                                        </a>
+                                    }
+                                </td>
                             </tr>
                         }
                     </tbody>
@@ -158,6 +180,12 @@
 
                 <dt class="col-7 app-page-subtitle">Paid:</dt>
                 <dd class="col-5 text-end" style="color:#4ade80;">@Model.AmountPaid.ToString("C")</dd>
+
+                @if (Model.AmountRefunded > 0)
+                {
+                    <dt class="col-7 app-page-subtitle">Refunded:</dt>
+                    <dd class="col-5 text-end" style="color:#f87171;" id="amount-refunded">@Model.AmountRefunded.ToString("C")</dd>
+                }
 
                 <dt class="col-7 fw-bold text-white">Outstanding:</dt>
                 <dd class="col-5 text-end fw-bold mb-0" style="color:@(Model.OutstandingBalance > 0 ? "#f87171" : "#4ade80");">

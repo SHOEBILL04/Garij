@@ -1,8 +1,9 @@
-@model InvoiceDto
+@model RecordPaymentViewModel
 @using Garij.Domain.Enums
 
 @{
     ViewData["Title"] = "Record Payment";
+    var invoice = Model.Invoice;
 }
 
 <div class="app-page-header">
@@ -18,46 +19,49 @@
 
             <dl class="row mb-4">
                 <dt class="col-sm-5 app-page-subtitle">Invoice:</dt>
-                <dd class="col-sm-7 text-white font-monospace">@Model.InvoiceNumber</dd>
+                <dd class="col-sm-7 text-white font-monospace">@invoice.InvoiceNumber</dd>
 
                 <dt class="col-sm-5 app-page-subtitle">Total:</dt>
-                <dd class="col-sm-7 text-white">@Model.TotalAmount.ToString("C")</dd>
+                <dd class="col-sm-7 text-white">@invoice.TotalAmount.ToString("C")</dd>
 
                 <dt class="col-sm-5 app-page-subtitle">Already Paid:</dt>
-                <dd class="col-sm-7 text-white">@Model.AmountPaid.ToString("C")</dd>
+                <dd class="col-sm-7 text-white">@invoice.AmountPaid.ToString("C")</dd>
 
                 <dt class="col-sm-5 fw-bold text-white">Outstanding:</dt>
-                <dd class="col-sm-7 fw-bold mb-0" style="color:#f87171;">@Model.OutstandingBalance.ToString("C")</dd>
+                <dd class="col-sm-7 fw-bold mb-0" style="color:#f87171;">@invoice.OutstandingBalance.ToString("C")</dd>
             </dl>
 
-            @if (Model.OutstandingBalance <= 0)
+            @if (invoice.OutstandingBalance <= 0)
             {
                 <p style="color:#4ade80;"><i class="bi bi-check-circle-fill me-1"></i> This invoice is fully paid.</p>
-                <a asp-action="Details" asp-route-id="@Model.Id" class="app-btn app-btn-outline">Back to Invoice</a>
+                <a asp-action="Details" asp-route-id="@invoice.Id" class="app-btn app-btn-outline">Back to Invoice</a>
             }
             else
             {
-                <form asp-action="RecordPayment" asp-route-invoiceId="@Model.Id" method="post">
+                <form asp-action="RecordPayment" asp-route-invoiceId="@invoice.Id" method="post">
                     <div asp-validation-summary="ModelOnly" class="app-alert-danger" role="alert"></div>
 
                     <div class="app-form-group">
-                        <label for="Amount" class="app-form-label">Amount</label>
-                        <input type="number" step="0.01" min="0.01" max="@Model.OutstandingBalance" name="Amount" id="Amount" class="app-form-control" placeholder="e.g. @Model.OutstandingBalance.ToString("0.00")" required />
-                        <div class="app-page-subtitle small mt-1">Up to the outstanding balance of @Model.OutstandingBalance.ToString("C").</div>
+                        <label asp-for="Payment.Amount" class="app-form-label">Amount</label>
+                        <input asp-for="Payment.Amount" type="number" step="0.01" min="0.01" max="@invoice.OutstandingBalance" class="app-form-control" placeholder="e.g. @invoice.OutstandingBalance.ToString("0.00")" required />
+                        <span asp-validation-for="Payment.Amount" class="app-field-error"></span>
+                        <div class="app-page-subtitle small mt-1">Up to the outstanding balance of @invoice.OutstandingBalance.ToString("C").</div>
                     </div>
 
                     <div class="app-form-group">
-                        <label for="PaymentMethod" class="app-form-label">Payment Method</label>
-                        <select name="PaymentMethod" id="PaymentMethod" class="app-form-select" asp-items="Html.GetEnumSelectList<PaymentMethod>()"></select>
+                        <label asp-for="Payment.PaymentMethod" class="app-form-label">Payment Method</label>
+                        <select asp-for="Payment.PaymentMethod" class="app-form-select" asp-items="Html.GetEnumSelectList<PaymentMethod>()"></select>
+                        <span asp-validation-for="Payment.PaymentMethod" class="app-field-error"></span>
                     </div>
 
                     <div class="app-form-group">
-                        <label for="TransactionReference" class="app-form-label">Transaction Reference</label>
-                        <input type="text" name="TransactionReference" id="TransactionReference" class="app-form-control" placeholder="e.g. receipt or card slip number" />
+                        <label asp-for="Payment.TransactionReference" class="app-form-label">Transaction Reference</label>
+                        <input asp-for="Payment.TransactionReference" class="app-form-control" placeholder="e.g. receipt or card slip number" />
+                        <span asp-validation-for="Payment.TransactionReference" class="app-field-error"></span>
                     </div>
 
                     <div class="d-flex justify-content-end gap-2 mt-3">
-                        <a asp-action="Details" asp-route-id="@Model.Id" class="app-btn app-btn-outline">Cancel</a>
+                        <a asp-action="Details" asp-route-id="@invoice.Id" class="app-btn app-btn-outline">Cancel</a>
                         <button type="submit" class="app-btn app-btn-primary"><i class="bi bi-check-circle"></i> Record Payment</button>
                     </div>
                 </form>
@@ -65,3 +69,7 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -18,6 +18,7 @@
                 <input type="hidden" asp-for="Id" />
                 <input type="hidden" asp-for="VehicleId" />
                 <input type="hidden" asp-for="BookingReference" />
+                <span asp-validation-for="BookingReference" class="app-field-error"></span>
 
                 <div asp-validation-summary="ModelOnly" class="app-alert-danger" role="alert"></div>
 

@@ -1,32 +1,47 @@
 @model ErrorViewModel
 @{
-    ViewData["Title"] = "Error";
+    ViewData["Title"] = Model.Title;
+
+    var accent = Model.StatusCode >= 500 ? "#f87171" : (Model.StatusCode == 404 ? "#38bdf8" : "#fbbf24");
+    var icon = Model.StatusCode switch
+    {
+        404 => "bi-compass",
+        400 => "bi-exclamation-triangle",
+        401 => "bi-box-arrow-in-right",
+        403 => "bi-shield-lock",
+        _ => "bi-bug"
+    };
 }
 
 <div class="app-page-header">
     <div>
-        <h1 class="app-page-title" style="color:#f87171;">Something went wrong</h1>
-        <p class="app-page-subtitle">An error occurred while processing your request.</p>
+        <h1 class="app-page-title" style="color:@accent;">
+            <i class="bi @icon me-2"></i>@Model.Title
+        </h1>
+        <p class="app-page-subtitle">HTTP @Model.StatusCode</p>
     </div>
-    <a asp-controller="Dashboard" asp-action="Index" class="app-btn app-btn-outline">Back to Dashboard</a>
+    <a asp-controller="Home" asp-action="Index" class="app-btn app-btn-outline">Back to Home</a>
 </div>
 
 <div class="app-card" style="max-width: 720px;">
-    @if (Model.ShowRequestId)
+    <p class="text-white" id="error-message">@Model.Message</p>
+
+    @if (Model.ShowRequestedPath)
     {
-        <p class="text-white">
-            <strong>Request ID:</strong> <code>@Model.RequestId</code>
+        <p class="app-page-subtitle mb-0">
+            <strong class="text-white">Requested address:</strong> <code>@Model.RequestedPath</code>
         </p>
     }
 
-    <h3 class="app-card-heading">Development Mode</h3>
-    <p class="app-page-subtitle">
-        Swapping to <strong class="text-white">Development</strong> environment will display more detailed information about the error that occurred.
-    </p>
-    <p class="app-page-subtitle mb-0">
-        <strong class="text-white">The Development environment shouldn't be enabled for deployed applications.</strong>
-        It can result in displaying sensitive information from exceptions to end users.
-        For local debugging, enable the <strong class="text-white">Development</strong> environment by setting the <strong class="text-white">ASPNETCORE_ENVIRONMENT</strong> environment variable to <strong class="text-white">Development</strong>
-        and restarting the app.
-    </p>
+    @if (Model.ShowRequestId)
+    {
+        <p class="app-page-subtitle mb-0">
+            <strong class="text-white">Request ID:</strong> <code>@Model.RequestId</code>
+        </p>
+    }
+
+    <div class="d-flex gap-2 mt-4">
+        <a asp-controller="Dashboard" asp-action="Index" class="app-btn app-btn-primary">Go to Dashboard</a>
+        <a href="javascript:history.back()" class="app-btn app-btn-outline">Go Back</a>
+    </div>
 </div>

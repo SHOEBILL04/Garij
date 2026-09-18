@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Garij.Application.DTOs;
 using Garij.Application.Interfaces;
 using Garij.Domain.Enums;
@@ -181,8 +182,24 @@ public class MechanicController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> SaveNotes(int serviceJobId, string diagnosticNotes, int? mechanicId, JobStatus? filterStatus = null, string? sortBy = null, string? search = null)
+    public async Task<IActionResult> SaveNotes(
+        int serviceJobId,
+        // The job board posts notes as a bare parameter rather than through ServiceJobDto, so
+        // the column's 2000-character limit has to be declared here as well to be enforced.
+        [StringLength(2000, ErrorMessage = "Diagnostic notes cannot exceed 2000 characters.")] string diagnosticNotes,
+        int? mechanicId,
+        JobStatus? filterStatus = null,
+        string? sortBy = null,
+        string? search = null)
     {
+        if (!ModelState.IsValid)
+        {
+            TempData["ErrorMessage"] = string.Join(" ", ModelState.Values
+                .SelectMany(v => v.Errors)
+                .Select(e => e.ErrorMessage));
+            return RedirectToAction(nameof(JobBoard), new { mechanicId, status = filterStatus, sortBy, search });
+        }
+
         try
         {
             await _serviceJobService.SaveDiagnosticNotesAsync(serviceJobId, diagnosticNotes);

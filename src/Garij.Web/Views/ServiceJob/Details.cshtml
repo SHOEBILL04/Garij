@@ -1,4 +1,4 @@
-@model Garij.Application.DTOs.ServiceJobDto
+﻿@model Garij.Application.DTOs.ServiceJobDto
 @using Garij.Domain.Enums
 @using Garij.Web.Helpers
 
@@ -16,6 +16,9 @@
     <div class="d-flex gap-2 flex-wrap">
         <a asp-controller="Parts" asp-action="LogUsage" asp-route-serviceJobId="@Model.Id" class="app-btn app-btn-primary">
             <i class="bi bi-box-seam"></i> Log Parts
+        </a>
+        <a asp-action="LogService" asp-route-serviceJobId="@Model.Id" class="app-btn app-btn-primary">
+            <i class="bi bi-wrench-adjustable"></i> Log Service
         </a>
         <a asp-controller="Mechanic" asp-action="Assign" asp-route-serviceJobId="@Model.Id" class="app-btn app-btn-success">
             <i class="bi bi-person-plus"></i> Assign Mechanic
@@ -105,6 +108,56 @@
                             </div>
                         </div>
                     }
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Services & Labour Card -->
+    <div class="col-12">
+        <div class="app-card mb-4">
+            <div class="d-flex justify-content-between align-items-center app-card-heading">
+                <span><i class="bi bi-wrench-adjustable me-2 text-info"></i>Services &amp; Labour</span>
+                <a asp-action="LogService" asp-route-serviceJobId="@Model.Id" class="app-btn app-btn-primary app-btn-sm">+ Log Service</a>
+            </div>
+            @if (!Model.JobServiceDetails.Any())
+            {
+                <p class="app-page-subtitle text-center py-2 mb-0">No services logged against this job yet.</p>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table app-table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Service</th>
+                                <th class="text-end">Qty</th>
+                                <th class="text-end">Price at Booking</th>
+                                <th class="text-end">Line Total</th>
+                                <th class="text-end">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var line in Model.JobServiceDetails)
+                            {
+                                <tr>
+                                    <td class="text-white">@line.ServiceName</td>
+                                    <td class="text-end text-white">@line.Quantity</td>
+                                    <td class="text-end text-white">@line.PriceAtBooking.ToString("C")</td>
+                                    <td class="text-end fw-bold text-white">@((line.PriceAtBooking * line.Quantity).ToString("C"))</td>
+                                    <td class="text-end">
+                                        <form asp-action="RemoveService" method="post" onsubmit="return confirm('Remove this service from the job?');">
+                                            <input type="hidden" name="id" value="@line.Id" />
+                                            <input type="hidden" name="serviceJobId" value="@Model.Id" />
+                                            <button type="submit" class="app-btn app-btn-danger app-btn-sm">
+                                                <i class="bi bi-trash"></i> Remove
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
                 </div>
             }
         </div>

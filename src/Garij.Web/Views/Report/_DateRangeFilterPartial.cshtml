@@ -1,7 +1,21 @@
 @{
-    var currentStart = Context.Request.Query["start"].ToString();
-    var currentEnd = Context.Request.Query["end"].ToString();
+    var appliedRange = ViewData[ReportDateRange.ViewDataKey] as ReportDateRange;
+
+    // After a reversed range is swapped, the inputs show the dates the report actually ran with, so
+    // applying the filter again does not resubmit the reversed pair. Otherwise they echo the query as
+    // typed, which keeps an unparseable value's handling exactly as it was.
+    var showAppliedRange = appliedRange is { WasReversed: true };
+    var currentStart = showAppliedRange ? appliedRange!.Start!.Value.ToString("yyyy-MM-dd") : Context.Request.Query["start"].ToString();
+    var currentEnd = showAppliedRange ? appliedRange!.End!.Value.ToString("yyyy-MM-dd") : Context.Request.Query["end"].ToString();
     var action = ViewContext.RouteData.Values["action"]?.ToString() ?? "Index";
+}
+
+@if (appliedRange?.CorrectionMessage is { } correctionMessage)
+{
+    <div class="alert alert-warning py-2 px-3 mb-3 d-flex align-items-center gap-2 small border border-warning border-opacity-50 bg-dark text-warning" role="alert" id="date-range-corrected">
+        <i class="bi bi-arrow-left-right fs-5 flex-shrink-0"></i>
+        <div><strong>Date range corrected:</strong> @correctionMessage</div>
+    </div>
 }
 
 <div class="app-card mb-4 no-print border border-secondary border-opacity-25">

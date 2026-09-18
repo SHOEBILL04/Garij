@@ -76,7 +76,7 @@
 @await Html.PartialAsync("_DateRangeFilterPartial")
 
 <!-- Summary KPI Cards -->
-<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-xl-6 g-3 mb-4">
+<div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-3 mb-4">
     <div class="col">
         <div class="app-card h-100 p-3">
             <span class="text-secondary small text-uppercase">Billed Net (Pre-Tax)</span>
@@ -94,7 +94,7 @@
     <div class="col">
         <div class="app-card h-100 p-3 border-success border-opacity-25">
             <span class="text-success small text-uppercase fw-semibold">Cash Collected</span>
-            <h3 class="text-success fw-bold font-monospace mt-1 mb-0">$@Model.TotalCollected.ToString("N2")</h3>
+            <h3 class="text-success fw-bold font-monospace mt-1 mb-0" id="total-collected">$@Model.TotalCollected.ToString("N2")</h3>
             <span class="small text-muted">Cleared payment transactions</span>
         </div>
     </div>
@@ -119,13 +119,20 @@
             <span class="small text-muted">@Model.RefundedInvoiceCount invoice(s) excluded from billed</span>
         </div>
     </div>
+    <div class="col">
+        <div class="app-card h-100 p-3 border-danger border-opacity-25">
+            <span class="text-danger small text-uppercase fw-semibold">Refunded Payments</span>
+            <h3 class="text-danger fw-bold font-monospace mt-1 mb-0" id="refunded-payment-amount">$@Model.RefundedPaymentAmount.ToString("N2")</h3>
+            <span class="small text-muted">@Model.RefundedPaymentCount payment(s) excluded from collected</span>
+        </div>
+    </div>
 </div>
 
 <div class="app-card p-3 mb-4 border-secondary border-opacity-25 bg-dark bg-opacity-25">
     <div class="d-flex align-items-start gap-2">
         <i class="bi bi-info-circle text-info mt-1"></i>
         <div class="small text-secondary">
-            <strong class="text-light">Reporting Basis:</strong> Billed revenue excludes invoices currently marked Refunded; collected revenue records all payments received in the period regardless of the invoice's current status; the system does not store refund timestamps, so an invoice refunded after the reporting period will still have its original payments counted as collected.
+            <strong class="text-light">Reporting Basis:</strong> Billed revenue excludes invoices currently marked Refunded. Collected revenue counts payments received in the period, excluding any payment that has since been refunded; refunded payments are shown separately by the date they were originally received, so a payment refunded after the period ends is removed from that period's collected figure once the refund is recorded.
         </div>
     </div>
 </div>

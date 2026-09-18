@@ -22,6 +22,14 @@ public interface IServiceJobService
 
     Task<ServiceJobDto> UpdateServiceJobStatusAsync(int id, JobStatus status);
 
+    /// <summary>
+    /// Records an Approved/Rejected decision on a notification and applies its effect on the job.
+    /// For a customer approval request, approving moves the job to InProgress and rejecting moves
+    /// it to Cancelled, both through the normal status transition rules. A completion notification
+    /// only records the decision.
+    /// </summary>
+    Task<NotificationDto> RespondToNotificationAsync(int notificationId, NotificationStatus decision);
+
     Task DeleteServiceJobAsync(int id);
 
     Task<MechanicAssignmentDto> AssignMechanicAsync(int serviceJobId, int userId, RoleInJob roleInJob);

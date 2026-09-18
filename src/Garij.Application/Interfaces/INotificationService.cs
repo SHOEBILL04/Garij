@@ -15,5 +15,9 @@ public interface INotificationService
 
     Task<NotificationDto> CreateNotificationAsync(NotificationDto notification);
 
+    /// <summary>
+    /// Records the decision on the notification row only; it never touches the job. To respond as
+    /// a user and have the decision act on the job, use IServiceJobService.RespondToNotificationAsync.
+    /// </summary>
     Task<NotificationDto> RespondToNotificationAsync(int notificationId, NotificationStatus status);
 }

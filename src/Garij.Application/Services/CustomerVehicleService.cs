@@ -69,6 +69,8 @@ public class CustomerVehicleService : ICustomerVehicleService
     public async Task<CustomerDto> CreateCustomerAsync(CustomerDto customer)
     {
         var garageId = await ResolveGarageIdAsync(customer.GarageId);
+        await EnsureContactDetailsAreUniqueAsync(customer.Email, customer.PhoneNumber, garageId);
+
         var entity = new Customer
         {
             FullName = customer.FullName.Trim(),
@@ -95,6 +97,10 @@ public class CustomerVehicleService : ICustomerVehicleService
         {
             throw new NotFoundException(nameof(Customer), customer.Id);
         }
+
+        // Excludes the customer being edited, so saving without changing the e-mail or phone
+        // is not blocked by the customer matching itself.
+        await EnsureContactDetailsAreUniqueAsync(customer.Email, customer.PhoneNumber, garageId, excludingCustomerId: entity.Id);
 
         entity.FullName = customer.FullName.Trim();
         entity.Email = customer.Email.Trim();
@@ -299,6 +305,48 @@ public class CustomerVehicleService : ICustomerVehicleService
         _vehicles.Remove(entity);
         await _vehicles.SaveChangesAsync();
     }
+
+    /// <summary>
+    /// Rejects an e-mail or phone number already on file for another customer in the same garage,
+    /// so one person is not registered twice with their vehicles and history split across the rows.
+    /// Shared by the create and edit paths. Other garages are not considered: the same person may
+    /// be a customer of more than one workshop.
+    /// </summary>
+    /// <param name="excludingCustomerId">The customer being edited; null when creating.</param>
+    private async Task EnsureContactDetailsAreUniqueAsync(string email, string phoneNumber, string garageId, int? excludingCustomerId = null)
+    {
+        var normalizedEmail = NormalizeEmail(email);
+        var normalizedPhone = NormalizePhone(phoneNumber);
+
+        var otherCustomers = (await _customers.GetAllAsync())
+            .Where(c => c.Id != excludingCustomerId && (c.GarageId ?? "default-garij-master") == garageId)
+            .ToList();
+
+        // Both fields are checked so a form that duplicates both reports both, each under its own input.
+        var errors = new Dictionary<string, string[]>();
+
+        if (normalizedEmail.Length > 0 && otherCustomers.Any(c => NormalizeEmail(c.Email) == normalizedEmail))
+        {
+            errors[nameof(CustomerDto.Email)] = ["A customer with this e-mail address already exists."];
+        }
+
+        if (normalizedPhone.Length > 0 && otherCustomers.Any(c => NormalizePhone(c.PhoneNumber) == normalizedPhone))
+        {
+            errors[nameof(CustomerDto.PhoneNumber)] = ["A customer with this phone number already exists."];
+        }
+
+        if (errors.Count > 0)
+        {
+            throw new ValidationException(errors);
+        }
+    }
+
+    /// <summary>E-mail addresses are compared case-insensitively: John@Example.com and john@example.com are one mailbox.</summary>
+    private static string NormalizeEmail(string? email) => (email ?? string.Empty).Trim().ToLowerInvariant();
+
+    /// <summary>Phone numbers are compared by their digits, so "+880 1711-000000" matches "+8801711000000".</summary>
+    private static string NormalizePhone(string? phoneNumber) =>
+        new((phoneNumber ?? string.Empty).Where(char.IsAsciiDigit).ToArray());
 
     private async Task EnsureCustomerExists(int customerId, string? garageId = null)
     {

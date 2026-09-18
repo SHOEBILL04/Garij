@@ -1,0 +1,69 @@
+@model RefundPaymentViewModel
+
+@{
+    ViewData["Title"] = "Refund Payment";
+    var invoice = Model.Invoice;
+    var payment = Model.Payment;
+}
+
+<div class="app-page-header">
+    <div>
+        <h1 class="app-page-title">Refund Payment</h1>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="app-card">
+            <h2 class="app-card-heading"><i class="bi bi-arrow-counterclockwise me-2 text-danger"></i>Refund Payment</h2>
+
+            <dl class="row mb-4">
+                <dt class="col-sm-5 app-page-subtitle">Invoice:</dt>
+                <dd class="col-sm-7 text-white font-monospace">@invoice.InvoiceNumber</dd>
+
+                <dt class="col-sm-5 app-page-subtitle">Received:</dt>
+                <dd class="col-sm-7 text-white">@payment.PaidAt.ToString("MMM dd, yyyy HH:mm")</dd>
+
+                <dt class="col-sm-5 app-page-subtitle">Method:</dt>
+                <dd class="col-sm-7 text-white">@payment.PaymentMethod</dd>
+
+                <dt class="col-sm-5 app-page-subtitle">Reference:</dt>
+                <dd class="col-sm-7 text-white font-monospace">@(string.IsNullOrWhiteSpace(payment.TransactionReference) ? "-" : payment.TransactionReference)</dd>
+
+                <dt class="col-sm-5 fw-bold text-white">Amount:</dt>
+                <dd class="col-sm-7 fw-bold text-white mb-0">@payment.Amount.ToString("C")</dd>
+            </dl>
+
+            @if (payment.IsRefunded)
+            {
+                <div asp-validation-summary="ModelOnly" class="app-alert-danger" role="alert"></div>
+                <p class="text-light">
+                    <span class="app-badge app-badge-danger">Refunded</span>
+                    This payment was already refunded on @payment.RefundedAt!.Value.ToString("MMM dd, yyyy HH:mm").
+                </p>
+                <a asp-action="Details" asp-route-id="@invoice.Id" class="app-btn app-btn-outline">Back to Invoice</a>
+            }
+            else
+            {
+                <form asp-action="RefundPayment" asp-route-invoiceId="@invoice.Id" asp-route-paymentId="@payment.Id" method="post">
+                    <div asp-validation-summary="ModelOnly" class="app-alert-danger" role="alert"></div>
+
+                    <p class="text-light">
+                        Refund the full <strong>@payment.Amount.ToString("C")</strong> of this payment? It stays in the
+                        invoice's payment history marked <span class="app-badge app-badge-danger">Refunded</span>, stops
+                        counting towards the amount paid, and is excluded from collected revenue.
+                    </p>
+                    <p class="app-page-subtitle small">
+                        The invoice's outstanding balance goes from @invoice.OutstandingBalance.ToString("C")
+                        to @((invoice.OutstandingBalance + payment.Amount).ToString("C")). This cannot be undone from here.
+                    </p>
+
+                    <div class="d-flex justify-content-end gap-2 mt-3">
+                        <a asp-action="Details" asp-route-id="@invoice.Id" class="app-btn app-btn-outline">Cancel</a>
+                        <button type="submit" class="app-btn app-btn-danger"><i class="bi bi-arrow-counterclockwise"></i> Refund Payment</button>
+                    </div>
+                </form>
+            }
+        </div>
+    </div>
+</div>

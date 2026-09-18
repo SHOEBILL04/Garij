@@ -86,6 +86,7 @@ public class NotificationService : INotificationService
             GarageId = garageId,
             ServiceJobId = notification.ServiceJobId,
             Message = notification.Message,
+            Type = notification.Type,
             Status = NotificationStatus.Pending,
             CreatedAt = DateTime.UtcNow
         };
@@ -122,6 +123,7 @@ public class NotificationService : INotificationService
         GarageId = notification.GarageId,
         ServiceJobId = notification.ServiceJobId,
         Message = notification.Message,
+        Type = notification.Type,
         Status = notification.Status,
         CreatedAt = notification.CreatedAt,
         RespondedAt = notification.RespondedAt

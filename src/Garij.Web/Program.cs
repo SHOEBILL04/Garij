@@ -46,12 +46,19 @@ builder.Services.AddControllersWithViews(options =>
 
 var app = builder.Build();
 
+// Catches unhandled exceptions and renders the shared error view in place, keeping the
+// status code it calculated. Registered first so it wraps the whole pipeline, and used in
+// every environment so a failure looks the same to the user in development and production.
 app.UseGlobalExceptionMiddleware();
+
+// Gives the same treatment to bare status codes that never threw - NotFound()/BadRequest()
+// from a controller, or an unmatched route. Re-executes the /Error endpoint on the original
+// request instead of redirecting, so the original status code is what the client receives.
+app.UseStatusCodePagesWithReExecute("/Error/{0}");
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Error");
     app.UseHsts();
 }
 

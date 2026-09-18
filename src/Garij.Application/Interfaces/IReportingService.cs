@@ -10,7 +10,7 @@ public interface IReportingService
 
     Task<IEnumerable<PartsConsumptionReportDto>> GetPartsConsumptionReportAsync(DateTime periodStart, DateTime periodEnd);
 
-    Task<IEnumerable<PartDto>> GetLowStockReportAsync();
+    Task<IEnumerable<LowStockReportDto>> GetLowStockReportAsync();
 
     Task<IEnumerable<ServiceJobDto>> GetCompletedJobsReportAsync(DateTime periodStart, DateTime periodEnd);
 }

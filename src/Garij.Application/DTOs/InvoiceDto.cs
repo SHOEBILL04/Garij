@@ -32,7 +32,11 @@ public class InvoiceDto
 
     public List<PaymentTransactionDto> Payments { get; set; } = new();
 
+    /// <summary>Sum of payments still standing; refunded payments are excluded.</summary>
     public decimal AmountPaid { get; set; }
+
+    /// <summary>Sum of payments that were received and later refunded.</summary>
+    public decimal AmountRefunded { get; set; }
 
     public decimal OutstandingBalance { get; set; }
 

@@ -236,7 +236,7 @@ public class BillingService : IBillingService
             throw new NotFoundException(nameof(Invoice), payment.InvoiceId);
         }
 
-        var amountPaidSoFar = invoice.PaymentTransactions.Sum(p => p.Amount);
+        var amountPaidSoFar = AmountStillPaid(invoice);
         var outstanding = invoice.TotalAmount - amountPaidSoFar;
 
         if (payment.Amount > outstanding)
@@ -255,18 +255,52 @@ public class BillingService : IBillingService
             PaidAt = DateTime.UtcNow
         };
 
-        var newAmountPaid = amountPaidSoFar + payment.Amount;
-        invoice.PaymentStatus = newAmountPaid == invoice.TotalAmount
-            ? PaymentStatus.Paid
-            : newAmountPaid > 0
-                ? PaymentStatus.PartiallyPaid
-                : PaymentStatus.Pending;
+        invoice.PaymentStatus = PaymentStatusFor(amountPaidSoFar + payment.Amount, invoice.TotalAmount);
 
         await _paymentTransactionRepository.AddAsync(entity);
         _invoiceRepository.Update(invoice);
         await _paymentTransactionRepository.SaveChangesAsync();
 
         return MapPaymentToDto(entity);
+    }
+
+    /// <summary>
+    /// Refunds a recorded payment in full. The payment row is kept and stamped with RefundedAt -
+    /// never deleted, and never offset by a negative row, which CK_PaymentTransaction_Amount forbids -
+    /// so the payment history still shows it. PaymentStatus is then recomputed from the payments still
+    /// standing, the same way RecordPaymentAsync does, which reopens the outstanding balance.
+    /// </summary>
+    public async Task<PaymentTransactionDto> RefundPaymentAsync(int invoiceId, int paymentId)
+    {
+        var garageId = await ResolveGarageIdAsync();
+        var invoice = await _invoiceRepository.GetByIdWithPaymentsAsync(invoiceId)
+            ?? throw new NotFoundException(nameof(Invoice), invoiceId);
+
+        if ((invoice.GarageId ?? "default-garij-master") != garageId)
+        {
+            throw new NotFoundException(nameof(Invoice), invoiceId);
+        }
+
+        // Found through the invoice, so only a payment actually recorded against this invoice can be
+        // refunded; an id belonging to another invoice reads as not found.
+        var payment = invoice.PaymentTransactions.FirstOrDefault(p => p.Id == paymentId)
+            ?? throw new NotFoundException(nameof(PaymentTransaction), paymentId);
+
+        if (payment.IsRefunded)
+        {
+            throw new BusinessRuleException(
+                "BR-013",
+                $"The payment of {payment.Amount:0.00} on invoice '{invoice.InvoiceNumber}' was already refunded on {payment.RefundedAt:yyyy-MM-dd}.");
+        }
+
+        payment.RefundedAt = DateTime.UtcNow;
+        invoice.PaymentStatus = PaymentStatusFor(AmountStillPaid(invoice), invoice.TotalAmount);
+
+        _paymentTransactionRepository.Update(payment);
+        _invoiceRepository.Update(invoice);
+        await _paymentTransactionRepository.SaveChangesAsync();
+
+        return MapPaymentToDto(payment);
     }
 
     public async Task<IEnumerable<PaymentTransactionDto>> GetPaymentsByInvoiceAsync(int invoiceId)
@@ -308,7 +342,8 @@ public class BillingService : IBillingService
             .OrderBy(p => p.PaidAt)
             .Select(MapPaymentToDto)
             .ToList();
-        var amountPaid = payments.Sum(p => p.Amount);
+        var amountPaid = payments.Where(p => !p.IsRefunded).Sum(p => p.Amount);
+        var amountRefunded = payments.Where(p => p.IsRefunded).Sum(p => p.Amount);
 
         return new InvoiceDto
         {
@@ -328,6 +363,7 @@ public class BillingService : IBillingService
             PartLines = partLines,
             Payments = payments,
             AmountPaid = amountPaid,
+            AmountRefunded = amountRefunded,
             OutstandingBalance = invoice.TotalAmount - amountPaid
         };
     }
@@ -353,6 +389,18 @@ public class BillingService : IBillingService
         Amount = payment.Amount,
         PaymentMethod = payment.PaymentMethod,
         TransactionReference = payment.TransactionReference,
-        PaidAt = payment.PaidAt
+        PaidAt = payment.PaidAt,
+        RefundedAt = payment.RefundedAt
     };
+
+    /// <summary>What has been paid and not refunded - the figure the balance and the status are based on.</summary>
+    private static decimal AmountStillPaid(Invoice invoice) =>
+        invoice.PaymentTransactions.Where(p => !p.IsRefunded).Sum(p => p.Amount);
+
+    private static PaymentStatus PaymentStatusFor(decimal amountPaid, decimal totalAmount) =>
+        amountPaid == totalAmount
+            ? PaymentStatus.Paid
+            : amountPaid > 0
+                ? PaymentStatus.PartiallyPaid
+                : PaymentStatus.Pending;
 }

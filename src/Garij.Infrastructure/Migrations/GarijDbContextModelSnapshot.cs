@@ -78,12 +78,18 @@ namespace Garij.Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("GarageId")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("GarageId");
 
                     b.ToTable("Customers");
                 });
@@ -93,6 +99,10 @@ namespace Garij.Infrastructure.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("GarageId")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("InvoiceNumber")
                         .IsRequired()
@@ -118,6 +128,8 @@ namespace Garij.Infrastructure.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("GarageId");
 
                     b.HasIndex("ServiceJobId")
                         .IsUnique();
@@ -232,6 +244,10 @@ namespace Garij.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("GarageId")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Message")
                         .IsRequired()
                         .HasMaxLength(1000)
@@ -246,7 +262,12 @@ namespace Garij.Infrastructure.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("Type")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("GarageId");
 
                     b.HasIndex("ServiceJobId");
 
@@ -258,6 +279,10 @@ namespace Garij.Infrastructure.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("GarageId")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -283,6 +308,11 @@ namespace Garij.Infrastructure.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("GarageId");
+
+                    b.HasIndex("GarageId", "PartNumber")
+                        .IsUnique();
 
                     b.ToTable("Parts", t =>
                         {
@@ -311,6 +341,9 @@ namespace Garij.Infrastructure.Migrations
 
                     b.Property<int>("PaymentMethod")
                         .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("RefundedAt")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("TransactionReference")
                         .IsRequired()
@@ -349,6 +382,10 @@ namespace Garij.Infrastructure.Migrations
                     b.Property<string>("Currency")
                         .IsRequired()
                         .HasMaxLength(10)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("GarageId")
+                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("IdentityUserId")
@@ -390,6 +427,8 @@ namespace Garij.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("BuyerEmail");
+
+                    b.HasIndex("GarageId");
 
                     b.HasIndex("IdentityUserId");
 
@@ -455,6 +494,10 @@ namespace Garij.Infrastructure.Migrations
                         .HasMaxLength(2000)
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("GarageId")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("JobType")
                         .HasColumnType("INTEGER");
 
@@ -470,6 +513,8 @@ namespace Garij.Infrastructure.Migrations
                         .IsUnique();
 
                     b.HasIndex("CustomerId");
+
+                    b.HasIndex("GarageId");
 
                     b.HasIndex("VehicleId");
 
@@ -495,6 +540,10 @@ namespace Garij.Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("GarageId")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("IdentityUserId")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -508,6 +557,8 @@ namespace Garij.Infrastructure.Migrations
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("GarageId");
 
                     b.HasIndex("IdentityUserId");
 
@@ -527,6 +578,10 @@ namespace Garij.Infrastructure.Migrations
 
                     b.Property<int>("CustomerId")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("GarageId")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("LicensePlateNumber")
                         .IsRequired()
@@ -555,7 +610,11 @@ namespace Garij.Infrastructure.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.HasIndex("LicensePlateNumber")
+                    b.HasIndex("GarageId");
+
+                    b.HasIndex("LicensePlateNumber");
+
+                    b.HasIndex("GarageId", "LicensePlateNumber")
                         .IsUnique();
 
                     b.ToTable("Vehicles", t =>

@@ -12,7 +12,10 @@ public class RevenueReportDto
     /// <summary>Total gross billed revenue including tax (Invoice.TotalAmount).</summary>
     public decimal TotalBilledGross { get; set; }
 
-    /// <summary>Total actual collected cash/payments (PaymentTransaction.Amount).</summary>
+    /// <summary>
+    /// Total collected cash/payments (PaymentTransaction.Amount) received in the period, excluding
+    /// payments that have since been refunded.
+    /// </summary>
     public decimal TotalCollected { get; set; }
 
     /// <summary>Number of billed non-void invoices issued in the period.</summary>
@@ -26,6 +29,15 @@ public class RevenueReportDto
 
     /// <summary>Total gross value of refunded invoices issued in the period.</summary>
     public decimal RefundedGrossAmount { get; set; }
+
+    /// <summary>Number of payments received in the period that have since been refunded.</summary>
+    public int RefundedPaymentCount { get; set; }
+
+    /// <summary>
+    /// Total of payments received in the period that have since been refunded - the amount
+    /// excluded from TotalCollected. TotalCollected + RefundedPaymentAmount is everything received.
+    /// </summary>
+    public decimal RefundedPaymentAmount { get; set; }
 
     /// <summary>Backwards-compatible total revenue field (mirrors TotalBilledGross).</summary>
     public decimal TotalRevenue

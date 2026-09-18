@@ -1,10 +1,60 @@
+@model IEnumerable<Garij.Application.DTOs.LowStockReportDto>
 @{
     ViewData["Title"] = "Low Stock Report";
+
+    var partsList = Model.ToList();
+    var outOfStockCount = partsList.Count(p => p.IsOutOfStock);
+    var totalShortfall = partsList.Sum(p => p.ShortfallBelowReorderLevel);
 }
 
-<div class="app-page-header">
+<style>
+    @@media print {
+        header, nav, footer, .no-print, .app-btn, .navbar, .brand-title, .theme-toggle {
+            display: none !important;
+        }
+        body {
+            background: #ffffff !important;
+            color: #000000 !important;
+            font-size: 12pt;
+        }
+        .app-card {
+            border: 1px solid #ccc !important;
+            background: #ffffff !important;
+            color: #000000 !important;
+            box-shadow: none !important;
+            break-inside: avoid;
+        }
+        .text-white, .text-light, .text-info, .text-secondary {
+            color: #000000 !important;
+        }
+        table {
+            width: 100% !important;
+            border-collapse: collapse !important;
+        }
+        table, th, td {
+            border: 1px solid #333 !important;
+            color: #000000 !important;
+            padding: 6px !important;
+        }
+        .print-header {
+            display: block !important;
+            margin-bottom: 20px;
+        }
+    }
+    .print-header {
+        display: none;
+    }
+</style>
+
+<div class="print-header">
+    <h2>Garij Workshop — Low Stock Report</h2>
+    <p>Generated: @DateTime.UtcNow.ToString("g") UTC</p>
+</div>
+
+<div class="app-page-header no-print">
     <div>
         <h1 class="app-page-title">Low Stock Report</h1>
+        <p class="app-page-subtitle">Parts currently at or below their reorder level, most urgent first.</p>
     </div>
     <div class="d-flex gap-2">
         <a asp-controller="Parts" asp-action="Index" class="app-btn app-btn-outline">View Parts Inventory</a>
@@ -12,10 +62,101 @@
     </div>
 </div>
 
-<div class="app-card">
-    <div class="app-empty-state">
-        <i class="bi bi-box-seam"></i>
-        This report isn't built yet.
-        <div class="small mt-1">In the meantime, the Parts Inventory page already flags any part at or below its reorder level.</div>
+<div class="alert alert-info py-2 px-3 mb-4 d-flex align-items-center gap-2 small border border-info border-opacity-25 bg-dark" role="alert">
+    <i class="bi bi-info-circle-fill text-info fs-5 flex-shrink-0"></i>
+    <div>
+        <strong>Snapshot:</strong> This report reflects stock levels right now, so it has no date range. A part is listed when its quantity in stock is at or below its reorder level &mdash; the same rule behind the <strong>Low stock</strong> badge on the Parts Inventory screen.
     </div>
+</div>
+
+<!-- Summary KPI Cards -->
+<div class="row row-cols-1 row-cols-sm-3 g-3 mb-4">
+    <div class="col">
+        <div class="app-card h-100 p-3 @(partsList.Count > 0 ? "border-warning border-opacity-50" : "")">
+            <span class="text-warning small text-uppercase fw-semibold">Parts To Reorder</span>
+            <h3 class="text-warning fw-bold font-monospace mt-1 mb-0" id="low-stock-count">@partsList.Count</h3>
+            <span class="small text-muted">At or below reorder level</span>
+        </div>
+    </div>
+    <div class="col">
+        <div class="app-card h-100 p-3 @(outOfStockCount > 0 ? "border-danger border-opacity-50" : "")">
+            <span class="text-danger small text-uppercase fw-semibold">Out Of Stock</span>
+            <h3 class="text-danger fw-bold font-monospace mt-1 mb-0">@outOfStockCount</h3>
+            <span class="small text-muted">No units left to fit</span>
+        </div>
+    </div>
+    <div class="col">
+        <div class="app-card h-100 p-3">
+            <span class="text-secondary small text-uppercase">Units Below Threshold</span>
+            <h3 class="text-white fw-bold font-monospace mt-1 mb-0">@totalShortfall.ToString("N0")</h3>
+            <span class="small text-muted">Sum of (reorder level &minus; in stock)</span>
+        </div>
+    </div>
+</div>
+
+<!-- Ranked Table -->
+<div class="app-card">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="text-white fw-bold mb-0">Reorder List</h5>
+        <span class="badge bg-secondary bg-opacity-25 text-light">@partsList.Count Part(s)</span>
+    </div>
+
+    @if (partsList.Count == 0)
+    {
+        <div class="app-empty-state py-5">
+            <i class="bi bi-check2-circle fs-1 text-success mb-2"></i>
+            <div class="fw-semibold">No parts are at or below their reorder level.</div>
+            <div class="small text-secondary mt-1">Every part in the inventory is above its reorder threshold.</div>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-dark table-hover align-middle mb-0">
+                <thead>
+                    <tr class="text-secondary small text-uppercase border-secondary">
+                        <th>#</th>
+                        <th>Part Details</th>
+                        <th>Part Number</th>
+                        <th class="text-center">In Stock</th>
+                        <th class="text-center">Reorder Level</th>
+                        <th class="text-center">Below Threshold</th>
+                        <th class="text-end">Unit Price</th>
+                        <th class="text-center">Stock Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < partsList.Count; i++)
+                    {
+                        var p = partsList[i];
+                        <tr data-part-number="@p.PartNumber">
+                            <td class="text-secondary font-monospace">@(i + 1)</td>
+                            <td>
+                                <a asp-controller="Parts" asp-action="Details" asp-route-id="@p.PartId" class="fw-semibold text-white text-decoration-none">@p.PartName</a>
+                            </td>
+                            <td class="font-monospace text-secondary small">@p.PartNumber</td>
+                            <td class="text-center font-monospace fw-bold">@p.CurrentStock</td>
+                            <td class="text-center font-monospace text-secondary">@p.ReorderLevel</td>
+                            <td class="text-center font-monospace">@p.ShortfallBelowReorderLevel</td>
+                            <td class="text-end font-monospace">$@p.UnitPrice.ToString("N2")</td>
+                            <td class="text-center">
+                                @if (p.IsOutOfStock)
+                                {
+                                    <span class="badge bg-danger bg-opacity-25 text-danger border border-danger border-opacity-50">
+                                        <i class="bi bi-x-octagon-fill me-1"></i>Out of stock
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning bg-opacity-25 text-warning border border-warning border-opacity-50">
+                                        <i class="bi bi-exclamation-triangle-fill me-1"></i>Reorder
+                                    </span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
 </div>

@@ -16,6 +16,12 @@ public class PartConfiguration : IEntityTypeConfiguration<Part>
         builder.Property(p => p.GarageId).HasMaxLength(100);
         builder.HasIndex(p => p.GarageId);
 
+        // Second line of defence behind EnsurePartNumberIsUniqueAsync: a part number identifies
+        // one part within a garage, so two rows sharing one would make a stock adjustment or a
+        // parts-usage log ambiguous. Scoped to the garage, matching the vehicle plate index, so
+        // separate garages may still stock the same manufacturer part number.
+        builder.HasIndex(p => new { p.GarageId, p.PartNumber }).IsUnique();
+
         // Included in the WHERE clause of every UPDATE, so a stale writer affects 0 rows
         // and EF Core raises DbUpdateConcurrencyException instead of losing the update.
         builder.Property(p => p.RowVersion).IsConcurrencyToken();

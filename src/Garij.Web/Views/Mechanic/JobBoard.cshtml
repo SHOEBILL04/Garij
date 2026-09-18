@@ -215,7 +215,7 @@ else
                                     <input type="hidden" name="filterStatus" value="@selectedStatus" />
                                     <input type="hidden" name="sortBy" value="@selectedSortBy" />
                                     <input type="hidden" name="search" value="@searchTerm" />
-                                    <textarea name="diagnosticNotes" class="app-form-control mb-2" rows="3" placeholder="Add diagnostic notes...">@job.DiagnosticNotes</textarea>
+                                    <textarea name="diagnosticNotes" maxlength="2000" class="app-form-control mb-2" rows="3" placeholder="Add diagnostic notes...">@job.DiagnosticNotes</textarea>
                                     <button type="submit" class="app-btn app-btn-primary app-btn-sm w-100">Save Diagnostic Notes</button>
                                 </form>
                             </div>
@@ -236,7 +236,7 @@ else
                                     <input type="hidden" name="sortBy" value="@selectedSortBy" />
                                     <input type="hidden" name="search" value="@searchTerm" />
                                     <button type="submit" class="app-btn app-btn-primary w-100 py-3"
-                                            title="@(nextStatus == JobStatus.Completed ? "Ensure parts used are logged before marking completed" : "")">
+                                            title="@(nextStatus == JobStatus.Completed ? "Log the parts used or the services performed before marking completed" : "")">
                                         <i class="bi bi-arrow-right-circle-fill"></i>
                                         <span>@nextStatusLabel</span>
                                     </button>

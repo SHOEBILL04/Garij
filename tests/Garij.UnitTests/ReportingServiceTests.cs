@@ -2,6 +2,7 @@ using Garij.Application.Services;
 using Garij.Domain.Entities;
 using Garij.Domain.Enums;
 using Garij.Infrastructure.Persistence;
+using Garij.Infrastructure.Repositories;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
@@ -26,7 +27,9 @@ public class ReportingServiceTests : IDisposable
         _context = new GarijDbContext(options);
         _context.Database.EnsureCreated();
 
-        _reportingService = new ReportingService(_context);
+        _reportingService = new ReportingService(
+            _context,
+            new PartsInventoryService(new PartRepository(_context), new JobPartUsedRepository(_context)));
     }
 
     public void Dispose()

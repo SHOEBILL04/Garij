@@ -1,4 +1,4 @@
-using Garij.Application.Interfaces;
+﻿using Garij.Application.Interfaces;
 using Garij.Application.Services;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -11,6 +11,7 @@ public static class DependencyInjection
         services.AddScoped<ICustomerVehicleService, CustomerVehicleService>();
         services.AddScoped<IServiceJobService, ServiceJobService>();
         services.AddScoped<IPartsInventoryService, PartsInventoryService>();
+        services.AddScoped<IJobServiceDetailService, JobServiceDetailService>();
         services.AddScoped<IBillingService, BillingService>();
         services.AddScoped<INotificationService, NotificationService>();
         services.AddScoped<IReportingService, ReportingService>();

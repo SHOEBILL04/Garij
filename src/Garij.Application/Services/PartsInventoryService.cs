@@ -66,11 +66,7 @@ public class PartsInventoryService : IPartsInventoryService
     public async Task<PartDto> AddPartAsync(PartDto part)
     {
         var garageId = await ResolveGarageIdAsync(part.GarageId);
-        var parts = await _partRepository.GetAllAsync();
-        if (parts.Any(p => (p.GarageId ?? "default-garij-master") == garageId && p.PartNumber == part.PartNumber))
-        {
-            throw new ValidationException(nameof(PartDto.PartNumber), $"A part with part number '{part.PartNumber}' already exists.");
-        }
+        await EnsurePartNumberIsUniqueAsync(part.PartNumber, garageId);
 
         var entity = new Part
         {
@@ -98,6 +94,11 @@ public class PartsInventoryService : IPartsInventoryService
         {
             throw new NotFoundException(nameof(Part), part.Id);
         }
+
+        // Editing has to run the same uniqueness check as creating, or a part number can be
+        // changed to one another part already uses and the inventory becomes ambiguous - a
+        // stock adjustment or usage log would no longer identify a single part.
+        await EnsurePartNumberIsUniqueAsync(part.PartNumber, garageId, excludingPartId: entity.Id);
 
         entity.Name = part.Name;
         entity.PartNumber = part.PartNumber;
@@ -201,6 +202,28 @@ public class PartsInventoryService : IPartsInventoryService
         jobPartUsed.Id = entity.Id;
         jobPartUsed.PriceAtUsage = entity.PriceAtUsage;
         return jobPartUsed;
+    }
+
+    /// <summary>
+    /// Rejects a part number already used by another part in the same garage. Shared by the
+    /// create and edit paths so both refuse a duplicate with identical wording.
+    /// </summary>
+    /// <param name="excludingPartId">
+    /// The part being edited, excluded from the comparison so saving a part without changing
+    /// its number is not blocked by the part matching itself. Null when creating.
+    /// </param>
+    private async Task EnsurePartNumberIsUniqueAsync(string partNumber, string garageId, int? excludingPartId = null)
+    {
+        var parts = await _partRepository.GetAllAsync();
+        var isTaken = parts.Any(p =>
+            p.Id != excludingPartId &&
+            (p.GarageId ?? "default-garij-master") == garageId &&
+            p.PartNumber == partNumber);
+
+        if (isTaken)
+        {
+            throw new ValidationException(nameof(PartDto.PartNumber), $"A part with part number '{partNumber}' already exists.");
+        }
     }
 
     /// <summary>

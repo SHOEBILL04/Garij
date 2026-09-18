@@ -1,4 +1,4 @@
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using Garij.Application.DTOs;
 using Garij.Application.Interfaces;
 using Garij.Domain.Entities;
@@ -17,6 +17,7 @@ namespace Garij.Web.Controllers;
 public class ServiceJobController : Controller
 {
     private readonly IServiceJobService _serviceJobService;
+    private readonly IJobServiceDetailService _jobServiceDetailService;
     private readonly IVehicleRepository _vehicleRepository;
     private readonly UserManager<IdentityUser> _userManager;
     private readonly RoleManager<IdentityRole> _roleManager;
@@ -24,12 +25,14 @@ public class ServiceJobController : Controller
 
     public ServiceJobController(
         IServiceJobService serviceJobService,
+        IJobServiceDetailService jobServiceDetailService,
         IVehicleRepository vehicleRepository,
         UserManager<IdentityUser> userManager,
         RoleManager<IdentityRole> roleManager,
         GarijDbContext context)
     {
         _serviceJobService = serviceJobService;
+        _jobServiceDetailService = jobServiceDetailService;
         _vehicleRepository = vehicleRepository;
         _userManager = userManager;
         _roleManager = roleManager;
@@ -152,6 +155,86 @@ public class ServiceJobController : Controller
             await PopulateVehiclesDropDownList(model.VehicleId);
             return View(model);
         }
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> LogService(int serviceJobId)
+    {
+        var job = await _serviceJobService.GetServiceJobByIdAsync(serviceJobId);
+        if (job is null)
+        {
+            return NotFound();
+        }
+
+        ViewBag.ServiceJob = job;
+        await PopulateServiceCatalogDropDownList();
+
+        return View(new JobServiceDetailDto { ServiceJobId = serviceJobId, Quantity = 1 });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> LogService(JobServiceDetailDto model)
+    {
+        if (model.ServiceCatalogId <= 0)
+        {
+            ModelState.AddModelError(nameof(model.ServiceCatalogId), "Please select a service.");
+        }
+
+        if (model.Quantity <= 0)
+        {
+            ModelState.AddModelError(nameof(model.Quantity), "Quantity must be at least 1.");
+        }
+
+        if (!ModelState.IsValid)
+        {
+            ViewBag.ServiceJob = await _serviceJobService.GetServiceJobByIdAsync(model.ServiceJobId);
+            await PopulateServiceCatalogDropDownList(model.ServiceCatalogId);
+            return View(model);
+        }
+
+        try
+        {
+            await _jobServiceDetailService.LogJobServiceAsync(model);
+            TempData["SuccessMessage"] = "Service (labour) added to the job.";
+            return RedirectToAction(nameof(Details), new { id = model.ServiceJobId });
+        }
+        catch (Exception ex)
+        {
+            ModelState.AddModelError(string.Empty, ex.Message);
+            ViewBag.ServiceJob = await _serviceJobService.GetServiceJobByIdAsync(model.ServiceJobId);
+            await PopulateServiceCatalogDropDownList(model.ServiceCatalogId);
+            return View(model);
+        }
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> RemoveService(int id, int serviceJobId)
+    {
+        try
+        {
+            await _jobServiceDetailService.RemoveJobServiceAsync(id);
+            TempData["SuccessMessage"] = "Service removed from the job.";
+        }
+        catch (Exception ex)
+        {
+            TempData["ErrorMessage"] = ex.Message;
+        }
+
+        return RedirectToAction(nameof(Details), new { id = serviceJobId });
+    }
+
+    private async Task PopulateServiceCatalogDropDownList(object? selectedService = null)
+    {
+        var catalogue = await _jobServiceDetailService.GetServiceCatalogAsync();
+        var catalogueList = catalogue.Select(c => new
+        {
+            c.Id,
+            DisplayText = $"{c.Name} - {c.BasePrice:C} ({c.EstimatedDurationMinutes} min)"
+        }).ToList();
+
+        ViewBag.ServiceCatalogue = new SelectList(catalogueList, "Id", "DisplayText", selectedService);
     }
 
     [HttpGet]

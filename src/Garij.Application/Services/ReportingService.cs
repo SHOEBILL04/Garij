@@ -10,11 +10,16 @@ namespace Garij.Application.Services;
 public class ReportingService : IReportingService
 {
     private readonly GarijDbContext _context;
+    private readonly IPartsInventoryService _partsInventoryService;
     private readonly ICurrentGarageService? _currentGarageService;
 
-    public ReportingService(GarijDbContext context, ICurrentGarageService? currentGarageService = null)
+    public ReportingService(
+        GarijDbContext context,
+        IPartsInventoryService partsInventoryService,
+        ICurrentGarageService? currentGarageService = null)
     {
         _context = context;
+        _partsInventoryService = partsInventoryService;
         _currentGarageService = currentGarageService;
     }
 
@@ -75,10 +80,12 @@ public class ReportingService : IReportingService
             InvoiceCount = b.InvoiceCount
         }).ToList();
 
-        // 2. Collected Revenue: Grouped by PaymentTransaction.PaidAt month
+        // 2. Collected Revenue: Grouped by PaymentTransaction.PaidAt month. A refunded payment was
+        // handed back, so it is not collected revenue; it is reported separately in step 4.
         var collectedQuery = _context.PaymentTransactions.AsNoTracking()
             .Where(pt => (pt.Invoice.GarageId ?? "default-garij-master") == garageId &&
-                         pt.PaidAt >= periodStart && pt.PaidAt <= rangeEnd);
+                         pt.PaidAt >= periodStart && pt.PaidAt <= rangeEnd &&
+                         pt.RefundedAt == null);
 
         var collectedList = await collectedQuery
             .GroupBy(pt => new { pt.PaidAt.Year, pt.PaidAt.Month })
@@ -115,6 +122,16 @@ public class ReportingService : IReportingService
         var refundedInvoiceCount = await refundedQuery.CountAsync();
         var refundedGrossAmount = await refundedQuery.SumAsync(i => (decimal?)i.TotalAmount) ?? 0m;
 
+        // 4. Refunded Payments: received in the period (same PaidAt basis as collected) and since
+        // refunded - exactly what step 2 left out, so collected + refunded = everything received.
+        var refundedPaymentsQuery = _context.PaymentTransactions.AsNoTracking()
+            .Where(pt => (pt.Invoice.GarageId ?? "default-garij-master") == garageId &&
+                         pt.PaidAt >= periodStart && pt.PaidAt <= rangeEnd &&
+                         pt.RefundedAt != null);
+
+        var refundedPaymentCount = await refundedPaymentsQuery.CountAsync();
+        var refundedPaymentAmount = await refundedPaymentsQuery.SumAsync(pt => (decimal?)pt.Amount) ?? 0m;
+
         return new RevenueReportDto
         {
             PeriodStart = periodStart,
@@ -126,6 +143,8 @@ public class ReportingService : IReportingService
             AverageInvoiceValue = avgInvoiceValue,
             RefundedInvoiceCount = refundedInvoiceCount,
             RefundedGrossAmount = refundedGrossAmount,
+            RefundedPaymentCount = refundedPaymentCount,
+            RefundedPaymentAmount = refundedPaymentAmount,
             MonthlyBilledBreakdown = billedItems,
             MonthlyCollectedBreakdown = collectedItems
         };
@@ -251,7 +270,32 @@ public class ReportingService : IReportingService
                            .ThenBy(w => w.FullName);
     }
 
-    public Task<IEnumerable<PartDto>> GetLowStockReportAsync() => throw new NotImplementedException();
+    /// <summary>
+    /// Every part in the current garage at or below its reorder level. Delegates to the inventory
+    /// service's existing low-stock query (PartRepository.GetLowStockAsync, garage-scoped) rather
+    /// than restating the rule, so the report cannot drift from the "Low stock" badge on the Parts
+    /// Inventory screen, which applies the same QuantityInStock &lt;= ReorderLevel test.
+    /// </summary>
+    public async Task<IEnumerable<LowStockReportDto>> GetLowStockReportAsync()
+    {
+        var lowStockParts = await _partsInventoryService.GetLowStockPartsAsync();
+
+        return lowStockParts
+            .Select(p => new LowStockReportDto
+            {
+                PartId = p.Id,
+                PartName = p.Name,
+                PartNumber = p.PartNumber,
+                CurrentStock = p.QuantityInStock,
+                ReorderLevel = p.ReorderLevel,
+                UnitPrice = p.UnitPrice
+            })
+            // Most urgent first: out of stock, then furthest below the reorder level.
+            .OrderByDescending(r => r.IsOutOfStock)
+            .ThenBy(r => r.CurrentStock - r.ReorderLevel)
+            .ThenBy(r => r.PartName)
+            .ToList();
+    }
 
     public Task<IEnumerable<ServiceJobDto>> GetCompletedJobsReportAsync(DateTime periodStart, DateTime periodEnd) => throw new NotImplementedException();
 }

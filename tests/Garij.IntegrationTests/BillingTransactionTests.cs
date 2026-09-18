@@ -128,5 +128,7 @@ public class BillingTransactionTests
         public Task<IEnumerable<ServiceJobDto>> GetJobsByMechanicAsync(int mechanicUserId) => throw new NotImplementedException();
 
         public Task<ServiceJobDto> SaveDiagnosticNotesAsync(int serviceJobId, string notes) => throw new NotImplementedException();
+
+        public Task<NotificationDto> RespondToNotificationAsync(int notificationId, NotificationStatus decision) => throw new NotImplementedException();
     }
 }

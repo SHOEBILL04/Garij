@@ -13,6 +13,12 @@ public class Notification
 
     public string Message { get; set; } = string.Empty;
 
+    /// <summary>
+    /// What the notification is for, which decides whether responding to it acts on the job.
+    /// Recorded explicitly rather than inferred from Message, which is free-form text.
+    /// </summary>
+    public NotificationType Type { get; set; } = NotificationType.JobCompleted;
+
     public NotificationStatus Status { get; set; }
 
     public DateTime CreatedAt { get; set; }
