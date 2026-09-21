@@ -162,7 +162,7 @@ else
                 <div class="app-card h-100 d-flex flex-column" style="border-top: 3px solid @(isCompleted ? "var(--color-success)" : isCancelled ? "var(--color-danger)" : "var(--color-cyan)");">
                     <!-- Card Header: Ref & Status -->
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <span class="font-monospace fw-bold text-info fs-6">@job.BookingReference</span>
+                        <span class="font-monospace fw-bold text-info fs-6">#@job.Id &bull; @job.BookingReference</span>
                         <span class="app-badge @StatusBadgeHelper.BadgeClass(job.Status) ms-2">@job.Status</span>
                     </div>
 
@@ -215,7 +215,7 @@ else
                                     <input type="hidden" name="filterStatus" value="@selectedStatus" />
                                     <input type="hidden" name="sortBy" value="@selectedSortBy" />
                                     <input type="hidden" name="search" value="@searchTerm" />
-                                    <textarea name="diagnosticNotes" maxlength="2000" class="app-form-control mb-2" rows="3" placeholder="Add diagnostic notes...">@job.DiagnosticNotes</textarea>
+                                    <textarea name="diagnosticNotes" class="app-form-control mb-2" rows="3" placeholder="Add diagnostic notes...">@job.DiagnosticNotes</textarea>
                                     <button type="submit" class="app-btn app-btn-primary app-btn-sm w-100">Save Diagnostic Notes</button>
                                 </form>
                             </div>

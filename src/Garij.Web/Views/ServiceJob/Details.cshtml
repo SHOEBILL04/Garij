@@ -1,4 +1,4 @@
-﻿@model Garij.Application.DTOs.ServiceJobDto
+@model Garij.Application.DTOs.ServiceJobDto
 @using Garij.Domain.Enums
 @using Garij.Web.Helpers
 
@@ -9,18 +9,25 @@
 <div class="app-page-header">
     <div>
         <h1 class="app-page-title mb-2">
-            Booking Reference: <span class="font-monospace text-info">@Model.BookingReference</span>
+            Service Job <span class="text-info font-monospace">#@Model.Id</span>
+            <span class="text-secondary fs-6 fw-normal font-monospace ms-2">(@Model.BookingReference)</span>
         </h1>
         <span class="app-badge @StatusBadgeHelper.BadgeClass(Model.Status)">@Model.Status</span>
     </div>
     <div class="d-flex gap-2 flex-wrap">
+        @if (User.IsInRole("Admin") || User.IsInRole("FrontDesk"))
+        {
+            <a asp-controller="Billing" asp-action="Create" asp-route-serviceJobId="@Model.Id" class="app-btn app-btn-success" title="Generate Invoice for Job #@Model.Id">
+                <i class="bi bi-receipt"></i> Generate Invoice
+            </a>
+        }
         <a asp-controller="Parts" asp-action="LogUsage" asp-route-serviceJobId="@Model.Id" class="app-btn app-btn-primary">
             <i class="bi bi-box-seam"></i> Log Parts
         </a>
         <a asp-action="LogService" asp-route-serviceJobId="@Model.Id" class="app-btn app-btn-primary">
             <i class="bi bi-wrench-adjustable"></i> Log Service
         </a>
-        <a asp-controller="Mechanic" asp-action="Assign" asp-route-serviceJobId="@Model.Id" class="app-btn app-btn-success">
+        <a asp-controller="Mechanic" asp-action="Assign" asp-route-serviceJobId="@Model.Id" class="app-btn app-btn-outline">
             <i class="bi bi-person-plus"></i> Assign Mechanic
         </a>
         <a asp-action="Edit" asp-route-id="@Model.Id" class="app-btn app-btn-outline">
@@ -32,7 +39,12 @@
 
 @if (TempData["SuccessMessage"] != null)
 {
-    <div class="app-alert-success"><span><i class="bi bi-check-circle-fill me-2"></i>@TempData["SuccessMessage"]</span></div>
+    <div class="app-alert-success mb-3"><span><i class="bi bi-check-circle-fill me-2"></i>@TempData["SuccessMessage"]</span></div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="app-alert-danger mb-3"><span><i class="bi bi-exclamation-octagon-fill me-2"></i>@TempData["ErrorMessage"]</span></div>
 }
 
 <div class="row g-4">
@@ -41,6 +53,12 @@
         <div class="app-card mb-4">
             <h5 class="app-card-heading"><i class="bi bi-card-checklist me-2 text-info"></i>Job &amp; Vehicle Information</h5>
             <dl class="row mb-0">
+                <dt class="col-sm-4 app-page-subtitle">Service Job ID:</dt>
+                <dd class="col-sm-8 fw-bold text-info font-monospace fs-6">#@Model.Id</dd>
+
+                <dt class="col-sm-4 app-page-subtitle">Booking Reference:</dt>
+                <dd class="col-sm-8 font-monospace text-white">@Model.BookingReference</dd>
+
                 <dt class="col-sm-4 app-page-subtitle">Vehicle License Plate:</dt>
                 <dd class="col-sm-8 fw-bold text-white">@Model.VehiclePlateNumber</dd>
 

@@ -94,7 +94,7 @@
         <div class="col-12 col-sm-6 col-lg-3">
             <label for="search" class="app-form-label small mb-1"><i class="bi bi-search me-1 text-info"></i>Search:</label>
             <div class="input-group">
-                <input type="text" name="search" id="search" class="app-form-control" placeholder="Plate, Ref, Owner..." value="@searchTerm" />
+                <input type="text" name="search" id="search" class="app-form-control" placeholder="Job ID, Plate, Ref, Owner..." value="@searchTerm" />
                 <button type="submit" class="app-btn app-btn-primary" title="Search">
                     <i class="bi bi-search"></i>
                 </button>
@@ -122,7 +122,7 @@
         <table class="app-table mb-0">
             <thead>
                 <tr>
-                    <th>Booking Ref</th>
+                    <th>Job ID</th>
                     <th>Vehicle &amp; Customer</th>
                     <th>Job Type</th>
                     <th>Status</th>
@@ -148,10 +148,13 @@
                     @foreach (var job in Model)
                     {
                         <tr>
-                            <td class="fw-bold">
-                                <a asp-action="Details" asp-route-id="@job.Id" class="text-info text-decoration-none font-monospace">
-                                    @job.BookingReference
+                            <td>
+                                <a asp-action="Details" asp-route-id="@job.Id" class="text-info text-decoration-none fw-bold font-monospace fs-6">
+                                    #@job.Id
                                 </a>
+                                <div class="small text-secondary font-monospace mt-1" title="Booking Reference">
+                                    <i class="bi bi-bookmark me-1"></i>@job.BookingReference
+                                </div>
                             </td>
                             <td>
                                 <div class="fw-semibold text-white">@job.VehiclePlateNumber</div>
@@ -185,6 +188,12 @@
                                     <a asp-action="Details" asp-route-id="@job.Id" class="app-btn app-btn-outline app-btn-sm" title="View Details">View</a>
                                     <a asp-controller="Mechanic" asp-action="Assign" asp-route-serviceJobId="@job.Id" class="app-btn app-btn-outline app-btn-sm" title="Assign Mechanic">Assign</a>
                                     <a asp-action="Edit" asp-route-id="@job.Id" class="app-btn app-btn-outline app-btn-sm" title="Edit Job">Edit</a>
+                                    @if (User.IsInRole("Admin") || User.IsInRole("FrontDesk"))
+                                    {
+                                        <a asp-controller="Billing" asp-action="Create" asp-route-serviceJobId="@job.Id" class="app-btn app-btn-primary app-btn-sm" title="Generate Invoice for Job #@job.Id">
+                                            <i class="bi bi-receipt"></i> Invoice
+                                        </a>
+                                    }
                                 </div>
                             </td>
                         </tr>

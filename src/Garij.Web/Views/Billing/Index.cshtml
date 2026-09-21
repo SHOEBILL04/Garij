@@ -28,7 +28,15 @@
         <div class="col-auto">
             <button type="submit" class="app-btn app-btn-primary"><i class="bi bi-arrow-right-circle"></i> Generate Invoice</button>
         </div>
+        <div class="col-auto">
+            <a asp-controller="ServiceJob" asp-action="Index" class="app-btn app-btn-outline" title="View Service Jobs to find Job ID">
+                <i class="bi bi-search me-1"></i> Browse Service Jobs
+            </a>
+        </div>
     </form>
+    <small class="app-page-subtitle d-block mt-2">
+        <i class="bi bi-info-circle me-1 text-info"></i> Enter the numeric Job ID (e.g. <strong>1</strong>) shown in the <strong>Job ID</strong> column of the <a asp-controller="ServiceJob" asp-action="Index" class="text-info text-decoration-underline">Service Jobs list</a>.
+    </small>
 </div>
 
 <div class="app-table-wrap">

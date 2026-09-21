@@ -88,7 +88,9 @@ public class ServiceJobService : IServiceJobService
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
             var term = searchTerm.Trim();
+            var isNumeric = int.TryParse(term.TrimStart('#'), out var parsedId);
             jobs = jobs.Where(j =>
+                (isNumeric && j.Id == parsedId) ||
                 j.BookingReference.Contains(term, StringComparison.OrdinalIgnoreCase) ||
                 (j.Vehicle != null && j.Vehicle.LicensePlateNumber.Contains(term, StringComparison.OrdinalIgnoreCase)) ||
                 (j.Customer != null && j.Customer.FullName.Contains(term, StringComparison.OrdinalIgnoreCase)) ||
