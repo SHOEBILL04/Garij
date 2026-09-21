@@ -2892,9 +2892,10 @@ body.landing-page-body {
     }
 
     .main-navbar-sticky .navbar-main-links {
-        flex: 1 1 auto;
+        flex: 0 1 auto;
         min-width: 0;
         flex-wrap: nowrap !important;
+        margin-left: 1.5rem;
     }
 
     .main-navbar-sticky .nav-link {

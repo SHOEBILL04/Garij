@@ -17,14 +17,7 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
 
-    <!-- Color Scheme & Instant Theme Initializer (Prevents FOUC) -->
-    <meta name="color-scheme" content="dark light" />
-    <script>
-        (function () {
-            var theme = localStorage.getItem('garij_theme') || 'dark';
-            document.documentElement.setAttribute('data-theme', theme);
-        })();
-    </script>
+    <meta name="color-scheme" content="dark" />
 
     <!-- Landing design tokens (fonts, palette, navbar/button component classes) + app-specific components -->
     <link rel="stylesheet" href="~/css/landing.css" asp-append-version="true" />
@@ -150,7 +143,7 @@
                         {
                             <a asp-controller="Purchase" asp-action="Status" class="btn btn-sm btn-outline-info rounded-pill px-3 py-1 font-monospace d-inline-flex align-items-center gap-1" title="View Lifetime License Certificate">
                                 <i class="bi bi-shield-check text-info"></i>
-                                <span class="nav-compact-label small fw-bold">LIFETIME LICENSE</span>
+                                <span class="nav-compact-label">LIFETIME LICENSE</span>
                             </a>
                         }
                         else
@@ -162,7 +155,7 @@
                         }
                         <a class="btn-nav-glow-lookup" href="/#status-tracker">
                             <i class="bi bi-search"></i>
-                            <span class="nav-compact-label small fw-bold">Status Lookup</span>
+                            <span class="nav-compact-label">Status Lookup</span>
                         </a>
                         @if ((isAdmin || isFrontDesk) && hasLicense)
                         {
@@ -195,7 +188,6 @@
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/theme-toggle.js" asp-append-version="true"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>

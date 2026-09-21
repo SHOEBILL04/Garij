@@ -4,11 +4,6 @@
 
 @if (SignInManager.IsSignedIn(User))
 {
-    <!-- Theme icon first; account name and logout remain adjacent. -->
-    <button type="button" class="theme-toggle-btn app-theme-icon-btn" data-theme-toggle title="Toggle Light / Dark Mode" aria-label="Toggle Light and Dark Mode">
-        <i class="bi bi-sun-fill theme-toggle-icon text-warning"></i>
-    </button>
-
     <span class="d-inline-flex align-items-center gap-1 app-user-pill small fw-semibold px-2 py-1 rounded-pill" title="Logged in as @User.Identity?.Name">
         <i class="bi bi-person-circle text-info fs-6 flex-shrink-0"></i>
         <span class="app-user-name">@User.Identity?.Name</span>
@@ -21,11 +16,6 @@
 }
 else
 {
-    <!-- Theme Switcher Option at Side of Profile / Auth Buttons -->
-    <button type="button" class="theme-toggle-btn app-theme-icon-btn" data-theme-toggle title="Toggle Light / Dark Mode" aria-label="Toggle Light and Dark Mode">
-        <i class="bi bi-sun-fill theme-toggle-icon text-warning"></i>
-    </button>
-
     <a class="btn-nav-glow-register" asp-area="" asp-controller="Account" asp-action="Register">
         <i class="bi bi-person-plus"></i>
         <span>Create Account</span>

@@ -14,14 +14,7 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
 
-    <!-- Color Scheme & Instant Theme Initializer (Prevents FOUC) -->
-    <meta name="color-scheme" content="dark light" />
-    <script>
-        (function () {
-            var theme = localStorage.getItem('garij_theme') || 'dark';
-            document.documentElement.setAttribute('data-theme', theme);
-        })();
-    </script>
+    <meta name="color-scheme" content="dark" />
 
     <!-- Landing design tokens (fonts, palette) + Auth-specific styles -->
     <link rel="stylesheet" href="~/css/landing.css" asp-append-version="true" />
@@ -40,10 +33,6 @@
             <span class="font-ethnocentric">GARIJ</span>
             <span class="brand-glow-dot"></span>
         </a>
-        <button type="button" class="theme-toggle-btn ms-auto" data-theme-toggle title="Toggle Light / Dark Mode" aria-label="Toggle Light and Dark Mode">
-            <i class="bi bi-sun-fill theme-toggle-icon text-warning"></i>
-            <span class="theme-toggle-text d-none d-sm-inline">Light</span>
-        </button>
     </div>
 
     <main class="auth-shell">
@@ -56,7 +45,6 @@
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/theme-toggle.js" asp-append-version="true"></script>
     <script src="~/js/auth.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>

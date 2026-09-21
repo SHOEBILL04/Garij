@@ -1,6 +1,9 @@
+using Microsoft.AspNetCore.Mvc.Testing;
+using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Text.RegularExpressions;
-using Microsoft.AspNetCore.Mvc.Testing;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Garij.IntegrationTests;
@@ -444,7 +447,7 @@ public class ProjectPurchaseIntegrationTests : IClassFixture<AuthorizationTestFa
     }
 
     [Fact]
-    public async Task Pages_RenderThemeToggleAndInitializer_ForLightAndDarkMode()
+    public async Task Pages_DoNotRenderRemovedThemeToggle()
     {
         // Arrange
         var client = _factory.CreateClient();
@@ -454,10 +457,9 @@ public class ProjectPurchaseIntegrationTests : IClassFixture<AuthorizationTestFa
         Assert.Equal(HttpStatusCode.OK, landingResponse.StatusCode);
         var landingHtml = await landingResponse.Content.ReadAsStringAsync();
 
-        // Assert 1: Has theme initializer in head and toggle button
-        Assert.Contains("garij_theme", landingHtml);
-        Assert.Contains("data-theme-toggle", landingHtml);
-        Assert.Contains("theme-toggle.js", landingHtml);
+        // The user-facing light/dark control and its handler were intentionally removed.
+        Assert.DoesNotContain("data-theme-toggle", landingHtml);
+        Assert.DoesNotContain("theme-toggle.js", landingHtml);
 
         // Act 2: Login Page
         var loginResponse = await client.GetAsync("/Account/Login");
