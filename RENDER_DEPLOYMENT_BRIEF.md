@@ -356,7 +356,10 @@ No migrations were created or regenerated for the deployment. The existing migra
 | JSON Configuration Key | Render Environment Variable Name | Purpose | Shape / Example Value | Required? |
 | :--- | :--- | :--- | :--- | :--- |
 | `ConnectionStrings:DefaultConnection` | `ConnectionStrings__DefaultConnection` | Database connection string for EF Core | `Data Source=Garij.db` *(SQLite)* or `Server=<host>;Database=<db>;User Id=<user>;Password=<password>;TrustServerCertificate=True;` *(SQL Server)* | **No** (Defaults in code to `Data Source=Garij.db`) |
-| `GeminiSettings:ApiKey` | `GeminiSettings__ApiKey` | Google Gemini API key for AI diagnostic suggestions | Secret API string (e.g., `AIzaSy...`) | **No** (App gracefully handles empty key; shows notice on intake form) |
+| `GroqSettings:ApiKey` | `GroqSettings__ApiKey` | Groq API key for AI diagnostic suggestions | Secret API string (e.g., `gsk_...`) | **No** (App gracefully handles empty key; shows notice on intake form) |
+| `GroqSettings:Model` | `GroqSettings__Model` | Groq AI model identifier | `openai/gpt-oss-120b` | **No** (Defaults to `openai/gpt-oss-120b`) |
+| `GroqSettings:BaseUrl` | `GroqSettings__BaseUrl` | Groq OpenAI-compatible REST base endpoint | `https://api.groq.com/openai/v1/` | **No** (Defaults in config) |
+| `GeminiSettings:ApiKey` | `GeminiSettings__ApiKey` | Legacy Google Gemini API key (optional fallback) | Secret API string | **No** (Optional) |
 | `GeminiSettings:Model` | `GeminiSettings__Model` | Gemini AI model identifier | `gemini-3.6-flash` | **No** (Defaults in config) |
 | `GeminiSettings:BaseUrl` | `GeminiSettings__BaseUrl` | Google Generative Language REST base endpoint | `https://generativelanguage.googleapis.com/v1beta/` | **No** (Defaults in config) |
 | `BillingSettings:TaxRatePercent` | `BillingSettings__TaxRatePercent` | Invoice tax percentage rate | `15` | **No** (Defaults to 15) |
@@ -538,7 +541,8 @@ Open a web browser and visit: `http://localhost:8080/`
 - [ ] **Configured Environment Variables (Names Only):**
   - [ ] `PORT` *(Render System Managed)*
   - [ ] `ASPNETCORE_ENVIRONMENT` *(Value: Production)*
-  - [ ] `GeminiSettings__ApiKey` *(Configured: [ ] Yes  [ ] No)*
+  - [ ] `GroqSettings__ApiKey` *(Configured: [ ] Yes  [ ] No)*
+  - [ ] `GeminiSettings__ApiKey` *(Legacy: [ ] Yes  [ ] No)*
   - [ ] `ConnectionStrings__DefaultConnection` *(Configured: [ ] Yes  [ ] No)*
   - [ ] Other: `____________________________________`
 - [ ] **Persistent Disk Attached:** `[ ] Yes  [ ] No`
