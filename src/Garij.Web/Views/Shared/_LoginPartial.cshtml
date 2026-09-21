@@ -4,18 +4,17 @@
 
 @if (SignInManager.IsSignedIn(User))
 {
-    <span class="d-inline-flex align-items-center gap-1 app-user-pill small fw-semibold me-1 px-2 py-1 rounded-pill" title="Logged in as @User.Identity?.Name">
-        <i class="bi bi-person-circle text-info fs-6"></i>
-        <span class="d-none d-md-inline">@User.Identity?.Name</span>
-    </span>
-
-    <!-- Theme Switcher Option at Side of Profile -->
-    <button type="button" class="theme-toggle-btn" data-theme-toggle title="Toggle Light / Dark Mode" aria-label="Toggle Light and Dark Mode">
+    <!-- Theme icon first; account name and logout remain adjacent. -->
+    <button type="button" class="theme-toggle-btn app-theme-icon-btn" data-theme-toggle title="Toggle Light / Dark Mode" aria-label="Toggle Light and Dark Mode">
         <i class="bi bi-sun-fill theme-toggle-icon text-warning"></i>
-        <span class="theme-toggle-text d-none d-md-inline">Light</span>
     </button>
 
-    <a class="btn-nav-glow-register" asp-area="" asp-controller="Account" asp-action="Logout" title="Sign out">
+    <span class="d-inline-flex align-items-center gap-1 app-user-pill small fw-semibold px-2 py-1 rounded-pill" title="Logged in as @User.Identity?.Name">
+        <i class="bi bi-person-circle text-info fs-6 flex-shrink-0"></i>
+        <span class="app-user-name">@User.Identity?.Name</span>
+    </span>
+
+    <a class="btn-nav-glow-register app-logout-btn" asp-area="" asp-controller="Account" asp-action="Logout" title="Sign out">
         <i class="bi bi-box-arrow-right"></i>
         <span class="d-none d-sm-inline">Logout</span>
     </a>
@@ -23,9 +22,8 @@
 else
 {
     <!-- Theme Switcher Option at Side of Profile / Auth Buttons -->
-    <button type="button" class="theme-toggle-btn" data-theme-toggle title="Toggle Light / Dark Mode" aria-label="Toggle Light and Dark Mode">
+    <button type="button" class="theme-toggle-btn app-theme-icon-btn" data-theme-toggle title="Toggle Light / Dark Mode" aria-label="Toggle Light and Dark Mode">
         <i class="bi bi-sun-fill theme-toggle-icon text-warning"></i>
-        <span class="theme-toggle-text d-none d-md-inline">Light</span>
     </button>
 
     <a class="btn-nav-glow-register" asp-area="" asp-controller="Account" asp-action="Register">
@@ -37,4 +35,3 @@ else
         <span>Login</span>
     </a>
 }
-

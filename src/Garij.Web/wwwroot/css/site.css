@@ -1116,3 +1116,288 @@ textarea.app-form-control {
     color: #334155 !important;
 }
 
+
+/* ==========================================================================
+   APP NAVBAR REFINEMENT — single-row desktop, safe collapse on smaller widths
+   ========================================================================== */
+
+.app-body .main-navbar-sticky {
+    min-height: 72px;
+    overflow: visible;
+}
+
+    .app-body .main-navbar-sticky > .container-fluid {
+        width: 100%;
+        min-width: 0;
+        max-width: none;
+    }
+
+    .app-body .main-navbar-sticky .navbar-brand {
+        flex: 0 0 auto;
+        min-width: 0;
+        margin-right: 0.85rem;
+    }
+
+    .app-body .main-navbar-sticky .navbar-collapse {
+        min-width: 0;
+        align-items: center;
+    }
+
+    .app-body .main-navbar-sticky .navbar-main-links {
+        flex: 1 1 auto;
+        min-width: 0;
+        flex-wrap: nowrap !important;
+        align-items: center;
+        gap: 0.05rem;
+    }
+
+    .app-body .main-navbar-sticky .nav-link {
+        font-size: 0.76rem;
+        letter-spacing: 1.05px;
+        padding: 0.5rem 0.72rem !important;
+        margin: 0;
+        white-space: nowrap;
+    }
+
+    .app-body .main-navbar-sticky .navbar-actions {
+        flex: 0 0 auto;
+        min-width: 0;
+        margin-left: auto;
+        gap: 0.45rem !important;
+        white-space: nowrap;
+        align-items: center;
+    }
+
+        .app-body .main-navbar-sticky .navbar-actions > * {
+            flex: 0 0 auto;
+        }
+
+        .app-body .main-navbar-sticky .navbar-actions .btn,
+        .app-body .main-navbar-sticky .navbar-actions .btn-nav-glow-lookup,
+        .app-body .main-navbar-sticky .navbar-actions .app-bell-btn,
+        .app-body .main-navbar-sticky .navbar-actions a,
+        .app-body .main-navbar-sticky .navbar-actions button {
+            white-space: nowrap;
+        }
+
+        .app-body .main-navbar-sticky .navbar-actions .btn {
+            min-height: 38px;
+        }
+
+    .app-body .main-navbar-sticky .btn-nav-glow-lookup {
+        min-height: 38px;
+        padding: 0.45rem 0.85rem !important;
+        border-radius: 12px;
+    }
+
+    .app-body .main-navbar-sticky .app-bell-btn {
+        flex: 0 0 38px;
+        width: 38px;
+        height: 38px;
+    }
+
+    .app-body .main-navbar-sticky .navbar-toggler {
+        flex: 0 0 auto;
+        margin-left: auto;
+    }
+
+    .app-body .main-navbar-sticky .brand-title {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+/* Collapse before the desktop composition can wrap or overflow. */
+@media (max-width: 1399.98px) {
+    .app-body .main-navbar-sticky .container-fluid {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+
+    .app-body .main-navbar-sticky .navbar-collapse {
+        flex-basis: 100%;
+        width: 100%;
+        margin-top: 0.65rem;
+        padding: 0.65rem;
+        border: 1px solid rgba(0, 168, 255, 0.18);
+        border-radius: 14px;
+        background: rgba(11, 14, 19, 0.96);
+        box-shadow: 0 14px 32px rgba(0,0,0,0.45);
+    }
+
+        .app-body .main-navbar-sticky .navbar-collapse.show {
+            display: flex !important;
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+    .app-body .main-navbar-sticky .navbar-main-links {
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+        flex-wrap: nowrap !important;
+        margin: 0 !important;
+    }
+
+        .app-body .main-navbar-sticky .navbar-main-links .nav-item,
+        .app-body .main-navbar-sticky .navbar-main-links .nav-link {
+            width: 100%;
+        }
+
+    .app-body .main-navbar-sticky .navbar-actions {
+        width: 100%;
+        margin: 0.65rem 0 0 !important;
+        padding-top: 0.65rem;
+        border-top: 1px solid rgba(255,255,255,0.08);
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+        .app-body .main-navbar-sticky .navbar-actions .app-user-pill {
+            max-width: 320px;
+        }
+}
+
+@media (max-width: 575.98px) {
+    .app-body .main-navbar-sticky {
+        min-height: 64px;
+    }
+
+        .app-body .main-navbar-sticky .navbar-actions {
+            justify-content: stretch;
+        }
+
+            .app-body .main-navbar-sticky .navbar-actions > * {
+                flex: 1 1 auto;
+            }
+
+            .app-body .main-navbar-sticky .navbar-actions .app-bell-btn {
+                flex: 0 0 38px;
+            }
+}
+
+@media (max-width: 1399.98px) {
+    [data-theme="light"] .app-body .main-navbar-sticky .navbar-collapse {
+        background: rgba(255,255,255,0.98);
+        border-color: #e2e8f0;
+        box-shadow: 0 14px 32px rgba(15,23,42,0.08);
+    }
+
+    [data-theme="light"] .app-body .main-navbar-sticky .navbar-actions {
+        border-top-color: #e2e8f0;
+    }
+}
+
+
+/* ==========================================================================
+   NAVBAR FINAL OVERLAP FIX — v3
+   ========================================================================== */
+
+.app-body .main-navbar-sticky .navbar-actions {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    gap: 0.4rem !important;
+    min-width: 0;
+    overflow: visible;
+}
+
+    .app-body .main-navbar-sticky .navbar-actions > .app-theme-icon-btn {
+        order: 1;
+        flex: 0 0 38px !important;
+        width: 38px;
+        min-width: 38px;
+        height: 38px;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .app-body .main-navbar-sticky .navbar-actions > .app-user-pill {
+        order: 2;
+        flex: 0 1 auto !important;
+        min-width: 0;
+        max-width: min(240px, 18vw);
+        margin: 0 !important;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+
+        .app-body .main-navbar-sticky .navbar-actions > .app-user-pill .app-user-name {
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+    .app-body .main-navbar-sticky .navbar-actions > .app-logout-btn {
+        order: 3;
+        flex: 0 0 auto !important;
+        margin: 0 !important;
+        white-space: nowrap;
+    }
+
+    .app-body .main-navbar-sticky .navbar-actions > .app-bell-btn {
+        order: 0;
+        flex: 0 0 38px !important;
+    }
+
+    .app-body .main-navbar-sticky .navbar-actions .app-theme-icon-btn .theme-toggle-text {
+        display: none !important;
+    }
+
+    .app-body .main-navbar-sticky .navbar-actions .nav-compact-label {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        line-height: 1.02;
+        min-width: 0;
+        white-space: normal;
+        font-size: 0.62rem;
+        letter-spacing: 0.7px;
+    }
+
+        .app-body .main-navbar-sticky .navbar-actions .nav-compact-label > span {
+            display: block;
+        }
+
+    .app-body .main-navbar-sticky .navbar-actions .btn-outline-info {
+        min-width: 106px;
+        height: 38px;
+        padding: 0.2rem 0.6rem !important;
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        gap: 0.3rem;
+    }
+
+    .app-body .main-navbar-sticky .navbar-actions .btn-nav-glow-lookup {
+        min-width: 106px;
+        height: 38px;
+        padding: 0.2rem 0.6rem !important;
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        gap: 0.3rem;
+    }
+
+@media (min-width: 1400px) {
+    .app-body .main-navbar-sticky .navbar-main-links {
+        gap: 0 !important;
+    }
+
+        .app-body .main-navbar-sticky .navbar-main-links .nav-link {
+            padding-left: 0.6rem !important;
+            padding-right: 0.6rem !important;
+        }
+}
+
+@media (max-width: 1399.98px) {
+    .app-body .main-navbar-sticky .navbar-actions {
+        flex-wrap: wrap !important;
+    }
+
+        .app-body .main-navbar-sticky .navbar-actions > .app-user-pill {
+            max-width: 100%;
+        }
+}

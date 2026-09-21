@@ -33,7 +33,7 @@
 </head>
 <body class="app-body">
     <header>
-        <nav class="navbar navbar-expand-lg main-navbar-sticky py-3">
+        <nav class="navbar navbar-expand-xxl main-navbar-sticky py-3">
             <div class="container-fluid px-lg-4">
                 @{
                     var isAdmin = User.IsInRole("Admin");
@@ -47,7 +47,7 @@
                         ? (await NotificationService.GetPendingNotificationsAsync()).Count()
                         : 0;
                 }
-                <a class="navbar-brand d-flex align-items-center gap-2 py-0" asp-area="" asp-controller="@(hasLicense ? (isMechanic ? "Mechanic" : "Dashboard") : "Home")" asp-action="@(hasLicense && isMechanic ? "JobBoard" : "Index")" title="@garageName">
+                <a class="navbar-brand app-navbar-brand d-flex align-items-center gap-2 py-0" asp-area="" asp-controller="@(hasLicense ? (isMechanic ? "Mechanic" : "Dashboard") : "Home")" asp-action="@(hasLicense && isMechanic ? "JobBoard" : "Index")" title="@garageName">
                     <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 38px; height: 38px; background: rgba(6, 182, 212, 0.15); border: 1px solid rgba(6, 182, 212, 0.4);">
                         <i class="bi bi-gear-wide-connected text-info fs-5"></i>
                     </div>
@@ -61,7 +61,7 @@
                     <i class="bi bi-list text-info fs-2"></i>
                 </button>
                 <div class="navbar-collapse collapse" id="appNavbar">
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0 flex-wrap">
+                    <ul class="navbar-nav navbar-main-links me-auto mb-2 mb-xxl-0 flex-wrap">
                         @if (!hasLicense)
                         {
                             <!-- Public Presentation Links (Only for unlicensed visitors) -->
@@ -145,13 +145,12 @@
                         }
                     </ul>
 
-                    <div class="d-flex align-items-center flex-wrap gap-2">
-
+                    <div class="navbar-actions d-flex align-items-center flex-wrap gap-2">
                         @if (hasLicense)
                         {
                             <a asp-controller="Purchase" asp-action="Status" class="btn btn-sm btn-outline-info rounded-pill px-3 py-1 font-monospace d-inline-flex align-items-center gap-1" title="View Lifetime License Certificate">
                                 <i class="bi bi-shield-check text-info"></i>
-                                <span class="d-none d-md-inline small fw-bold">LIFETIME LICENSE</span>
+                                <span class="nav-compact-label small fw-bold">LIFETIME LICENSE</span>
                             </a>
                         }
                         else
@@ -163,7 +162,7 @@
                         }
                         <a class="btn-nav-glow-lookup" href="/#status-tracker">
                             <i class="bi bi-search"></i>
-                            <span>Status Lookup</span>
+                            <span class="nav-compact-label small fw-bold">Status Lookup</span>
                         </a>
                         @if ((isAdmin || isFrontDesk) && hasLicense)
                         {

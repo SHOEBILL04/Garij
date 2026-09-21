@@ -61,7 +61,7 @@
     </div>
 
     <!-- 2. Sticky Main Navigation Bar -->
-    <nav class="navbar navbar-expand-lg main-navbar-sticky py-3">
+    <nav class="navbar navbar-expand-xxl main-navbar-sticky py-3">
         <div class="container-fluid px-lg-5 d-flex justify-content-between align-items-center">
             <a class="navbar-brand text-decoration-none py-0" asp-controller="Home" asp-action="Index">
                 <div class="brand-emblem-wrap">
@@ -80,13 +80,13 @@
             </a>
 
             <!-- Mobile Navbar Toggler (Clean, no sidebar) -->
-            <button class="navbar-toggler border-0 text-light d-lg-none p-2" type="button" data-bs-toggle="collapse" data-bs-target="#landingNavbarNav" aria-controls="landingNavbarNav" aria-expanded="false" aria-label="Toggle navigation menu">
+            <button class="navbar-toggler border-0 text-light d-xxl-none p-2" type="button" data-bs-toggle="collapse" data-bs-target="#landingNavbarNav" aria-controls="landingNavbarNav" aria-expanded="false" aria-label="Toggle navigation menu">
                 <i class="bi bi-list fs-2 text-info"></i>
             </button>
 
             <!-- Navigation Links (Centered, collapsible on mobile) -->
             <div class="collapse navbar-collapse justify-content-center" id="landingNavbarNav">
-                <ul class="navbar-nav mx-auto mb-2 mb-lg-0 gap-2 gap-lg-4 text-center py-2 py-lg-0">
+                <ul class="navbar-nav navbar-main-links mx-auto mb-2 mb-xxl-0 gap-2 gap-xxl-4 text-center py-2 py-lg-0">
                     <li class="nav-item">
                         <a class="nav-link" asp-controller="Home" asp-action="Index">HOME</a>
                     </li>
@@ -129,7 +129,7 @@
                 <!-- Status Lookup Quick Button -->
                 <a href="/#status-tracker" class="btn-nav-status-pill d-none d-lg-inline-flex" title="Track your vehicle service progress">
                     <i class="bi bi-radar text-info"></i>
-                    <span>Status Lookup</span>
+                    <span class="nav-compact-label small fw-bold">Status Lookup</span>
                 </a>
 
                 @if (isUserSignedIn)
@@ -172,7 +172,7 @@
                     <!-- Theme Switcher Option at Side of Profile -->
                     <button type="button" class="theme-toggle-btn" data-theme-toggle title="Toggle Light / Dark Mode" aria-label="Toggle Light and Dark Mode">
                         <i class="bi bi-sun-fill theme-toggle-icon text-warning"></i>
-                        <span class="theme-toggle-text d-none d-md-inline">Light</span>
+                        
                     </button>
 
                     <a asp-controller="Account" asp-action="Logout" class="btn-nav-glow-register d-none d-sm-inline-flex" title="Sign out">
@@ -185,7 +185,7 @@
                     <!-- Theme Switcher Option at Side of Profile / Login -->
                     <button type="button" class="theme-toggle-btn" data-theme-toggle title="Toggle Light / Dark Mode" aria-label="Toggle Light and Dark Mode">
                         <i class="bi bi-sun-fill theme-toggle-icon text-warning"></i>
-                        <span class="theme-toggle-text d-none d-md-inline">Light</span>
+                        
                     </button>
 
                     <a asp-controller="Account" asp-action="Login" class="btn-nav-glow-login d-inline-flex">
