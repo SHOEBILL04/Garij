@@ -5,6 +5,7 @@ using Garij.Application.Interfaces;
 using Garij.Domain.Entities;
 using Garij.Domain.Enums;
 using Garij.Infrastructure.ExternalServices.Gemini;
+using Garij.Infrastructure.ExternalServices.Groq;
 using Garij.Infrastructure.Persistence;
 using Garij.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -19,22 +20,44 @@ public class IntelligenceService : IIntelligenceService
 {
     private readonly GarijDbContext? _context;
     private readonly ILlmClient? _llmClient;
-    private readonly GeminiSettings _settings;
+    private readonly GroqSettings _groqSettings;
+    private readonly GeminiSettings _geminiSettings;
+    private readonly bool _hasGroqConfig;
     private readonly ILogger<IntelligenceService> _logger;
     private readonly IVehicleRepository _vehicleRepository;
     private readonly IServiceJobRepository _serviceJobRepository;
     private readonly ICurrentGarageService? _currentGarageService;
 
+    public IntelligenceService(GarijDbContext context)
+        : this(context, null, null, null, null, null)
+    {
+    }
+
+    // Backward-compatible constructor for existing tests and callers
+    public IntelligenceService(
+        GarijDbContext context,
+        ILlmClient? llmClient,
+        IOptions<GeminiSettings>? settings,
+        ILogger<IntelligenceService>? logger = null,
+        ICurrentGarageService? currentGarageService = null)
+        : this(context, llmClient, null, settings, logger, currentGarageService)
+    {
+    }
+
+    [ActivatorUtilitiesConstructor]
     public IntelligenceService(
         GarijDbContext context,
         ILlmClient? llmClient = null,
-        IOptions<GeminiSettings>? settings = null,
+        IOptions<GroqSettings>? groqSettings = null,
+        IOptions<GeminiSettings>? geminiSettings = null,
         ILogger<IntelligenceService>? logger = null,
         ICurrentGarageService? currentGarageService = null)
     {
         _context = context;
         _llmClient = llmClient;
-        _settings = settings?.Value ?? new GeminiSettings();
+        _hasGroqConfig = groqSettings != null;
+        _groqSettings = groqSettings?.Value ?? new GroqSettings();
+        _geminiSettings = geminiSettings?.Value ?? new GeminiSettings();
         _logger = logger ?? NullLogger<IntelligenceService>.Instance;
         _vehicleRepository = new VehicleRepository(context);
         _serviceJobRepository = new ServiceJobRepository(context);
@@ -252,13 +275,20 @@ public class IntelligenceService : IIntelligenceService
             };
         }
 
-        if (string.IsNullOrWhiteSpace(_settings.ApiKey))
+        var effectiveApiKey = !string.IsNullOrWhiteSpace(_groqSettings.ApiKey)
+            ? _groqSettings.ApiKey
+            : (!string.IsNullOrWhiteSpace(_geminiSettings.ApiKey)
+                ? _geminiSettings.ApiKey
+                : Environment.GetEnvironmentVariable("GROQ_API_KEY"));
+
+        if (string.IsNullOrWhiteSpace(effectiveApiKey))
         {
+            var providerName = _hasGroqConfig ? "Groq" : "Gemini";
             return new IntakeSuggestionResponseDto
             {
                 Success = false,
                 IsConfigured = false,
-                ErrorMessage = "Gemini API key is not configured. Suggestions are currently disabled."
+                ErrorMessage = $"{providerName} API key is not configured. Suggestions are currently disabled."
             };
         }
 
@@ -428,7 +458,7 @@ STRICT CONSTRAINTS:
             {
                 Success = false,
                 ErrorMessage = $"Smart Intake error: {ex.Message}",
-                IsConfigured = !string.IsNullOrWhiteSpace(_settings.ApiKey)
+                IsConfigured = !string.IsNullOrWhiteSpace(effectiveApiKey)
             };
         }
     }

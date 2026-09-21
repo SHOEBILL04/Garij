@@ -1,6 +1,7 @@
 using Garij.Application.Services;
 using Garij.Domain.Entities;
 using Garij.Infrastructure.ExternalServices.Gemini;
+using Garij.Infrastructure.ExternalServices.Groq;
 using Garij.Infrastructure.Persistence;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
@@ -150,5 +151,104 @@ public class IntakeAssistantTests : IDisposable
         Assert.False(result.Success);
         Assert.False(result.IsConfigured);
         Assert.Contains("Gemini API key is not configured", result.ErrorMessage);
+    }
+
+    [Fact]
+    public async Task SuggestServicesForIntakeAsync_WhenGroqApiKeyMissing_DegradesGracefullyWithoutThrowing()
+    {
+        // Arrange
+        var groqSettings = Options.Create(new GroqSettings
+        {
+            ApiKey = "", // Missing API key
+            Model = "openai/gpt-oss-120b"
+        });
+
+        var mockLlm = new FakeLlmClient("{}");
+        var service = new IntelligenceService(_context, mockLlm, groqSettings, null, NullLogger<IntelligenceService>.Instance);
+
+        // Act
+        var result = await service.SuggestServicesForIntakeAsync("Alternator whining noise.");
+
+        // Assert
+        Assert.False(result.Success);
+        Assert.False(result.IsConfigured);
+        Assert.Contains("Groq API key is not configured", result.ErrorMessage);
+    }
+
+    [Fact]
+    public async Task SuggestServicesForIntakeAsync_WithGroqConfigured_ReturnsGroundedSuggestions()
+    {
+        // Arrange
+        var catalogItem = new ServiceCatalog
+        {
+            Id = 5,
+            Name = "Synthetic Oil & Filter Change",
+            Description = "Full synthetic motor oil replacement",
+            BasePrice = 85.00m,
+            EstimatedDurationMinutes = 45
+        };
+        _context.ServiceCatalogs.Add(catalogItem);
+        await _context.SaveChangesAsync();
+
+        const string fixtureJson = @"{
+  ""summary"": ""Routine synthetic oil service recommended."",
+  ""suggestions"": [
+    {
+      ""serviceCatalogId"": 5,
+      ""serviceName"": ""Synthetic Oil & Filter Change"",
+      ""reason"": ""Oil service interval reached."",
+      ""confidence"": 0.98
+    }
+  ],
+  ""clarifyingQuestions"": [
+    ""When was your last oil change?""
+  ]
+}";
+
+        var mockLlm = new FakeLlmClient(fixtureJson);
+        var groqSettings = Options.Create(new GroqSettings
+        {
+            ApiKey = "test-groq-key",
+            Model = "openai/gpt-oss-120b"
+        });
+
+        var service = new IntelligenceService(_context, mockLlm, groqSettings, null, NullLogger<IntelligenceService>.Instance);
+
+        // Act
+        var result = await service.SuggestServicesForIntakeAsync("Engine oil light is flickering.");
+
+        // Assert
+        Assert.True(result.Success);
+        Assert.Equal("Routine synthetic oil service recommended.", result.Summary);
+        Assert.Single(result.Suggestions);
+        Assert.Equal(5, result.Suggestions[0].ServiceCatalogId);
+        Assert.Equal("Synthetic Oil & Filter Change", result.Suggestions[0].ServiceName);
+        Assert.Equal(85.00m, result.Suggestions[0].BasePrice);
+        Assert.Single(result.ClarifyingQuestions);
+    }
+
+    [Fact]
+    public async Task GroqClient_LiveApiCheck_ReturnsValidResponse()
+    {
+        var apiKey = Environment.GetEnvironmentVariable("GROQ_API_KEY");
+        if (string.IsNullOrWhiteSpace(apiKey))
+        {
+            return; // Skip live network call when key is not set in environment
+        }
+
+        var settings = Options.Create(new GroqSettings
+        {
+            ApiKey = apiKey,
+            Model = "openai/gpt-oss-120b"
+        });
+        using var httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(30) };
+        var client = new GroqClient(httpClient, settings, NullLogger<GroqClient>.Instance);
+
+        var result = await client.GenerateJsonContentAsync(
+            "You are a helpful assistant. Output JSON.",
+            "Return JSON with key result equal to ok.",
+            "{}");
+
+        Assert.Contains("ok", result);
     }
 }
