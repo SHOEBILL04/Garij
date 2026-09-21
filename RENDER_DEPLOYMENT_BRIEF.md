@@ -549,7 +549,7 @@ Open a web browser and visit: `http://localhost:8080/`
 - [ ] **Health Check Path Configured:** `_________________________` *(e.g., / or blank)*
 - [ ] **Custom Domain Configured:** `[ ] Yes  [ ] No` *(Live domain: https://garij.onrender.com/)*
 - [ ] **Date of First Successful Deploy:** `_________________________`
-- [ ] **Date / Commit of Latest Deploy:** `_________________________` *(Commit b2d6371)*
+- [ ] **Date / Commit of Latest Deploy:** `_________________________` *(Initial deploy: b2d6371; Latest pushed: d50358c)*
 - [ ] **Typical Build Time on Render:** `_________________________` *(e.g., 2m 15s)*
 - [ ] **Cold-Start Wakeup Time (Free Plan):** `_________________________` *(e.g., 45s)*
 - [ ] **Deploy Failures Encountered & Remediation:**
